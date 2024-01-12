@@ -22,10 +22,6 @@ const Homepage = ({ imageJson }) => {
 
 export default Homepage
 
-// const getStaticProps = () => {
-//   console.log('init--');
-//   return { props: {} }
-// }
 export async function getStaticProps() {
   const res = await fetch('https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json')
   const imageJson = await res.json()
