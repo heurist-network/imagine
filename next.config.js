@@ -1,7 +1,20 @@
 // const { i18n } = require('./next-i18next.config')
 
 module.exports = {
-  output: 'export',
   // i18n,
   trailingSlash: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'raw.githubusercontent.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 's3.us-east-1.amazonaws.com',
+        pathname: '/**',
+      }
+    ]
+  }
 }

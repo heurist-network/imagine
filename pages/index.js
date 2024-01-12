@@ -1,8 +1,40 @@
-// to detect language and automatically redirect to the approprate/[locale] page
-// import { Redirect } from '@/lib/redirect'
-// export default Redirect
+import { useTranslation } from 'next-i18next'
 
-// to keep this root page with the defaultLocale
-import Homepage, { getStaticProps } from './[locale]/index'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
+import ImageBox from '@/components/ImageBox/Index.jsx'
+import ImageDemo from '@/components/ImageBox/demo'
+
+import Link from '@/components/Link'
+
+const Homepage = ({ imageJson }) => {
+  const { t } = useTranslation(['common', 'footer'])
+  console.log('imageJson : --', imageJson);
+  return (
+    <>
+      <main>
+        <ImageBox imageJson={imageJson} />
+        {/* <ImageDemo /> */}
+      </main>
+    </>
+  )
+}
+
 export default Homepage
-export { getStaticProps }
+
+// const getStaticProps = () => {
+//   console.log('init--');
+//   return { props: {} }
+// }
+export async function getStaticProps() {
+  const res = await fetch('https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json')
+  const imageJson = await res.json()
+  // const imageJson = []
+  console.log('repo: --', imageJson);
+  return {
+    props: {
+      imageJson
+    },
+    revalidate: 30,
+  }
+}

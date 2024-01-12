@@ -1,18 +1,20 @@
 import { useTranslation } from 'next-i18next'
-import { getStaticPaths, makeStaticProps } from '@/lib/getStatic'
 
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
+import ImageBox from '@/components/ImageBox/Index.jsx'
+import ImageDemo from '@/components/ImageBox/demo'
 
 import Link from '@/components/Link'
 
-const Homepage = () => {
+const Homepage = ({ imageJson }) => {
   const { t } = useTranslation(['common', 'footer'])
-
+  console.log('imageJson : --', imageJson);
   return (
     <>
       <main>
-
+        <ImageBox imageJson={imageJson} />
+        {/* <ImageDemo /> */}
       </main>
     </>
   )
@@ -20,5 +22,19 @@ const Homepage = () => {
 
 export default Homepage
 
-const getStaticProps = makeStaticProps(['common', 'footer'])
-export { getStaticPaths, getStaticProps }
+// const getStaticProps = () => {
+//   console.log('init--');
+//   return { props: {} }
+// }
+export async function getStaticProps() {
+  const data = {}
+  // https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json
+  const res = await fetch('https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json')
+  const imageJson = await res.json()
+  console.log('repo: --', imageJson);
+  return {
+    props: {
+      imageJson
+    }
+  }
+}
