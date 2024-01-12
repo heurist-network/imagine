@@ -1,9 +1,58 @@
 .root {
 
   :global {
+    .content {
+      h3 {
+        font-size: 12pt;
+        color: #323232;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+
+      .model_title_row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+
+        .model_title {
+          vertical-align: middle;
+          line-height: 120%;
+          font-weight: 600;
+          font-size: 20pt;
+          color: #444444;
+        }
+      }
+
+      .model_creator {
+        margin-top: 10px;
+        font-size: 11pt;
+      }
+
+      .input-form {
+        .input-item {
+          margin-top: 20px;
+        }
+
+        .ant-slider {
+          height: 40px;
+          display: flex;
+          align-items: center;
+          margin: 0 auto;
+        }
+
+        .ant-slider-handle {
+          top: 0px;
+          bottom: 0px;
+          margin: auto;
+        }
+      }
+    }
+
     .image-box {
-      margin-top: 40px;
-      width: 400px;
+      margin-top: 10px;
+      width: 300px;
 
       img {
         border-radius: 10px;
