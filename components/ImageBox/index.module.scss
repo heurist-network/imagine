@@ -2,8 +2,18 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  margin-top: 100px;
+  padding: 0 40px;
+  box-sizing: border-box;
+  margin: 0 auto;
 
   :global {
+    h3 {
+      margin-bottom: 18px;
+      color: #323232;
+      font-weight: 500;
+    }
+
     .image-wrap {
       position: relative;
       width: 100%;
@@ -11,5 +21,34 @@
       // height: 300px;
       height: auto;
     }
+
+    .image-item {
+      // padding: 10px;
+    }
+  }
+}
+
+@media screen and (min-width: 1240px) {
+  .root {
+    min-width: 1200px;
+    width: 1200px;
+  }
+}
+
+@media screen and (max-width: 1240px) and (min-width: 940px) {
+  .root {
+    min-width: 900px;
+  }
+}
+
+@media screen and (max-width: 940px) and (min-width: 640px) {
+  .root {
+    min-width: 600px;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .root {
+    min-width: 300px;
   }
 }

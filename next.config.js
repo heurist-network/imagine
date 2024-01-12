@@ -3,6 +3,7 @@
 module.exports = {
   // i18n,
   trailingSlash: true,
+  transpilePackages: ['antd'],
   images: {
     remotePatterns: [
       {

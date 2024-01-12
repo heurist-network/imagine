@@ -1,0 +1,60 @@
+.root {
+  width: 100%;
+  box-sizing: border-box;
+
+  :global {
+
+    h1,
+    h2,
+    h3,
+    p,
+    span,
+    div {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    }
+
+
+
+    .content {
+      // padding: 0 40px;
+      margin: 100px auto;
+      max-width: 1300px;
+      padding: 0 20px;
+
+      .welcome_text {
+        font-size: 12pt;
+        font-weight: 400;
+        color: #444444;
+        margin-bottom: 20px;
+
+        span {
+          font-weight: 600;
+        }
+      }
+    }
+
+    h1 {
+      line-height: 120%;
+      font-weight: 600;
+      font-size: 36pt;
+      color: #444444;
+
+      span {
+        color: #C57CFF;
+      }
+    }
+
+
+    .text {
+      margin-top: 40px;
+      font-size: 12pt;
+      color: #666666;
+      margin-bottom: 30px;
+
+      span {
+        font-size: 12pt;
+        font-weight: bold;
+      }
+    }
+  }
+}

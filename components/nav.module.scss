@@ -1,0 +1,44 @@
+.root {
+
+  :global {
+    nav {
+      padding: 10px;
+      padding-left: 20px;
+      padding-right: 20px;
+      background-color: #111111;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11pt;
+      color: #ffffff;
+      flex-wrap: wrap;
+
+      .top_nav_left_section {
+        display: flex;
+        align-items: center;
+
+        .logo_text {
+          font-weight: 500;
+          font-size: 16pt;
+          line-height: 32px;
+
+          a {
+            text-decoration: none;
+            color: #ffffff;
+          }
+
+        }
+
+        a {
+          display: flex;
+        }
+
+        img {
+          margin-left: 40px;
+        }
+      }
+    }
+
+
+  }
+}

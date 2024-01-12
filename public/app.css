@@ -1,5 +1,4 @@
 #__next {
-  font-family: 'Open Sans', sans-serif;
   text-align: center;
   background-image: linear-gradient(
     to left top,
@@ -15,83 +14,23 @@
   margin: 0;
   min-height: 100vh;
   min-width: 100vw;
+  line-height: 1.5;
 }
-
-h1,
-h2 {
-  font-family: 'Oswald', sans-serif;
+*{
+  box-sizing: border-box;
 }
-
-h1 {
-  font-size: 3rem;
-  margin: 5rem 0;
-}
-h2 {
-  min-width: 18rem;
-  font-size: 2rem;
-  opacity: 0.3;
-}
-
 p {
   line-height: 1.65em;
 }
-p:nth-child(2) {
-  font-style: italic;
-  opacity: 0.65;
-  margin-top: 1rem;
-}
-
-a.github {
-  position: fixed;
-  top: 0.5rem;
-  right: 0.75rem;
-  font-size: 4rem;
-  color: #888;
-  opacity: 0.8;
-}
-a.github:hover {
-  opacity: 1;
-}
-
-button {
-  display: inline-block;
-  vertical-align: bottom;
-  outline: 0;
-  text-decoration: none;
-  cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.5);
-  box-sizing: border-box;
-  font-size: 1em;
-  font-family: inherit;
-  border-radius: 3px;
-  transition: box-shadow 0.2s ease;
-  user-select: none;
-  line-height: 2.5em;
-  min-height: 40px;
-  padding: 0 0.8em;
-  border: 0;
-  color: inherit;
-  position: relative;
-  transform: translateZ(0);
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-  margin: 0.8rem;
-}
-
-button:hover,
-button:focus {
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4);
-}
-
-a button {
-  color: #000;
-}
-
-main {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
+.content{
+  max-width: 1300px;
+  margin-top: 40px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 40px;
+  font-weight: 300;
 }
 footer {
   background-color: rgba(255, 255, 255, 0.5);

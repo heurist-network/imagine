@@ -1,0 +1,15 @@
+.root {
+
+  :global {
+    .image-box {
+      margin-top: 40px;
+      width: 400px;
+
+      img {
+        border-radius: 10px;
+        width: 100%;
+        height: auto;
+      }
+    }
+  }
+}

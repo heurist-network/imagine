@@ -10,19 +10,26 @@ function ImageBox({ imageJson }) {
     objectFit: "contain",
     width: "100%",
     height: "auto",
+    overflow: "hidden",
+    borderRadius: "10px",
   };
   console.log("image component imageJson: ", imageJson);
   useEffect(() => {});
   return (
     <div className={style.root}>
-      ImageBox component
-      <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
+      <h3>Models Deployed</h3>
+      <ResponsiveMasonry
+        columnsCountBreakPoints={{ 350: 1, 640: 2, 940: 3, 1240: 4 }}
+      >
         <Masonry gutter="20px">
           {imageJson.map((item) => (
-            <Link href={`/models/${item.name}`}>
+            <Link
+              href={`/models/${item.name}`}
+              key={item.name}
+              className="image-item"
+            >
               <Image
-                key={item.name}
-                width={200}
+                width={280}
                 height={400}
                 style={imageStyle}
                 priority
