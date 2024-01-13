@@ -12,9 +12,9 @@ class MyDocument extends Document {
       this.props.__NEXT_DATA__.query.locale ||
       i18nextConfig.i18n.defaultLocale
     const meta = {
-      url: "https://petmindreader.com",
-      image: "https://petmindreader.com/cat.png",
-      socialImageURL: "https://petmindreader.com/cat.png",
+      url: "https://heurist.vercel.app/",
+      image: "https://heurist.vercel.app/BlazingDrive.png",
+      socialImageURL: "https://heurist.vercel.app/BlazingDrive.png",
       title: 'Heurist FREE Image generate',
       description: 'We host best Stable Diffusion models on fast GPUs and offer them at low price'
     };
