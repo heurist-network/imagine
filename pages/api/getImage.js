@@ -33,6 +33,7 @@ export default async function handler(req, res) {
     "deadline": 60,
     "priority": 1
   }
+  // TODO: set BASE_URL in .env
   const data = await fetch('http://70.23.102.189:3030/submit_job', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

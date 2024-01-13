@@ -15,8 +15,8 @@ class MyDocument extends Document {
       url: "https://heurist.vercel.app/",
       image: "https://heurist.vercel.app/BlazingDrive.png",
       socialImageURL: "https://heurist.vercel.app/BlazingDrive.png",
-      title: 'Heurist FREE Image generate',
-      description: 'We host best Stable Diffusion models on fast GPUs and offer them at low price'
+      title: 'Imagine | FREE Image generator by Heurist',
+      description: 'We host best Stable Diffusion models on a decentralized network of GPUs and offer them for free'
     };
     return (
       <Html lang={currentLocale}>
@@ -29,9 +29,9 @@ class MyDocument extends Document {
 
           <meta name="title" content={meta.title} />
           <meta name="description" content={meta.description} />
-          <meta name="author" content="https://petmindreader.com" />
-          <meta name="keywords" content="Cat, mind reader" />
-          <meta name="generator" content="https://petmindreader.com" />
+          <meta name="author" content="https://heurist.xyz" />
+          <meta name="keywords" content="Stable Diffusion, Image Generation, AI, Art" />
+          <meta name="generator" content="https://heurist.xyz" />
 
           <meta property="og:type" content='website' />
           <meta property="og:title" content={meta.title} />

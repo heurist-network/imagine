@@ -17,7 +17,7 @@ function Model({ model }) {
   const [prompt, setPrompt] = useState("")
   const [neg_prompt, setNegPrompt] = useState("")
   const [num_iterations, setNumInterations] = useState(30)
-  const [seed, setSeed] = useState(0)
+  const [seed, setSeed] = useState(-1)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showInfo, setShowInfo] = useState({})
@@ -93,6 +93,7 @@ function Model({ model }) {
               <span className="model_title">{model}</span>
             </div>
             <div className="model_creator">
+            {/* TODO: use "author" field from https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json */}
               Created by Heurist
             </div>
             <Modal title="Prompt" open={isModalOpen} okText="Use this prompt" okButtonProps={{ size: 'large' }} cancelButtonProps={{ size: 'large' }} onOk={handleOk} onCancel={handleCancel}>
@@ -107,7 +108,7 @@ function Model({ model }) {
                     priority
                     // src="https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/ArthemyComics.png"
                     src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}.png`}
-                    alt="模型图片"
+                    alt="sample"
                   />
                   <div className="image-notice" onClick={() => showModal(model)}>
                     <Image src='/info.png' width={20} height={20} alt="model info" />
@@ -118,12 +119,24 @@ function Model({ model }) {
                   width={512}
                   height={500}
                   priority
-                  // src="https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/ArthemyComics.png"
-                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}.png`}
-                  alt="模型图片"
+                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-2.png`}
+                  alt="sample"
                 />
                 <div className="image-notice" onClick={() => showModal(`${model}-2`)}>
-                  <Image src='/info.png' width={20} height={20} alt="模型图片" />
+                  <Image src='/info.png' width={20} height={20} alt="sample" />
+                </div>
+              </div> */}
+
+                {/* <div className='image-box'>
+                <Image
+                  width={512}
+                  height={500}
+                  priority
+                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-3.png`}
+                  alt="sample"
+                />
+                <div className="image-notice" onClick={() => showModal(`${model}-2`)}>
+                  <Image src='/info.png' width={20} height={20} alt="sample" />
                 </div>
               </div> */}
               </div>
@@ -139,7 +152,7 @@ function Model({ model }) {
                 <Slider
                   min={1}
                   max={50}
-                  defaultValue={30}
+                  defaultValue={25}
                   // tooltip={{
                   //   open: false,
                   // }}
@@ -148,6 +161,8 @@ function Model({ model }) {
                   disabled={false}
                 />
               </div>
+
+              {/* TODO: set width and height with slider. Range: 512 ~ 1024*/}
               <div className="input-item">
                 <h3>Seed</h3>
                 <Input value={seed} placeholder="Seed" size='large' onChange={(value) => setSeed(value)} />
@@ -168,7 +183,7 @@ function Model({ model }) {
                       height={500}
                       priority
                       src={url}
-                      alt="模型图片1"
+                      alt="sample1"
                     />
                   </div>
                 </div>
