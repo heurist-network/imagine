@@ -14,8 +14,10 @@ const modelObj = {}
 
 function Model({ model }) {
   const [data, setData] = useState("data Model");
-  const [value, setValue] = useState("")
+  const [prompt, setPrompt] = useState("")
+  const [neg_prompt, setNegPrompt] = useState("")
   const [num_iterations, setNumInterations] = useState(30)
+  const [seed, setSeed] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showInfo, setShowInfo] = useState({})
@@ -24,7 +26,7 @@ function Model({ model }) {
   const getImage = async () => {
     setLoading(true)
     const { data } = await fetch('/api/getImage', {
-      method: 'POST', body: JSON.stringify({ prompt: 'girl', num_iterations })
+      method: 'POST', body: JSON.stringify({ prompt: 'girl', num_iterations, neg_prompt })
     }).then(res => res.json());
     console.log('--res data--', data);
     setLoading(false)
@@ -33,7 +35,7 @@ function Model({ model }) {
 
   const valueChange = (e) => {
     console.log('设置value', e.target.value);
-    setValue(e.target.value)
+    setPrompt(e.target.value)
   }
   const getImageInfo = async () => {
     const res1 = await fetch(`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}.json`).then(res => res.json());
@@ -69,8 +71,9 @@ function Model({ model }) {
   const handleOk = () => {
     console.log('--showInfo----', showInfo);
     // useClipboard(showInfo.prompt)
-    setValue(showInfo.prompt)
+    setPrompt(showInfo.prompt)
     setNumInterations(showInfo.num_inference_steps)
+    setNegPrompt(showInfo.neg_prompt)
     setIsModalOpen(false);
   };
 
@@ -129,7 +132,7 @@ function Model({ model }) {
             <div className="input-form">
               <div className="input-item">
                 <h3>Prompt</h3>
-                <Input value={value} placeholder="Prompt" size='large' onChange={valueChange} />
+                <Input value={prompt} placeholder="Prompt" size='large' onChange={(value) => setPrompt(value)} />
               </div>
               <div className="input-item">
                 <h3>Sampling Steps</h3>
@@ -145,7 +148,14 @@ function Model({ model }) {
                   disabled={false}
                 />
               </div>
-
+              <div className="input-item">
+                <h3>Seed</h3>
+                <Input value={seed} placeholder="Seed" size='large' onChange={(value) => setSeed(value)} />
+              </div>
+              <div className="input-item">
+                <h3>Negative Prompt</h3>
+                <Input value={neg_prompt} placeholder="Negative Prompt" size='large' onChange={(value) => setNegPrompt(value)} />
+              </div>
               <div className="input-item">
                 <Button onClick={getImage} loading={loading} size='large' type='primary'>SUBMIT</Button>
               </div>

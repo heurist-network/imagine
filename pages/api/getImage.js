@@ -15,6 +15,7 @@ export default async function handler(req, res) {
   const model_input = {
     prompt: obj.prompt,
     num_iterations: obj.num_iterations,
+    neg_prompt: obj.neg_prompt
   }
   const postData = {
     "job_id": "job1000",

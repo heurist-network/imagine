@@ -17,6 +17,10 @@
         display: flex;
         align-items: center;
 
+        a {
+          margin-left: 40px
+        }
+
         .logo_text {
           font-weight: 500;
           font-size: 16pt;
@@ -33,9 +37,6 @@
           display: flex;
         }
 
-        img {
-          margin-left: 40px;
-        }
       }
     }
 
