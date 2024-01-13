@@ -14,7 +14,7 @@ function TopNav() {
         <div className="top_nav_left_section">
           <div className="logo_text"><Link href="/">Imagine</Link></div>
           <Link href="https://discord.gg/Ch6Y7mYMdr">
-            <Image src='/discord.svg' width='25' height='19' alt='Discord Mark' passHref />
+            <Image src='/discord.svg' width='25' height='19' alt='Discord Mark' />
           </Link>
           <Link href="https://twitter.com/heurist_ai">
             <Image src='/x.svg' width='20' height='25' alt='Discord Mark' />
