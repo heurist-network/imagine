@@ -23,9 +23,6 @@
 img{
   display: block;
 }
-p {
-  line-height: 1.65em;
-}
 .content{
   max-width: 1300px;
   margin-top: 40px;
