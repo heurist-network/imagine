@@ -1,4 +1,4 @@
-import { useTranslation } from 'next-i18next'
+
 
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
@@ -8,7 +8,7 @@ import TopNav from '@/components/TopNav'
 import style from "./index.module.scss";
 
 const Homepage = ({ imageJson }) => {
-  const { t } = useTranslation(['common', 'footer'])
+
   console.log('imageJson : --', imageJson);
   return (
     <>

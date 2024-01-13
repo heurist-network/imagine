@@ -50,14 +50,33 @@
       }
     }
 
-    .image-box {
-      margin-top: 10px;
-      width: 300px;
+    .image-wrap {
+      display: flex;
+      column-gap: 20px;
 
-      img {
-        border-radius: 10px;
-        width: 100%;
-        height: auto;
+      .image-box {
+        margin-top: 10px;
+        width: 300px;
+        position: relative;
+
+        img {
+          border-radius: 10px;
+          width: 100%;
+          height: auto;
+        }
+
+        .image-notice {
+          height: 20px;
+          position: absolute;
+          right: 20px;
+          bottom: 20px;
+          cursor: pointer;
+
+          img {
+            height: 20px;
+            width: 20px;
+          }
+        }
       }
     }
   }

@@ -37,6 +37,7 @@ function ImageBox({ imageJson }) {
                 src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.name}.png`}
                 alt="模型图片"
               />
+              <div className="name-box">{item.name}</div>
             </Link>
           ))}
 
