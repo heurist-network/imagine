@@ -6,6 +6,7 @@ import ImageBox from '@/components/ImageBox/Index.jsx'
 import ImageDemo from '@/components/ImageBox/demo'
 import TopNav from '@/components/TopNav'
 import style from "./index.module.scss";
+import Link from 'next/link';
 
 const Homepage = ({ imageJson }) => {
 
@@ -22,7 +23,7 @@ const Homepage = ({ imageJson }) => {
             We host best Stable Diffusion models on <br></br><span style={{ color: '#C57CFF' }}>a decentralized network of GPUs</span>.
           </h1>
           <p className='text'>
-            <span> Call for model creators: </span> Want to get your models listed and earn HUE token rewards? Contact <span>team@heurist.xyz</span>
+            <span> Call for model creators: </span> Want to get your models listed and earn HUE token rewards? Contact <Link href='mailto:team@heurist.xyz' target="_blank">team@heurist.xyz</Link>
           </p>
           <ImageBox imageJson={imageJson} />
         </div>
