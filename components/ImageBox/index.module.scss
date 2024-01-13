@@ -3,7 +3,7 @@
   flex-direction: column;
   width: 100%;
   margin-top: 100px;
-  padding: 0 40px;
+  // padding: 0 40px;
   box-sizing: border-box;
   margin: 0 auto;
 
@@ -59,18 +59,18 @@
 
 @media screen and (max-width: 1240px) and (min-width: 940px) {
   .root {
-    min-width: 900px;
+    width: 900px;
   }
 }
 
 @media screen and (max-width: 940px) and (min-width: 640px) {
   .root {
-    min-width: 600px;
+    width: 600px;
   }
 }
 
 @media screen and (max-width: 640px) {
   .root {
-    min-width: 350px;
+    width: 350px;
   }
 }
