@@ -9,7 +9,6 @@ import style from "./index.module.scss";
 
 const Homepage = ({ imageJson }) => {
 
-  console.log('imageJson : --', imageJson);
   return (
     <>
       <Head>
