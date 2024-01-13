@@ -17,7 +17,7 @@ function ImageBox({ imageJson }) {
   useEffect(() => {});
   return (
     <div className={style.root}>
-      <h3>Models Deployed</h3>
+      <h2>Models Deployed</h2>
       <ResponsiveMasonry
         columnsCountBreakPoints={{ 350: 1, 640: 2, 940: 3, 1240: 4 }}
       >

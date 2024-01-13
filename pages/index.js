@@ -1,7 +1,7 @@
 
 
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
+import Head from 'next/head';
+
 import ImageBox from '@/components/ImageBox/Index.jsx'
 import ImageDemo from '@/components/ImageBox/demo'
 import TopNav from '@/components/TopNav'
@@ -12,6 +12,9 @@ const Homepage = ({ imageJson }) => {
   console.log('imageJson : --', imageJson);
   return (
     <>
+      <Head>
+        <title>Heurist FREE Image generate</title>
+      </Head>
       <main className={style.root}>
         <TopNav />
         <div className='content'>
