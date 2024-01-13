@@ -21,12 +21,14 @@ function Model({ model, author }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showInfo, setShowInfo] = useState({})
+  const [width, setWidth] = useState(750)
+  const [height, setHeight] = useState(750)
   console.log('modelObj', modelObj);
   const [url, setUrl] = useState("")
   const getImage = async () => {
     setLoading(true)
     const { data } = await fetch('/api/getImage', {
-      method: 'POST', body: JSON.stringify({ prompt: 'girl', num_iterations, neg_prompt })
+      method: 'POST', body: JSON.stringify({ prompt: 'girl', num_iterations, neg_prompt, width, height, model, neg_prompt })
     }).then(res => res.json());
     console.log('--res data--', data);
     setLoading(false)
@@ -162,11 +164,30 @@ function Model({ model, author }) {
                   min={1}
                   max={50}
                   defaultValue={25}
-                  // tooltip={{
-                  //   open: false,
-                  // }}
                   value={num_iterations}
                   onChange={value => setNumInterations(value)}
+                  disabled={false}
+                />
+              </div>
+              <div className="input-item">
+                <h3>Width</h3>
+                <Slider
+                  min={512}
+                  max={1024}
+                  defaultValue={512}
+                  value={width}
+                  onChange={value => setWidth(value)}
+                  disabled={false}
+                />
+              </div>
+              <div className="input-item">
+                <h3>Height</h3>
+                <Slider
+                  min={512}
+                  max={1024}
+                  defaultValue={512}
+                  value={height}
+                  onChange={value => setHeight(value)}
                   disabled={false}
                 />
               </div>
