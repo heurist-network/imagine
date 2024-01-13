@@ -21,10 +21,7 @@ class MyDocument extends Document {
     return (
       <Html lang={currentLocale}>
         <Head>
-          <link
-            href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
-            rel="stylesheet"
-          />
+          <link href="/reset.css" rel="stylesheet" />
           <link href="/app.css" rel="stylesheet" />
           <link rel="icon" href="/favicon.ico" />
           <meta property="og:title" content={meta.title} key="title" />
