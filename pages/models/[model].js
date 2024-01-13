@@ -12,7 +12,7 @@ import { useClipboard } from '@/lib/tool'
 import style from "./index.module.scss";
 const modelObj = {}
 
-function Model({ model }) {
+function Model({ model, author }) {
   const [data, setData] = useState("data Model");
   const [prompt, setPrompt] = useState("")
   const [neg_prompt, setNegPrompt] = useState("")
@@ -39,12 +39,12 @@ function Model({ model }) {
   }
   const getImageInfo = async () => {
     const res1 = await fetch(`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}.json`).then(res => res.json());
-    // const res2 = await fetch(`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-2.json`)
-    // const res3 = await fetch(`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-3.json`)
+    const res2 = await fetch(`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-2.json`).then(res => res.json());
+    const res3 = await fetch(`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-3.json`).then(res => res.json());
     modelObj[model] = res1
-    console.log('执行设置');
-    // modelObj[`${model}-2`] = res2
-    // modelObj[`${model}-3`] = res3
+    console.log('执行设置', res1);
+    modelObj[`${model}-2`] = res2
+    modelObj[`${model}-3`] = res3
   }
   useEffect(() => {
     if (model) {
@@ -60,6 +60,16 @@ function Model({ model }) {
         console.log('info: ', model);
         console.log('info -- : ', modelObj);
         setShowInfo(modelObj[model])
+        break;
+      case `${model}-2`:
+        console.log('info: ', model);
+        console.log('info -- : ', modelObj);
+        setShowInfo(modelObj[`${model}-2`])
+        break;
+      case `${model}-3`:
+        console.log('info: ', model);
+        console.log('info -- : ', modelObj);
+        setShowInfo(modelObj[`${model}-3`])
         break;
 
       default:
@@ -93,8 +103,8 @@ function Model({ model }) {
               <span className="model_title">{model}</span>
             </div>
             <div className="model_creator">
-            {/* TODO: use "author" field from https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json */}
-              Created by Heurist
+              {/* TODO: use "author" field from https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json */}
+              Created by <span>{author}</span>
             </div>
             <Modal title="Prompt" open={isModalOpen} okText="Use this prompt" okButtonProps={{ size: 'large' }} cancelButtonProps={{ size: 'large' }} onOk={handleOk} onCancel={handleCancel}>
               <p>{JSON.stringify(showInfo)}</p>
@@ -106,7 +116,6 @@ function Model({ model }) {
                     width={512}
                     height={500}
                     priority
-                    // src="https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/ArthemyComics.png"
                     src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}.png`}
                     alt="sample"
                   />
@@ -114,31 +123,31 @@ function Model({ model }) {
                     <Image src='/info.png' width={20} height={20} alt="model info" />
                   </div>
                 </div>
-                {/* <div className='image-box'>
-                <Image
-                  width={512}
-                  height={500}
-                  priority
-                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-2.png`}
-                  alt="sample"
-                />
-                <div className="image-notice" onClick={() => showModal(`${model}-2`)}>
-                  <Image src='/info.png' width={20} height={20} alt="sample" />
+                <div className='image-box'>
+                  <Image
+                    width={512}
+                    height={500}
+                    priority
+                    src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-2.png`}
+                    alt="sample"
+                  />
+                  <div className="image-notice" onClick={() => showModal(`${model}-2`)}>
+                    <Image src='/info.png' width={20} height={20} alt="sample" />
+                  </div>
                 </div>
-              </div> */}
 
-                {/* <div className='image-box'>
-                <Image
-                  width={512}
-                  height={500}
-                  priority
-                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-3.png`}
-                  alt="sample"
-                />
-                <div className="image-notice" onClick={() => showModal(`${model}-2`)}>
-                  <Image src='/info.png' width={20} height={20} alt="sample" />
+                <div className='image-box'>
+                  <Image
+                    width={512}
+                    height={500}
+                    priority
+                    src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-3.png`}
+                    alt="sample"
+                  />
+                  <div className="image-notice" onClick={() => showModal(`${model}-2`)}>
+                    <Image src='/info.png' width={20} height={20} alt="sample" />
+                  </div>
                 </div>
-              </div> */}
               </div>
             }
 
@@ -203,7 +212,7 @@ export function getStaticPaths() {
     paths: [
       {
         params: {
-          model: 'next.js',
+          model: '',
         },
       }, // See the "paths" section below
     ],
@@ -212,11 +221,12 @@ export function getStaticPaths() {
 }
 export function getStaticProps({ params }) {
   const { model } = params;
-
+  const modelAndAuthor = model.split('-')
   console.log('model--', model);
   return {
     props: {
-      model
+      model: modelAndAuthor[0],
+      author: modelAndAuthor[1]
     }
   }
 }
