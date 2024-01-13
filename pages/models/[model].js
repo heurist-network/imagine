@@ -93,7 +93,7 @@ function Model({ model }) {
               <span className="model_title">{model}</span>
             </div>
             <div className="model_creator">
-              Created by
+              Created by Heurist
             </div>
             <Modal title="Prompt" open={isModalOpen} okText="Use this prompt" okButtonProps={{ size: 'large' }} cancelButtonProps={{ size: 'large' }} onOk={handleOk} onCancel={handleCancel}>
               <p>{JSON.stringify(showInfo)}</p>
