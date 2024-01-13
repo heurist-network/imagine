@@ -30,22 +30,33 @@
         font-size: 11pt;
       }
 
-      .input-form {
-        .input-item {
-          margin-top: 20px;
-        }
+    }
 
-        .ant-slider {
-          height: 40px;
-          display: flex;
-          align-items: center;
-          margin: 0 auto;
-        }
+    .input-form {
+      .input-item {
+        margin-top: 20px;
 
-        .ant-slider-handle {
-          top: 0px;
-          bottom: 0px;
-          margin: auto;
+      }
+
+      .ant-slider {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        margin: 0 auto;
+      }
+
+      .ant-slider-handle {
+        top: 0px;
+        bottom: 0px;
+        margin: auto;
+      }
+    }
+
+    @media screen and (max-width: 600px) {
+      .image-box {
+        img {
+          width: 100%;
+          height: auto;
         }
       }
     }

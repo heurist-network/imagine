@@ -15,15 +15,17 @@ function Model({ model }) {
   const [value, setValue] = useState("")
   const [num_iterations, setNumInterations] = useState(30)
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [showInfo, setShowInfo] = useState({})
   console.log('modelObj', modelObj);
   const [url, setUrl] = useState("")
   const getImage = async () => {
+    setLoading(true)
     const { data } = await fetch('/api/getImage', {
       method: 'POST', body: JSON.stringify({ prompt: 'girl', num_iterations })
     }).then(res => res.json());
     console.log('--res data--', data);
+    setLoading(false)
     setUrl(data)
   }
 
@@ -139,7 +141,7 @@ function Model({ model }) {
             </div>
 
             <div className="input-item">
-              <Button onClick={getImage} size='large' type='primary'>Submit</Button>
+              <Button onClick={getImage} loading={loading} size='large' type='primary'>SUBMIT</Button>
             </div>
 
             {url &&
