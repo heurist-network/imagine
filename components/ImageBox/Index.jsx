@@ -13,7 +13,6 @@ function ImageBox({ imageJson }) {
     overflow: "hidden",
     borderRadius: "10px",
   };
-  console.log("image component imageJson: ", imageJson);
   useEffect(() => {});
   return (
     <div className={style.root}>

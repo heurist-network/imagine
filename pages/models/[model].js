@@ -156,7 +156,7 @@ function Model({ model, author }) {
             <div className="input-form">
               <div className="input-item">
                 <h3>Prompt</h3>
-                <Input value={prompt} placeholder="Prompt" size='large' onChange={(value) => setPrompt(value)} />
+                <Input value={prompt} placeholder="Prompt" size='large' onChange={(e) => setPrompt(e.target.value)} />
               </div>
               <div className="input-item">
                 <h3>Sampling Steps</h3>
@@ -195,11 +195,11 @@ function Model({ model, author }) {
               {/* TODO: set width and height with slider. Range: 512 ~ 1024*/}
               <div className="input-item">
                 <h3>Seed</h3>
-                <Input value={seed} placeholder="Seed" size='large' onChange={(value) => setSeed(value)} />
+                <Input value={seed} placeholder="Seed" size='large' onChange={(e) => setSeed(e.target.value)} />
               </div>
               <div className="input-item">
                 <h3>Negative Prompt</h3>
-                <Input value={neg_prompt} placeholder="Negative Prompt" size='large' onChange={(value) => setNegPrompt(value)} />
+                <Input value={neg_prompt} placeholder="Negative Prompt" size='large' onChange={(e) => setNegPrompt(e.target.value)} />
               </div>
               <div className="input-item">
                 <Button onClick={getImage} loading={loading} size='large' type='primary'>SUBMIT</Button>
