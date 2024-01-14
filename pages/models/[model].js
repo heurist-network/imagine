@@ -28,7 +28,7 @@ function Model({ model, author }) {
   const getImage = async () => {
     setLoading(true)
     const { data } = await fetch('/api/getImage', {
-      method: 'POST', body: JSON.stringify({ prompt: 'girl', num_iterations, neg_prompt, width, height, model, neg_prompt })
+      method: 'POST', body: JSON.stringify({ prompt: 'girl', num_iterations, neg_prompt, width, height, model, seed, neg_prompt })
     }).then(res => res.json());
     console.log('--res data--', data);
     setLoading(false)

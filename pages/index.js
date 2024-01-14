@@ -38,8 +38,6 @@ export default Homepage
 export async function getStaticProps() {
   const res = await fetch('https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json')
   const imageJson = await res.json()
-  // const imageJson = []
-  console.log('repo: --', imageJson);
   return {
     props: {
       imageJson

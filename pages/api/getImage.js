@@ -10,7 +10,6 @@ detectEnvAndSetUrl()
 
 export default async function handler(req, res) {
   console.log('req: ', req.body);
-  console.log('typeof req: ', typeof JSON.parse(req.body));
   const obj = JSON.parse(req.body)
   const model_input = {
     prompt: obj.prompt,
@@ -18,13 +17,15 @@ export default async function handler(req, res) {
     neg_prompt: obj.neg_prompt,
     width: obj.width,
     height: obj.height,
-    neg_prompt: obj.neg_prompt,
     model: obj.model,
+    seed: obj.seed,
   }
   const id = Randomstring.generate({
     charset: 'hex',
     length: 10
   });
+  console.log('model_input: ', model_input);
+  console.log('id: ', id);
   const postData = {
     "job_id": `imagine-${id}`,
     "model_input": {
@@ -34,11 +35,13 @@ export default async function handler(req, res) {
         "num_iterations": model_input.num_iterations,
         "width": model_input.width,
         "height": model_input.height,
+        "guidance_scale": 7,
+        "seed": model_input.seed
       }
     },
     "model_type": "SD",
     "model_id": model_input.model,
-    "deadline": 60,
+    "deadline": 30,
     "priority": 1
   }
   // TODO: set BASE_URL in .env
