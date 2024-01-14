@@ -17,12 +17,13 @@ function Model({ model, author }) {
   const [prompt, setPrompt] = useState("")
   const [neg_prompt, setNegPrompt] = useState("")
   const [num_iterations, setNumInterations] = useState(30)
+  const [guidance_scale, setGuidanceScale] = useState(10)
   const [seed, setSeed] = useState(-1)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showInfo, setShowInfo] = useState({})
-  const [width, setWidth] = useState(750)
-  const [height, setHeight] = useState(750)
+  const [width, setWidth] = useState(752)
+  const [height, setHeight] = useState(752)
   console.log('modelObj', modelObj);
   const [url, setUrl] = useState("")
   const getImage = async () => {
@@ -166,6 +167,18 @@ function Model({ model, author }) {
                   defaultValue={25}
                   value={num_iterations}
                   onChange={value => setNumInterations(value)}
+                  disabled={false}
+                />
+              </div>
+              <div className="input-item">
+                <h3>Guidance Scale</h3>
+                <Slider
+                  min={1}
+                  max={20}
+                  step={0.1}
+                  defaultValue={7}
+                  value={guidance_scale}
+                  onChange={value => setGuidanceScale(value)}
                   disabled={false}
                 />
               </div>

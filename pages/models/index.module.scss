@@ -52,6 +52,12 @@
       }
     }
 
+    .image-box {
+      img {
+        height: auto;
+      }
+    }
+
     @media screen and (max-width: 600px) {
       .image-box {
         img {

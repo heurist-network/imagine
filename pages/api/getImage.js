@@ -15,6 +15,7 @@ export default async function handler(req, res) {
     prompt: obj.prompt,
     num_iterations: obj.num_iterations,
     neg_prompt: obj.neg_prompt,
+    guidance_scale: obj.guidance_scale,
     width: obj.width,
     height: obj.height,
     model: obj.model,
@@ -35,7 +36,7 @@ export default async function handler(req, res) {
         "num_iterations": model_input.num_iterations,
         "width": model_input.width,
         "height": model_input.height,
-        "guidance_scale": 7,
+        "guidance_scale": model_input.guidance_scale,
         "seed": model_input.seed
       }
     },
