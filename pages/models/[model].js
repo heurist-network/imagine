@@ -31,6 +31,7 @@ function Model({ model, author }) {
   const [url, setUrl] = useState("")
   const getImage = async () => {
     setLoading(true)
+    // showSuprise = false;
     const { data } = await fetch('/api/getImage', {
       method: 'POST', body: JSON.stringify({ prompt: 'girl', num_iterations, neg_prompt, width, height, model, seed, neg_prompt })
     }).then(res => res.json());
@@ -247,7 +248,7 @@ function Model({ model, author }) {
 
           </div>
         </div>
-      </div>
+      </div >
     </>
 
   )
