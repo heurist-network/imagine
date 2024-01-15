@@ -18,7 +18,7 @@ const Homepage = ({ imageJson }) => {
       <main className={style.root}>
         <TopNav />
         <div className='content'>
-          <div className="welcome_text">Welcome to <span>Imagine</span> powered by Heurist</div>
+          <div className="welcome_text">Welcome to <span>Imagine</span> powered by <span>Heurist</span></div>
           <h1>
             We host best Stable Diffusion models on <br></br><span style={{ color: '#C57CFF' }}>a decentralized network of GPUs</span>.
           </h1>
@@ -42,6 +42,6 @@ export async function getStaticProps() {
     props: {
       imageJson
     },
-    revalidate: 30,
+    revalidate: 300,
   }
 }

@@ -9,39 +9,40 @@ const detectEnvAndSetUrl = () => {
 detectEnvAndSetUrl()
 
 export default async function handler(req, res) {
-  console.log('req: ', req.body);
   const obj = JSON.parse(req.body)
+  // only include the fields that are needed
   const model_input = {
     prompt: obj.prompt,
-    num_iterations: obj.num_iterations,
-    neg_prompt: obj.neg_prompt,
-    guidance_scale: obj.guidance_scale,
-    width: obj.width,
-    height: obj.height,
-    model: obj.model,
-    seed: obj.seed,
+  }
+  if (obj.num_iterations) {
+    model_input.num_iterations = obj.num_iterations
+  }
+  if (obj.neg_prompt) {
+    model_input.neg_prompt = obj.neg_prompt
+  }
+  if (obj.guidance_scale) {
+    model_input.guidance_scale = obj.guidance_scale
+  }
+  if (obj.width) {
+    model_input.width = obj.width
+  }
+  if (obj.height) {
+    model_input.height = obj.height
+  }
+  if (obj.seed !== undefined) {
+    model_input.seed = obj.seed
   }
   const id = Randomstring.generate({
     charset: 'hex',
     length: 10
   });
-  console.log('model_input: ', model_input);
-  console.log('id: ', id);
   const postData = {
     "job_id": `imagine-${id}`,
     "model_input": {
-      "SD": {
-        "prompt": model_input.prompt,
-        "neg_prompt": model_input.neg_prompt,
-        "num_iterations": model_input.num_iterations,
-        "width": model_input.width,
-        "height": model_input.height,
-        "guidance_scale": model_input.guidance_scale,
-        "seed": model_input.seed
-      }
+      "SD": model_input
     },
     "model_type": "SD",
-    "model_id": model_input.model,
+    "model_id": obj.model,
     "deadline": 30,
     "priority": 1
   }
@@ -53,7 +54,6 @@ export default async function handler(req, res) {
     const url = res.text()
     return url
   })
-  console.log('data---', data);
   const dataUrl = data.replaceAll('"', '')
   res.status(200).json({ data: dataUrl, status: 200, message: 'ok' })
 }

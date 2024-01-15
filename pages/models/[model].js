@@ -2,13 +2,11 @@
 import { useState, useEffect } from "react";
 import Head from 'next/head';
 
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import Image from "next/image";
 import { Button, Modal } from 'antd';
 import TopNav from '@/components/TopNav'
 import { Input } from 'antd';
 import { Slider } from 'antd';
-import { useClipboard } from '@/lib/tool'
 import Confetti from "react-confetti";
 
 import style from "./index.module.scss";
@@ -25,13 +23,11 @@ function Model({ model, author }) {
   const [loading, setLoading] = useState(false);
   const [showSuprise, setShowSuprise] = useState(false);
   const [showInfo, setShowInfo] = useState({})
-  const [width, setWidth] = useState(752)
-  const [height, setHeight] = useState(752)
-  console.log('modelObj', modelObj);
+  const [width, setWidth] = useState(512)
+  const [height, setHeight] = useState(768)
   const [url, setUrl] = useState("")
   const getImage = async () => {
     setLoading(true)
-    // showSuprise = false;
     const { data } = await fetch('/api/getImage', {
       method: 'POST', body: JSON.stringify({ prompt: 'girl', num_iterations, neg_prompt, width, height, model, seed, neg_prompt })
     }).then(res => res.json());
@@ -48,7 +44,7 @@ function Model({ model, author }) {
   }
 
   const valueChange = (e) => {
-    console.log('设置value', e.target.value);
+    console.log('valueChange', e.target.value);
     setPrompt(e.target.value)
   }
   const getImageInfo = async () => {
@@ -56,9 +52,9 @@ function Model({ model, author }) {
     const res2 = await fetch(`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-2.json`).then(res => res.json());
     const res3 = await fetch(`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-3.json`).then(res => res.json());
     modelObj[model] = res1
-    console.log('执行设置', res1);
     modelObj[`${model}-2`] = res2
     modelObj[`${model}-3`] = res3
+    console.log('getImageInfo modelObj', modelObj);
   }
   useEffect(() => {
     if (model) {
@@ -71,21 +67,14 @@ function Model({ model, author }) {
   const showModal = async (value) => {
     switch (value) {
       case model:
-        console.log('info: ', model);
-        console.log('info -- : ', modelObj);
         setShowInfo(modelObj[model])
         break;
       case `${model}-2`:
-        console.log('info: ', model);
-        console.log('info -- : ', modelObj);
         setShowInfo(modelObj[`${model}-2`])
         break;
       case `${model}-3`:
-        console.log('info: ', model);
-        console.log('info -- : ', modelObj);
         setShowInfo(modelObj[`${model}-3`])
         break;
-
       default:
         break;
     }
@@ -93,8 +82,6 @@ function Model({ model, author }) {
   };
 
   const handleOk = () => {
-    console.log('--showInfo----', showInfo);
-    // useClipboard(showInfo.prompt)
     setPrompt(showInfo.prompt)
     setNumInterations(showInfo.num_inference_steps)
     setNegPrompt(showInfo.neg_prompt)
@@ -119,7 +106,6 @@ function Model({ model, author }) {
               <span className="model_title">{model}</span>
             </div>
             <div className="model_creator">
-              {/* TODO: use "author" field from https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json */}
               Created by <span>{author}</span>
             </div>
             <Modal title="Prompt" open={isModalOpen} okText="Use this prompt" okButtonProps={{ size: 'large' }} cancelButtonProps={{ size: 'large' }} onOk={handleOk} onCancel={handleCancel}>
@@ -218,7 +204,6 @@ function Model({ model, author }) {
                 />
               </div>
 
-              {/* TODO: set width and height with slider. Range: 512 ~ 1024*/}
               <div className="input-item">
                 <h3>Seed</h3>
                 <Input value={seed} placeholder="Seed" size='large' onChange={(e) => setSeed(e.target.value)} />
@@ -263,7 +248,6 @@ export function getStaticPaths() {
 export function getStaticProps({ params }) {
   const { model } = params;
   const modelAndAuthor = model.split('-')
-  console.log('model--', model);
   return {
     props: {
       model: modelAndAuthor[0],
