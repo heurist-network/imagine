@@ -31,14 +31,19 @@ function Model({ model, author }) {
   const [url, setUrl] = useState("")
   const getImage = async () => {
     setLoading(true)
-    // showSuprise = false;
     const { data } = await fetch('/api/getImage', {
       method: 'POST', body: JSON.stringify({ prompt: 'girl', num_iterations, neg_prompt, width, height, model, seed, neg_prompt })
     }).then(res => res.json());
-    console.log('--res data--', data);
     setLoading(false)
     setUrl(data)
-    setShowSuprise(true)
+    setTimeout(() => {
+      window.scrollTo({
+        top: 1000,
+        left: 0,
+        behavior: "smooth",
+      });
+      setShowSuprise(true)
+    }, 100);
   }
 
   const valueChange = (e) => {
@@ -53,8 +58,6 @@ function Model({ model, author }) {
     console.log('执行设置', res1);
     modelObj[`${model}-2`] = res2
     modelObj[`${model}-3`] = res3
-    // setShowSuprise(true)
-
   }
   useEffect(() => {
     if (model) {
@@ -107,7 +110,7 @@ function Model({ model, author }) {
       </Head>
       <div className={style.root}>
         <TopNav />
-        {showSuprise && <Confetti numberOfPieces={3000} tweenDuration={8000} recycle={false} />}
+        {showSuprise && <Confetti numberOfPieces={3000} height={document.body.clientHeight} tweenDuration={8000} recycle={false} />}
 
         <div className={style.root}>
           <div className="content">
