@@ -53,7 +53,7 @@ function Model({ model, author }) {
     console.log('执行设置', res1);
     modelObj[`${model}-2`] = res2
     modelObj[`${model}-3`] = res3
-    setShowSuprise(true)
+    // setShowSuprise(true)
 
   }
   useEffect(() => {
