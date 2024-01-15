@@ -9,6 +9,8 @@ import TopNav from '@/components/TopNav'
 import { Input } from 'antd';
 import { Slider } from 'antd';
 import { useClipboard } from '@/lib/tool'
+import Confetti from "react-confetti";
+
 import style from "./index.module.scss";
 const modelObj = {}
 
@@ -21,6 +23,7 @@ function Model({ model, author }) {
   const [seed, setSeed] = useState(-1)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showSuprise, setShowSuprise] = useState(false);
   const [showInfo, setShowInfo] = useState({})
   const [width, setWidth] = useState(752)
   const [height, setHeight] = useState(752)
@@ -28,12 +31,14 @@ function Model({ model, author }) {
   const [url, setUrl] = useState("")
   const getImage = async () => {
     setLoading(true)
+    // showSuprise = false;
     const { data } = await fetch('/api/getImage', {
       method: 'POST', body: JSON.stringify({ prompt: 'girl', num_iterations, neg_prompt, width, height, model, seed, neg_prompt })
     }).then(res => res.json());
     console.log('--res data--', data);
     setLoading(false)
     setUrl(data)
+    setShowSuprise(true)
   }
 
   const valueChange = (e) => {
@@ -100,6 +105,8 @@ function Model({ model, author }) {
       </Head>
       <div className={style.root}>
         <TopNav />
+        {showSuprise && <Confetti recycle={false} />}
+
         <div className={style.root}>
           <div className="content">
             <div className="model_title_row">
