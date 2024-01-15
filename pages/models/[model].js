@@ -53,6 +53,8 @@ function Model({ model, author }) {
     console.log('执行设置', res1);
     modelObj[`${model}-2`] = res2
     modelObj[`${model}-3`] = res3
+    setShowSuprise(true)
+
   }
   useEffect(() => {
     if (model) {
@@ -105,7 +107,7 @@ function Model({ model, author }) {
       </Head>
       <div className={style.root}>
         <TopNav />
-        {showSuprise && <Confetti recycle={false} />}
+        {showSuprise && <Confetti numberOfPieces={3000} tweenDuration={8000} recycle={false} />}
 
         <div className={style.root}>
           <div className="content">
