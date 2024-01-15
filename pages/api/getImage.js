@@ -45,7 +45,7 @@ export default async function handler(req, res) {
     "deadline": 30,
     "priority": 1
   }
-  const data = await fetch('http://70.23.102.189:3030/submit_job', {
+  const data = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/submit_job`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(postData)
