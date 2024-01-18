@@ -41,7 +41,7 @@ function Model({ model, author }) {
           left: 0,
           behavior: "smooth",
         });
-        setShowSuprise(true)
+        //setShowSuprise(true)
       }, 100);
     } catch (error) {
       console.error('Error:', error);
