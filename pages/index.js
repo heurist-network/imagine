@@ -13,7 +13,8 @@ const Homepage = () => {
    const fetchData = async () => {
      const res = await fetch('https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json');
      const json = await res.json();
-     setImageJson(json);
+     const filtered = json.filter((item) => item.type === 'sd15');
+     setImageJson(filtered);
    };
 
    fetchData();
