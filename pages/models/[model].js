@@ -13,6 +13,7 @@ import style from "./index.module.scss";
 
 function Model({ model, author }) {
   const [modelObj, setModelObj] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
   const [prompt, setPrompt] = useState("")
   const [neg_prompt, setNegPrompt] = useState("")
   const [num_iterations, setNumInterations] = useState(30)
@@ -26,7 +27,8 @@ function Model({ model, author }) {
   const [height, setHeight] = useState(768)
   const [resultImgUrl, setResultImgUrl] = useState("")
   const getImage = async () => {
-    setLoading(true)
+    setLoading(true);
+    setErrorMessage("");
     try {
       const { data } = await fetch('/api/getImage', {
         method: 'POST', body: JSON.stringify({ prompt, num_iterations, neg_prompt, width, height, model, seed, neg_prompt, guidance_scale })
@@ -43,6 +45,7 @@ function Model({ model, author }) {
       }, 100);
     } catch (error) {
       console.error('Error:', error);
+      setErrorMessage("Failed to generate image, please try again.");
       setLoading(false);
     }
    }
@@ -209,6 +212,7 @@ function Model({ model, author }) {
               </div>
               <div className="input-item">
                 <Button onClick={getImage} loading={loading} size='large' type='primary'>SUBMIT</Button>
+                {errorMessage && <p className={style.errorMessage} onClick={() => setErrorMessage("")}>{errorMessage}</p>}
               </div>
 
               {resultImgUrl &&
