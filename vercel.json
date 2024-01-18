@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/getImage.js": {
+    "pages/api/getImage.js": {
       "memory": 128,
       "maxDuration": 20
     }
