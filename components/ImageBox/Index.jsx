@@ -4,15 +4,6 @@ import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import style from "./index.module.scss";
 import Link from "next/link";
 function ImageBox({ imageJson }) {
-  const imageStyle = {
-    // borderRadius: '50%',
-    border: "1px solid #fff",
-    objectFit: "contain",
-    width: "100%",
-    height: "auto",
-    overflow: "hidden",
-    borderRadius: "10px",
-  };
   useEffect(() => {});
   return (
     <div className={style.root}>
@@ -30,7 +21,6 @@ function ImageBox({ imageJson }) {
               <Image
                 width={280}
                 height={400}
-                style={imageStyle}
                 priority
                 src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.name}.png`}
                 alt="models image"

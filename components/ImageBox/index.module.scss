@@ -26,7 +26,12 @@
       position: relative;
 
       img {
-        border: none;
+        border: 1px solid #fff;
+        object-fit: contain;
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+        border-radius: 10px;
       }
 
       // padding: 10px;
@@ -71,6 +76,6 @@
 
 @media screen and (max-width: 640px) {
   .root {
-    width: 350px;
+    width: 100%;
   }
 }
