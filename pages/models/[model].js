@@ -48,7 +48,7 @@ function Model({ model, author }) {
       setErrorMessage("Failed to generate image, please try again.");
       setLoading(false);
     }
-   }
+  }
 
   const getImageInfo = async () => {
     console.log("loading model presets and images")
@@ -70,7 +70,7 @@ function Model({ model, author }) {
 
   const showModal = (index) => {
     const modelKey = `${model}${index == 1 ? '' : `-${index}`}`;
-    const presetData = {...modelObj[modelKey]};
+    const presetData = { ...modelObj[modelKey] };
     delete presetData['sampler'];
     setPreset(presetData);
     setIsModalOpen(true);
@@ -93,7 +93,7 @@ function Model({ model, author }) {
   return (
     <>
       <Head>
-        <title>Heurist FREE Image generate</title>
+        <title>Imagine | FREE Image generator by Heurist</title>
       </Head>
       <div className={style.root}>
         <TopNav />
@@ -193,8 +193,8 @@ function Model({ model, author }) {
                   value={width}
                   onChange={value => setWidth(value)}
                 />
-                </div>
-                <div className="input-item">
+              </div>
+              <div className="input-item">
                 <h3>Height</h3>
                 <InputNumber
                   min={512}
@@ -203,7 +203,7 @@ function Model({ model, author }) {
                   value={height}
                   onChange={value => setHeight(value)}
                 />
-                </div>
+              </div>
 
               <div className="input-item">
                 <h3>Seed</h3>
