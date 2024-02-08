@@ -93,7 +93,7 @@ function Model({ model, author }) {
   return (
     <>
       <Head>
-        <title>Imagine | FREE Image generator by Heurist</title>
+        <title>Imagine | AI Image generator by Heurist</title>
       </Head>
       <div className={style.root}>
         <TopNav />

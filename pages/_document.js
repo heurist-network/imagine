@@ -15,7 +15,7 @@ class MyDocument extends Document {
       url: "https://heurist.vercel.app/",
       image: "https://heurist.vercel.app/BlazingDrive.png",
       socialImageURL: "https://heurist.vercel.app/BlazingDrive.png",
-      title: 'Imagine | FREE Image generator by Heurist',
+      title: 'Imagine | AI Image generator by Heurist',
       description: 'We host best Stable Diffusion models on a decentralized network of GPUs and offer them for free'
     };
     return (
