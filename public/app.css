@@ -28,3 +28,12 @@ footer {
   width: 100vw;
   padding: 3rem 0;
 }
+.content{
+  max-width: 1300px;
+  margin-top: 40px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 40px;
+}
