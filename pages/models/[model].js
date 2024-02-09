@@ -219,13 +219,16 @@ function Model({ model, author }) {
                 <div className="input-item">
                   <div className='image-box'>
                     <Image
-                      width={512}
-                      height={500}
+                      width={width}
+                      height={height}
                       priority
                       src={resultImgUrl}
                       alt="image result"
                     />
                   </div>
+                  <a href={resultImgUrl} download>
+                    Download Original Image
+                  </a>
                 </div>
               }
             </div>
