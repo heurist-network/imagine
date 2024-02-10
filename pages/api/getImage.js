@@ -49,7 +49,7 @@ export default async function handler(req, res) {
   
     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/submit_job`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.AUTH_KEY}`},
       body: JSON.stringify(postData)
     });
   
