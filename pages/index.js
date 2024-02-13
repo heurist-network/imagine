@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import ImageBox from '@/components/ImageBox/Index.jsx'
-import ImageDemo from '@/components/ImageBox/demo'
 import TopNav from '@/components/TopNav'
 import style from "./index.module.scss";
 import Link from 'next/link';
@@ -37,7 +36,6 @@ const Homepage = () => {
           </p>
           {imageJson && <ImageBox imageJson={imageJson} />}
         </div>
-        {/* <ImageDemo /> */}
       </main >
     </>
   )

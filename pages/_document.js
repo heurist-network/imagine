@@ -4,13 +4,9 @@ import Document, {
   Main,
   NextScript,
 } from 'next/document'
-import i18nextConfig from '@/next-i18next.config'
 
 class MyDocument extends Document {
   render() {
-    const currentLocale =
-      this.props.__NEXT_DATA__.query.locale ||
-      i18nextConfig.i18n.defaultLocale
     const meta = {
       url: "https://heurist.vercel.app/",
       image: "https://heurist.vercel.app/BlazingDrive.png",
@@ -19,7 +15,7 @@ class MyDocument extends Document {
       description: 'We host best Stable Diffusion models on a decentralized network of GPUs and offer them for free'
     };
     return (
-      <Html lang={currentLocale}>
+      <Html lang={'en'}>
         <Head>
           <link href="/reset.css" rel="stylesheet" />
           <link href="/app.css" rel="stylesheet" />

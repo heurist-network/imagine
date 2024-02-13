@@ -1,11 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import style from "./nav.module.scss";
 import Image from "next/image";
 
 import Link from 'next/link';
 function TopNav() {
-  const [data, setData] = useState("data TopNav");
   useEffect(() => {
   }, []);
   return (
