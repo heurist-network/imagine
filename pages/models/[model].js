@@ -219,6 +219,7 @@ function Model({ model, author }) {
                 <div className="input-item">
                   <div className='image-box'>
                     <Image
+                      unoptimized
                       width={width}
                       height={height}
                       priority
