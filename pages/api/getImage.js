@@ -35,7 +35,7 @@ export default async function handler(req, res) {
       length: 10
     });
     const postData = {
-      "job_id": `debug$$$$$$$$$$$$-imagine-${id}`,
+      "job_id": `imagine-${id}`,
       "model_input": {
         "SD": model_input
       },
