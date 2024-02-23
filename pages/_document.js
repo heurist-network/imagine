@@ -25,9 +25,9 @@ class MyDocument extends Document {
 
           <meta name="title" content={meta.title} />
           <meta name="description" content={meta.description} />
-          <meta name="author" content="https://heurist.xyz" />
+          <meta name="author" content="https://heurist.ai" />
           <meta name="keywords" content="Stable Diffusion, Image Generation, AI, Art" />
-          <meta name="generator" content="https://heurist.xyz" />
+          <meta name="generator" content="https://heurist.ai" />
 
           <meta property="og:type" content='website' />
           <meta property="og:title" content={meta.title} />
