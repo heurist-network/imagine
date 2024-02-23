@@ -34,6 +34,9 @@ const Homepage = () => {
           <p className='text'>
             <span> Call for model creators: </span> Want to get your models listed and earn HUE token rewards? Contact <Link href='mailto:team@heurist.xyz' target="_blank">team@heurist.xyz</Link>
           </p>
+          <p className='text'>
+            <span> <Link href='./nft'>🎁 Imaginaries NFT Airdrop is here! </Link> </span>
+          </p>
           {imageJson && <ImageBox imageJson={imageJson} />}
         </div>
       </main >
