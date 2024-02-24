@@ -1,0 +1,28 @@
+.root {
+
+  :global {
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+
+      h1 {
+        line-height: 120%;
+        font-weight: 600;
+        font-size: 36pt;
+        color: #444444;
+      }
+
+      p {
+        font-size: 12pt;
+        font-weight: 400;
+        color: #444444;
+      }
+
+      img {
+        margin: 10px auto;
+      }
+    }
+  }
+}
