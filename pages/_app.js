@@ -11,15 +11,14 @@ import {
 const config = getDefaultConfig({
   appName: 'Imagine',
   projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-  // TODO: Add mainnet back in
-  // chains: [mainnet],
-  // transports: {
-  //   [mainnet.id]: http(),
-  // },
-  chains: [sepolia],
+  chains: [mainnet],
   transports: {
-    [sepolia.id]: http(),
+    [mainnet.id]: http(),
   },
+  // chains: [sepolia],
+  // transports: {
+  //   [sepolia.id]: http("https://sepolia.gateway.tenderly.co"),
+  // },
 })
 
 const queryClient = new QueryClient();
