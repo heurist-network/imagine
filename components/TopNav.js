@@ -2,8 +2,10 @@
 import { useEffect } from "react";
 import style from "./nav.module.scss";
 import Image from "next/image";
-
 import Link from 'next/link';
+
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+
 function TopNav() {
   useEffect(() => {
   }, []);
@@ -21,6 +23,10 @@ function TopNav() {
           <Link href="https://github.com/heurist-network" target="_blank">
             <Image src='/github.svg' width='22' height='22' alt='Discord Mark' />
           </Link>
+        </div>
+        <div>
+          <ConnectButton />
+
         </div>
       </nav>
     </div>
