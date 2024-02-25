@@ -1,25 +1,55 @@
 import '@rainbow-me/rainbowkit/styles.css';
 
 import { RainbowKitProvider, getDefaultConfig } from '@rainbow-me/rainbowkit';
-import { WagmiProvider, http } from 'wagmi' 
+import { connectorsForWallets } from '@rainbow-me/rainbowkit';
+import {
+  rainbowWallet,
+  metaMaskWallet,
+  rabbyWallet,
+  walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets';
+import { WagmiProvider, http, createConfig } from 'wagmi' 
 import { mainnet, sepolia } from 'wagmi/chains' 
 import {
   QueryClientProvider,
   QueryClient,
 } from "@tanstack/react-query";
 
-const config = getDefaultConfig({
-  appName: 'Imagine',
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+const connectors = connectorsForWallets(
+  [
+    {
+      groupName: 'Suggested',
+      wallets: [
+        metaMaskWallet,
+        rabbyWallet,
+        rainbowWallet,
+        walletConnectWallet,
+      ],
+    },
+  ],
+  { appName: 'Imagine', projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID },
+);
+
+const config = createConfig({
+  connectors,
   chains: [mainnet],
   transports: {
     [mainnet.id]: http(),
   },
-  // chains: [sepolia],
-  // transports: {
-  //   [sepolia.id]: http("https://sepolia.gateway.tenderly.co"),
-  // },
-})
+});
+
+// const config = getDefaultConfig({
+//   appName: 'Imagine',
+//   projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+//   chains: [mainnet],
+//   transports: {
+//     [mainnet.id]: http(),
+//   },
+//   // chains: [sepolia],
+//   // transports: {
+//   //   [sepolia.id]: http("https://sepolia.gateway.tenderly.co"),
+//   // },
+// })
 
 const queryClient = new QueryClient();
 

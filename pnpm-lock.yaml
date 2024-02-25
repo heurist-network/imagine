@@ -4,6 +4,7 @@ specifiers:
   '@headlessui/react': ^1.7.18
   '@rainbow-me/rainbowkit': ^2.0.1
   '@tanstack/react-query': ^5.22.2
+  '@walletconnect/modal': ^2.6.2
   antd: ^5.12.8
   date-fns: ^3.3.1
   eslint-config-next: 14.0.3
@@ -25,6 +26,7 @@ dependencies:
   '@headlessui/react': 1.7.18_biqbaboplfbrettd7655fr4n2y
   '@rainbow-me/rainbowkit': 2.0.1_wgbvijgwacy7qflzg3zzdxjmq4
   '@tanstack/react-query': 5.22.2_react@18.2.0
+  '@walletconnect/modal': 2.6.2_react@18.2.0
   antd: 5.14.2_3d23l5fhovohrcuceey6widvgm
   date-fns: 3.3.1
   image-size: 1.1.1
