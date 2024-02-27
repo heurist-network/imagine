@@ -1,13 +1,14 @@
-import Link from "next/link";
-import Image from "next/image";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Button } from "@/components/ui/button";
+import Image from 'next/image'
+import Link from 'next/link'
+
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 export function Header() {
   return (
@@ -15,30 +16,30 @@ export function Header() {
       <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
         <Link
           href="/"
-          className="flex items-center gap-1 cursor-pointer select-none"
+          className="flex cursor-pointer select-none items-center gap-1"
         >
           <Image src="/logo.svg" alt="logo" width={30} height={30} />
-          <div className="flex font-extrabold text-transparent text-2xl items-center bg-clip-text animate-flow bg-logo bg-[size:400%]">
+          <div className="flex animate-flow items-center bg-logo bg-[size:400%] bg-clip-text text-2xl font-extrabold text-transparent">
             Imagine
           </div>
         </Link>
-        <div className="flex gap-3 items-center">
-          <nav className="md:flex items-center gap-1 hidden">
+        <div className="flex items-center gap-3">
+          <nav className="hidden items-center gap-1 md:flex">
             <Link target="_blank" href="https://discord.gg/Ch6Y7mYMdr">
-              <div className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 py-2 w-10 px-0">
-                <span className="i-ri-discord-fill w-6 h-6" />
+              <div className="inline-flex h-10 w-10 items-center justify-center whitespace-nowrap rounded-md px-0 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
+                <span className="i-ri-discord-fill h-6 w-6" />
                 <span className="sr-only">Discord</span>
               </div>
             </Link>
             <Link target="_blank" href="https://twitter.com/heurist_ai">
-              <div className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 py-2 w-10 px-0">
-                <span className="i-ri-twitter-x-fill w-[18px] h-[18px]" />
+              <div className="inline-flex h-10 w-10 items-center justify-center whitespace-nowrap rounded-md px-0 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
+                <span className="i-ri-twitter-x-fill h-[18px] w-[18px]" />
                 <span className="sr-only">X</span>
               </div>
             </Link>
             <Link target="_blank" href="https://github.com/heurist-network">
-              <div className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 py-2 w-10 px-0">
-                <span className="i-ri-github-fill w-6 h-6" />
+              <div className="inline-flex h-10 w-10 items-center justify-center whitespace-nowrap rounded-md px-0 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
+                <span className="i-ri-github-fill h-6 w-6" />
                 <span className="sr-only">GitHub</span>
               </div>
             </Link>
@@ -46,11 +47,11 @@ export function Header() {
           <div className="text-sm">
             <ConnectButton />
           </div>
-          <div className="block md:hidden -mr-2">
+          <div className="-mr-2 block md:hidden">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="rounded-full">
-                  <span className="i-ri-menu-line text-[hsl(0,0%,40%)] w-4 h-4" />
+                  <span className="i-ri-menu-line h-4 w-4 text-[hsl(0,0%,40%)]" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -60,7 +61,7 @@ export function Header() {
                     target="_blank"
                     href="https://discord.gg/Ch6Y7mYMdr"
                   >
-                    <span className="i-ri-discord-fill w-6 h-6" />
+                    <span className="i-ri-discord-fill h-6 w-6" />
                     <span>Discord</span>
                   </Link>
                 </DropdownMenuItem>
@@ -70,8 +71,8 @@ export function Header() {
                     target="_blank"
                     href="https://twitter.com/heurist_ai"
                   >
-                    <div className="w-6 h-6 flex justify-center items-center">
-                      <span className="i-ri-twitter-x-fill w-[18px] h-[18px]" />
+                    <div className="flex h-6 w-6 items-center justify-center">
+                      <span className="i-ri-twitter-x-fill h-[18px] w-[18px]" />
                     </div>
                     <span>X</span>
                   </Link>
@@ -82,7 +83,7 @@ export function Header() {
                     target="_blank"
                     href="https://github.com/heurist-network"
                   >
-                    <span className="i-ri-github-fill w-6 h-6" />
+                    <span className="i-ri-github-fill h-6 w-6" />
                     <span>GitHub</span>
                   </Link>
                 </DropdownMenuItem>
@@ -92,5 +93,5 @@ export function Header() {
         </div>
       </div>
     </div>
-  );
+  )
 }

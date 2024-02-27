@@ -1,25 +1,26 @@
-"use server";
+'use server'
 
-import Image from "next/image";
-import { notFound } from "next/navigation";
-import Link from "next/link";
+import Image from 'next/image'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+
 import {
-  ModelsWrapper,
   ImageWrapper,
   ModelsTitle,
-} from "@/components/motion/modelsWrapper";
+  ModelsWrapper,
+} from '@/components/motion/modelsWrapper'
 
 export async function Models() {
   try {
     const res: any[] = await fetch(
-      "https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json"
-    ).then((res) => res.json());
+      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
+    ).then((res) => res.json())
 
     const lists = res.filter(
-      (item) => item.type === "sd15" || item.type === "sdxl10"
-    );
+      (item) => item.type === 'sd15' || item.type === 'sdxl10',
+    )
 
-    if (!lists.length) return null;
+    if (!lists.length) return null
 
     // console.log("--------------------------------------");
     // console.log("\n\n");
@@ -137,7 +138,7 @@ export async function Models() {
             <Link key={item.name} href={`/models/${item.name}-${item.author}`}>
               <ImageWrapper name={item.name} index={index}>
                 <Image
-                  className="w-full h-auto hover:scale-105 transition-transform"
+                  className="h-auto w-full transition-transform hover:scale-105"
                   width={280}
                   height={400}
                   priority
@@ -149,8 +150,8 @@ export async function Models() {
           ))}
         </ModelsWrapper>
       </div>
-    );
+    )
   } catch (error) {
-    return notFound();
+    return notFound()
   }
 }

@@ -1,5 +1,6 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import Link from 'next/link'
+
+import { Button } from '@/components/ui/button'
 
 export default function Share() {
   return (
@@ -8,5 +9,5 @@ export default function Share() {
         <Button variant="secondary">Redirect to Index</Button>
       </Link>
     </div>
-  );
+  )
 }

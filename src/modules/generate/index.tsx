@@ -1,27 +1,17 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useFormState, useFormStatus } from "react-dom";
-import { useForm } from "react-hook-form";
-import { useLocalStorage } from "usehooks-ts";
-import { nanoid } from "nanoid";
-import Image from "next/image";
-import Link from "next/link";
-import { Loader2 } from "lucide-react";
-import toast from "react-hot-toast";
-import { generateImage } from "@/app/actions";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormDescription,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Loader2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useFormState, useFormStatus } from 'react-dom'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import { nanoid } from 'nanoid'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useLocalStorage } from 'usehooks-ts'
+import { z } from 'zod'
+
+import { generateImage } from '@/app/actions'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,13 +22,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Slider } from '@/components/ui/slider'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 interface GenerateProps {
-  model: string;
-  models: any[];
+  model: string
+  models: any[]
 }
 
 const formSchema = z.object({
@@ -50,10 +51,10 @@ const formSchema = z.object({
   height: z.number().min(512).max(1024),
   seed: z.string().optional(),
   model: z.string().optional(),
-});
+})
 
 function Submit({ url }: { url: string }) {
-  const status = useFormStatus();
+  const status = useFormStatus()
 
   return (
     <div className="flex gap-2">
@@ -67,52 +68,52 @@ function Submit({ url }: { url: string }) {
         </Link>
       )}
     </div>
-  );
+  )
 }
 
 export default function Generate({ model, models }: GenerateProps) {
-  const [state, formAction] = useFormState(generateImage, null);
-  const [history, setHistory] = useLocalStorage<any[]>("IMAGINE_HISTORY", []);
+  const [state, formAction] = useFormState(generateImage, null)
+  const [history, setHistory] = useLocalStorage<any[]>('IMAGINE_HISTORY', [])
   const [result, setResult] = useState({
-    url: "",
+    url: '',
     width: 0,
     height: 0,
-  });
+  })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      prompt: "",
-      neg_prompt: "",
+      prompt: '',
+      neg_prompt: '',
       num_iterations: 30,
       guidance_scale: 10,
       width: 512,
       height: 768,
-      seed: "-1",
+      seed: '-1',
     },
-  });
+  })
 
   useEffect(() => {
-    if (!state) return;
+    if (!state) return
 
     if (state.status !== 200) {
-      toast.error("Failed to generate image, please try again.");
-      return;
+      toast.error('Failed to generate image, please try again.')
+      return
     }
 
-    const data: any = state.data;
+    const data: any = state.data
 
     setResult({
       url: data.url,
       width: data.width,
       height: data.height,
-    });
+    })
 
-    const findModel = history.find((item) => item.model === model);
+    const findModel = history.find((item) => item.model === model)
 
     const url = `https://d1dagtixswu0qn.cloudfront.net/${
-      data.url.split("/").slice(-1)[0].split("?")[0]
-    }`;
+      data.url.split('/').slice(-1)[0].split('?')[0]
+    }`
 
     const item = {
       id: nanoid(),
@@ -125,41 +126,41 @@ export default function Generate({ model, models }: GenerateProps) {
       num_inference_steps: data.num_inference_steps,
       guidance_scale: data.guidance_scale,
       create_at: new Date().toISOString(),
-    };
+    }
 
     if (!findModel) {
-      const obj = { model, lists: [item] };
-      setHistory([...history, obj]);
+      const obj = { model, lists: [item] }
+      setHistory([...history, obj])
     } else {
-      findModel.lists.push(item);
-      setHistory(history);
+      findModel.lists.push(item)
+      setHistory(history)
     }
 
     setTimeout(() => {
       window.scrollTo({
         top: document.body.scrollHeight,
         left: 0,
-        behavior: "smooth",
-      });
-    }, 100);
-  }, [state]);
+        behavior: 'smooth',
+      })
+    }, 100)
+  }, [state])
 
   return (
     <div>
-      <div className="grid grid-cols-3 w-full md:3/4 lg:w-4/5 md:grid-cols-4 gap-4 py-4">
+      <div className="md:3/4 grid w-full grid-cols-3 gap-4 py-4 md:grid-cols-4 lg:w-4/5">
         {models.map((item) => (
           <AlertDialog key={item.label}>
             <AlertDialogTrigger asChild>
-              <div className="cursor-pointer relative">
+              <div className="relative cursor-pointer">
                 <Image
-                  className="rounded-lg hover:opacity-80 transition-opacity duration-image"
+                  className="rounded-lg transition-opacity duration-image hover:opacity-80"
                   width={512}
                   height={768}
                   priority
                   src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
                   alt="model"
                 />
-                <span className="i-ri-information-line absolute right-1 bottom-1 md:right-2 md:bottom-2 text-gray-300 w-5 h-5 md:w-6 md:h-6" />
+                <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
               </div>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -175,16 +176,16 @@ export default function Generate({ model, models }: GenerateProps) {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => {
-                    form.setValue("prompt", item.data.prompt);
-                    form.setValue("neg_prompt", item.data.neg_prompt);
+                    form.setValue('prompt', item.data.prompt)
+                    form.setValue('neg_prompt', item.data.neg_prompt)
                     form.setValue(
-                      "num_iterations",
-                      item.data.num_inference_steps
-                    );
-                    form.setValue("guidance_scale", item.data.guidance_scale);
-                    form.setValue("width", item.data.width);
-                    form.setValue("height", item.data.height);
-                    form.setValue("seed", item.data.seed);
+                      'num_iterations',
+                      item.data.num_inference_steps,
+                    )
+                    form.setValue('guidance_scale', item.data.guidance_scale)
+                    form.setValue('width', item.data.width)
+                    form.setValue('height', item.data.height)
+                    form.setValue('seed', item.data.seed)
                   }}
                 >
                   Use this prompt
@@ -290,10 +291,10 @@ export default function Generate({ model, models }: GenerateProps) {
                     {...field}
                     onBlur={(e) => {
                       if (Number(e.target.value) < 512) {
-                        field.onChange(512);
+                        field.onChange(512)
                       }
                       if (Number(e.target.value) > 1024) {
-                        field.onChange(1024);
+                        field.onChange(1024)
                       }
                     }}
                   />
@@ -315,10 +316,10 @@ export default function Generate({ model, models }: GenerateProps) {
                     {...field}
                     onBlur={(e) => {
                       if (Number(e.target.value) < 512) {
-                        field.onChange(512);
+                        field.onChange(512)
                       }
                       if (Number(e.target.value) > 1024) {
-                        field.onChange(1024);
+                        field.onChange(1024)
                       }
                     }}
                   />
@@ -361,5 +362,5 @@ export default function Generate({ model, models }: GenerateProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

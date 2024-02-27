@@ -1,22 +1,22 @@
 /* eslint-disable @next/next/no-img-element */
-import { ImageResponse } from "next/og";
+import { ImageResponse } from 'next/og'
 
 // Route segment config
-export const runtime = "edge";
+export const runtime = 'edge'
 
 // Image metadata
-export const alt = "Imagine Share";
+export const alt = 'Imagine Share'
 export const size = {
   width: 1200,
   height: 630,
-};
+}
 
-export const contentType = "image/png";
+export const contentType = 'image/png'
 
 // https://d1dagtixswu0qn.cloudfront.net/imagine-08139a61a4.png
 
 export default async function Image({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+  const { slug } = params
 
   // Font
   // const interSemiBold = fetch(
@@ -29,12 +29,12 @@ export default async function Image({ params }: { params: { slug: string } }) {
       <div
         style={{
           fontSize: 128,
-          background: "white",
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          background: 'white',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <img
@@ -56,6 +56,6 @@ export default async function Image({ params }: { params: { slug: string } }) {
       //     weight: 400,
       //   },
       // ],
-    }
-  );
+    },
+  )
 }

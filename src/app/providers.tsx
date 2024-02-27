@@ -1,22 +1,26 @@
-"use client";
+'use client'
 
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { connectorsForWallets } from "@rainbow-me/rainbowkit";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { createConfig, http, WagmiProvider } from 'wagmi'
+import { mainnet } from 'wagmi/chains'
+
+import { env } from '@/env.mjs'
 import {
-  rainbowWallet,
+  connectorsForWallets,
+  lightTheme,
+  RainbowKitProvider,
+} from '@rainbow-me/rainbowkit'
+import {
   metaMaskWallet,
   rabbyWallet,
+  rainbowWallet,
   walletConnectWallet,
-} from "@rainbow-me/rainbowkit/wallets";
-import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
-import { mainnet } from "wagmi/chains";
-import { WagmiProvider, http, createConfig } from "wagmi";
-import { env } from "@/env.mjs";
+} from '@rainbow-me/rainbowkit/wallets'
 
 const connectors = connectorsForWallets(
   [
     {
-      groupName: "Suggested",
+      groupName: 'Suggested',
       wallets: [
         metaMaskWallet,
         rabbyWallet,
@@ -25,8 +29,8 @@ const connectors = connectorsForWallets(
       ],
     },
   ],
-  { appName: "Imagine", projectId: env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID }
-);
+  { appName: 'Imagine', projectId: env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID },
+)
 
 const config = createConfig({
   connectors,
@@ -34,9 +38,9 @@ const config = createConfig({
   transports: {
     [mainnet.id]: http(),
   },
-});
+})
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 export function Providers({
   children,
@@ -45,11 +49,11 @@ export function Providers({
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
-          theme={lightTheme({ accentColor: "hsl(240,5.9%,10%)" })}
+          theme={lightTheme({ accentColor: 'hsl(240,5.9%,10%)' })}
         >
           {children}
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
-  );
+  )
 }
