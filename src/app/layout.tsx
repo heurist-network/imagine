@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "./providers";
 import { Header } from "@/modules/header";
+import { env } from "@/env.mjs";
 
 import "@rainbow-me/rainbowkit/styles.css";
 import "../styles/globals.css";
@@ -60,6 +61,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={GeistSans.className}>
+      {!!(env.UMAMI_URL && env.UMAMI_WEBSITE_ID) && (
+        <script
+          async
+          src={env.UMAMI_URL}
+          data-website-id={env.UMAMI_WEBSITE_ID}
+        />
+      )}
       <body className="min-h-screen bg-background">
         <Providers>
           <div className="relative flex min-h-screen flex-col bg-background">

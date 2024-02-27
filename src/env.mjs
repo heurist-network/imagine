@@ -6,6 +6,8 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     AUTH_KEY: z.string().min(1),
+    UMAMI_URL: z.string().optional(),
+    UMAMI_WEBSITE_ID: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_BASE_URL: z.string().min(1),
