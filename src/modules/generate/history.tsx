@@ -53,16 +53,16 @@ export default function History({ model }: { model: string }) {
                   const intentUrl =
                     "https://twitter.com/intent/tweet?text=" +
                     encodeURIComponent(
-                      "Welcome to Imagine powered by Heurist"
+                      "My latest #AIart creation with Imagine #Heurist 🎨"
                     ) +
                     "&url=" +
                     encodeURIComponent(
                       `https://imagine.heurist.ai/share/${name}`
-                    ) +
-                    // "&via=" +
-                    // encodeURIComponent("asf") +
-                    "&hashtags=" +
-                    encodeURIComponent("Heurist");
+                    );
+                  // "&via=" +
+                  // encodeURIComponent("asf") +
+                  // "&hashtags=" +
+                  // encodeURIComponent("Heurist");
                   window.open(intentUrl, "_blank", "width=550,height=420");
                 }}
               >
