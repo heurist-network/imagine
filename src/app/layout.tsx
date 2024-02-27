@@ -12,6 +12,7 @@ const description =
   "We host best Stable Diffusion models on a decentralized network of GPUs and offer them for free";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://imagine.heurist.ai"),
   title,
   description,
   authors: [{ name: "Heurist", url: "https://heurist.ai" }],

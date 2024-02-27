@@ -1,12 +1,12 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function Share() {
-  // redirect("/");
-
   return (
-    <div className="container">
-      <Link href="/">Redirect to Index</Link>
+    <div className="container pt-16 text-center">
+      <Link href="/">
+        <Button variant="secondary">Redirect to Index</Button>
+      </Link>
     </div>
   );
 }
