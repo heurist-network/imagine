@@ -44,7 +44,28 @@ export default function History({ model }: { model: string }) {
                   Download
                 </Button>
               </Link>
-              <Button size="sm" variant="outline">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  const path = item.url.split("/");
+                  const name = path[path.length - 1].split(".")[0];
+                  const intentUrl =
+                    "https://twitter.com/intent/tweet?text=" +
+                    encodeURIComponent(
+                      "Welcome to Imagine powered by Heurist"
+                    ) +
+                    "&url=" +
+                    encodeURIComponent(
+                      `https://imagine.heurist.ai/share/${name}`
+                    ) +
+                    // "&via=" +
+                    // encodeURIComponent("asf") +
+                    "&hashtags=" +
+                    encodeURIComponent("Heurist");
+                  window.open(intentUrl, "_blank", "width=550,height=420");
+                }}
+              >
                 <span className="i-ri-twitter-x-fill" />
               </Button>
             </div>

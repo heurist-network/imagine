@@ -28,65 +28,6 @@ export default async function Models({ params }: { params: { slug: string } }) {
       { label: `${model}-3`, data: model3 },
     ];
 
-    // console.log(JSON.stringify(models), "models");
-
-    // const models = [
-    //   {
-    //     label: "BlazingDrive",
-    //     data: {
-    //       prompt:
-    //         "girl, simple background, side shot, ultra detailed, mecha, cyber full face helmet, goggles, Illustrate a translucent watercolor painting, with delicate washes of color, subtle blending, and an airy, dreamlike quality",
-    //       neg_prompt: "worst quality, nsfw",
-    //       seed: 2795363458,
-    //       width: 512,
-    //       height: 768,
-    //       num_inference_steps: 30,
-    //       guidance_scale: 6.5,
-    //       sampler: {
-    //         class_name: "DPMSolverMultistepScheduler",
-    //         use_karras_sigmas: true,
-    //         algorithm_type: "sde-dpmsolver++",
-    //       },
-    //     },
-    //   },
-    //   {
-    //     label: "BlazingDrive-2",
-    //     data: {
-    //       prompt:
-    //         "Watercolor illustration of a dreamy girl in a sundress, walking in a field of wildflowers at sunset, Anime-style portrait of a teenage girl with sparkling blue eyes and a gentle smile,",
-    //       neg_prompt: "worst quality, nsfw",
-    //       seed: 3717059370,
-    //       width: 512,
-    //       height: 768,
-    //       num_inference_steps: 41,
-    //       guidance_scale: 9.5,
-    //       sampler: {
-    //         class_name: "DPMSolverMultistepScheduler",
-    //         use_karras_sigmas: true,
-    //         algorithm_type: "sde-dpmsolver++",
-    //       },
-    //     },
-    //   },
-    //   {
-    //     label: "BlazingDrive-3",
-    //     data: {
-    //       prompt:
-    //         "Girl, Orange Flower Crown, shallow depth of field, Proud, two colors",
-    //       neg_prompt: "worst quality, nsfw",
-    //       seed: 2795363458,
-    //       width: 512,
-    //       height: 768,
-    //       num_inference_steps: 40,
-    //       guidance_scale: 9.5,
-    //       sampler: {
-    //         class_name: "DPMSolverMultistepScheduler",
-    //         use_karras_sigmas: true,
-    //         algorithm_type: "sde-dpmsolver++",
-    //       },
-    //     },
-    //   },
-    // ];
-
     return (
       <main className="flex-1">
         <div className="container pt-8 pb-20">
