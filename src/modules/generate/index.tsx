@@ -1,0 +1,365 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormState, useFormStatus } from "react-dom";
+import { useForm } from "react-hook-form";
+import { useLocalStorage } from "usehooks-ts";
+import { nanoid } from "nanoid";
+import Image from "next/image";
+import Link from "next/link";
+import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
+import { generateImage } from "@/app/actions";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormDescription,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+
+interface GenerateProps {
+  model: string;
+  models: any[];
+}
+
+const formSchema = z.object({
+  prompt: z.string().optional(),
+  neg_prompt: z.string().optional(),
+  num_iterations: z.number(),
+  guidance_scale: z.number(),
+  width: z.number().min(512).max(1024),
+  height: z.number().min(512).max(1024),
+  seed: z.string().optional(),
+  model: z.string().optional(),
+});
+
+function Submit({ url }: { url: string }) {
+  const status = useFormStatus();
+
+  return (
+    <div className="flex gap-2">
+      <Button type="submit" disabled={status.pending}>
+        {status.pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        Submit
+      </Button>
+      {!!url && (
+        <Link href={url}>
+          <Button variant="outline">Download Original Image</Button>
+        </Link>
+      )}
+    </div>
+  );
+}
+
+export default function Generate({ model, models }: GenerateProps) {
+  const [state, formAction] = useFormState(generateImage, null);
+  const [history, setHistory] = useLocalStorage<any[]>("IMAGINE_HISTORY", []);
+  const [result, setResult] = useState({
+    url: "",
+    width: 0,
+    height: 0,
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      prompt: "",
+      neg_prompt: "",
+      num_iterations: 30,
+      guidance_scale: 10,
+      width: 512,
+      height: 768,
+      seed: "-1",
+    },
+  });
+
+  useEffect(() => {
+    if (!state) return;
+
+    if (state.status !== 200) {
+      toast.error("Failed to generate image, please try again.");
+      return;
+    }
+
+    const data: any = state.data;
+
+    setResult({
+      url: data.url,
+      width: data.width,
+      height: data.height,
+    });
+
+    const findModel = history.find((item) => item.model === model);
+
+    const url = `https://d1dagtixswu0qn.cloudfront.net/${
+      data.url.split("/").slice(-1)[0].split("?")[0]
+    }`;
+
+    const item = {
+      id: nanoid(),
+      url,
+      prompt: data.prompt,
+      neg_prompt: data.neg_prompt,
+      seed: data.seed,
+      width: data.width,
+      height: data.height,
+      num_inference_steps: data.num_inference_steps,
+      guidance_scale: data.guidance_scale,
+      create_at: new Date().toISOString(),
+    };
+
+    if (!findModel) {
+      const obj = { model, lists: [item] };
+      setHistory([...history, obj]);
+    } else {
+      findModel.lists.push(item);
+      setHistory(history);
+    }
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        left: 0,
+        behavior: "smooth",
+      });
+    }, 100);
+  }, [state]);
+
+  return (
+    <div>
+      <div className="grid grid-cols-3 w-full md:3/4 lg:w-4/5 md:grid-cols-4 gap-4 py-4">
+        {models.map((item) => (
+          <AlertDialog key={item.label}>
+            <AlertDialogTrigger asChild>
+              <div className="cursor-pointer relative">
+                <Image
+                  className="rounded-lg hover:opacity-80 transition-opacity duration-image"
+                  width={512}
+                  height={768}
+                  priority
+                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
+                  alt="model"
+                />
+                <span className="i-ri-information-line absolute right-1 bottom-1 md:right-2 md:bottom-2 text-gray-300 w-5 h-5 md:w-6 md:h-6" />
+              </div>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Prompt</AlertDialogTitle>
+                <AlertDialogDescription asChild>
+                  <div className="whitespace-pre-wrap text-left">
+                    {JSON.stringify(item.data, null, 2)}
+                  </div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    form.setValue("prompt", item.data.prompt);
+                    form.setValue("neg_prompt", item.data.neg_prompt);
+                    form.setValue(
+                      "num_iterations",
+                      item.data.num_inference_steps
+                    );
+                    form.setValue("guidance_scale", item.data.guidance_scale);
+                    form.setValue("width", item.data.width);
+                    form.setValue("height", item.data.height);
+                    form.setValue("seed", item.data.seed);
+                  }}
+                >
+                  Use this prompt
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        ))}
+      </div>
+      <Form {...form}>
+        <form action={formAction} className="space-y-8">
+          <input type="hidden" name="model" value={model} />
+          <FormField
+            control={form.control}
+            name="prompt"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Prompt</FormLabel>
+                <FormControl>
+                  <Input placeholder="Prompt" autoComplete="off" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="neg_prompt"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Negative Prompt</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Negative Prompt"
+                    autoComplete="off"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="num_iterations"
+            render={({ field }) => (
+              <FormItem className="space-y-4">
+                <FormLabel>Sampling Steps ({field.value})</FormLabel>
+                <Input
+                  className="hidden"
+                  name="num_iterations"
+                  value={field.value}
+                  onChange={() => {}}
+                />
+                <FormControl>
+                  <Slider
+                    value={[field.value]}
+                    onValueChange={(value) => field.onChange(value[0])}
+                    min={1}
+                    max={50}
+                    step={1}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="guidance_scale"
+            render={({ field }) => (
+              <FormItem className="space-y-4">
+                <FormLabel>Guidance Scale ({field.value})</FormLabel>
+                <Input
+                  className="hidden"
+                  name="guidance_scale"
+                  value={field.value}
+                  onChange={() => {}}
+                />
+                <FormControl>
+                  <Slider
+                    value={[field.value]}
+                    onValueChange={(value) => field.onChange(value[0])}
+                    min={1}
+                    max={20}
+                    step={0.1}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="width"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Width</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Width"
+                    type="number"
+                    {...field}
+                    onBlur={(e) => {
+                      if (Number(e.target.value) < 512) {
+                        field.onChange(512);
+                      }
+                      if (Number(e.target.value) > 1024) {
+                        field.onChange(1024);
+                      }
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="height"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Height</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Height"
+                    type="number"
+                    {...field}
+                    onBlur={(e) => {
+                      if (Number(e.target.value) < 512) {
+                        field.onChange(512);
+                      }
+                      if (Number(e.target.value) > 1024) {
+                        field.onChange(1024);
+                      }
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="seed"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Seed</FormLabel>
+                <FormControl>
+                  <Input placeholder="Seed" {...field} />
+                </FormControl>
+                <FormDescription>
+                  Use -1 for random results. Use non-negative number for
+                  deterministic results.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Submit url={result.url} />
+        </form>
+      </Form>
+      {result.url && (
+        <div className="mt-8">
+          <Image
+            className="rounded-lg"
+            unoptimized
+            width={result.width}
+            height={result.height}
+            priority
+            src={result.url}
+            alt="image result"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
