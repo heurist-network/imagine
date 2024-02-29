@@ -63,9 +63,35 @@ function Submit({ url }: { url: string }) {
         Submit
       </Button>
       {!!url && (
-        <Link href={url}>
-          <Button variant="outline">Download Original Image</Button>
-        </Link>
+        <>
+          <Link href={url}>
+            <Button variant="outline">Download</Button>
+          </Link>
+          <Button
+            type="button"
+            variant="outline"
+            className="gap-1.5"
+            onClick={() => {
+              const link = `https://d1dagtixswu0qn.cloudfront.net/${
+                url.split('/').slice(-1)[0].split('?')[0]
+              }`
+
+              const path = link.split('/')
+              const name = path[path.length - 1].split('.')[0]
+              const intentUrl =
+                'https://twitter.com/intent/tweet?text=' +
+                encodeURIComponent(
+                  'My latest #AIart creation with Imagine #Heurist 🎨',
+                ) +
+                '&url=' +
+                encodeURIComponent(`https://imagine.heurist.ai/share/${name}`)
+              window.open(intentUrl, '_blank', 'width=550,height=420')
+            }}
+          >
+            <span>Share on</span>
+            <span className="i-ri-twitter-x-fill h-4 w-4" />
+          </Button>
+        </>
       )}
     </div>
   )
