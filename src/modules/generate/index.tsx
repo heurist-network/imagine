@@ -53,12 +53,12 @@ const formSchema = z.object({
   model: z.string().optional(),
 })
 
-function Submit({ url }: { url: string }) {
+function Submit({ url, onReset }: { url: string; onReset: () => void }) {
   const status = useFormStatus()
 
   return (
     <div className="flex gap-2">
-      <Button type="submit" disabled={status.pending}>
+      <Button type="submit" disabled={status.pending} onClick={onReset}>
         {status.pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Submit
       </Button>
@@ -373,7 +373,12 @@ export default function Generate({ model, models }: GenerateProps) {
               </FormItem>
             )}
           />
-          <Submit url={result.url} />
+          <Submit
+            url={result.url}
+            onReset={() => {
+              setResult({ url: '', width: 0, height: 0 })
+            }}
+          />
         </form>
       </Form>
       {result.url && (
