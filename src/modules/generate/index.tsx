@@ -123,7 +123,9 @@ export default function Generate({ model, models }: GenerateProps) {
     if (!state) return
 
     if (state.status !== 200) {
-      toast.error('Failed to generate image, please try again.')
+      toast.error(
+        state.message || 'Failed to generate image, please try again.',
+      )
       return
     }
 

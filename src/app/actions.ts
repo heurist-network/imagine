@@ -84,6 +84,12 @@ export async function generateImage(_: any, formData: FormData) {
     })
 
     if (!response.ok) {
+      if (
+        String(response.status).startsWith('5') ||
+        String(response.status).startsWith('4')
+      ) {
+        throw new Error(`Request timed out. Please try again`)
+      }
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
@@ -104,7 +110,7 @@ export async function generateImage(_: any, formData: FormData) {
       },
     }
   } catch (error: any) {
-    console.log(error, 'generateImage error')
+    console.log(error.message, 'generateImage error')
     return { status: 500, message: error.message }
   }
 }
