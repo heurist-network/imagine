@@ -182,6 +182,7 @@ export default function Generate({ model, models }: GenerateProps) {
               <div className="relative cursor-pointer">
                 <Image
                   className="rounded-lg transition-opacity duration-image hover:opacity-80"
+                  unoptimized
                   width={512}
                   height={768}
                   priority

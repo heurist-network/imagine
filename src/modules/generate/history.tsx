@@ -28,6 +28,7 @@ export default function History({ model }: { model: string }) {
           <div>
             <Image
               className="mb-4 aspect-[2/1] w-full rounded-lg object-cover object-center transition-opacity duration-image group-hover:opacity-80"
+              unoptimized
               src={item.url}
               alt="img"
               width={item.width}
