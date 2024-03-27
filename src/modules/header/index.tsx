@@ -25,7 +25,7 @@ export function Header() {
         </Link>
         <div className="flex items-center gap-3">
           <nav className="hidden items-center gap-1 md:flex">
-            <Link target="_blank" href="https://discord.gg/Ch6Y7mYMdr">
+            <Link target="_blank" href="https://discord.com/invite/heuristai">
               <div className="inline-flex h-10 w-10 items-center justify-center whitespace-nowrap rounded-md px-0 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
                 <span className="i-ri-discord-fill h-6 w-6" />
                 <span className="sr-only">Discord</span>
