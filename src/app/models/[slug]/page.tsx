@@ -17,12 +17,21 @@ export default async function Models({ params }: { params: { slug: string } }) {
   try {
     const model1 = await fetch(
       `https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}.json`,
+      {
+        next: { revalidate: 60 },
+      },
     ).then((res) => res.json())
     const model2 = await fetch(
       `https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-2.json`,
+      {
+        next: { revalidate: 60 },
+      },
     ).then((res) => res.json())
     const model3 = await fetch(
       `https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-3.json`,
+      {
+        next: { revalidate: 60 },
+      },
     ).then((res) => res.json())
 
     const models = [
