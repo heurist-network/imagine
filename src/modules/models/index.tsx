@@ -14,6 +14,9 @@ export async function Models() {
   try {
     const res: any[] = await fetch(
       'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
+      {
+        next: { revalidate: 60 },
+      },
     ).then((res) => res.json())
 
     const lists = res.filter(
@@ -27,11 +30,15 @@ export async function Models() {
         <ModelsTitle>Deployed Models</ModelsTitle>
         <ModelsWrapper>
           {lists.map((item, index) => (
-            <Link key={item.name} href={`/models/${item.name}-${item.author}`}>
+            <Link
+              className="flex"
+              key={item.name}
+              href={`/models/${item.name}-${item.author}`}
+            >
               <ImageWrapper name={item.name} index={index}>
                 <Image
                   unoptimized
-                  className="h-auto w-full transition-transform hover:scale-105"
+                  className="h-full w-full transition-transform hover:scale-105"
                   width={280}
                   height={400}
                   priority
