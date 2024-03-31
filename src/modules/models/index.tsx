@@ -15,7 +15,7 @@ export async function Models() {
     const res: any[] = await fetch(
       'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600 },
       },
     ).then((res) => res.json())
 
