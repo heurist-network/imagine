@@ -1,4 +1,4 @@
-'use server'
+// 'use server'
 
 import { notFound } from 'next/navigation'
 
@@ -6,6 +6,8 @@ import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Generate from '@/modules/generate'
 import History from '@/modules/generate/history'
+
+export const maxDuration = 10
 
 export default async function Models({ params }: { params: { slug: string } }) {
   const { slug } = params
