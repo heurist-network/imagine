@@ -1,9 +1,13 @@
 'use server'
 
-import Randomstring from 'randomstring'
+import Heurist, { ImageModel } from 'heurist'
 import { z } from 'zod'
 
 import { env } from '@/env.mjs'
+
+const heurist = new Heurist({
+  apiKey: env.AUTH_KEY,
+})
 
 const formSchema = z.object({
   prompt: z.string().optional(),
@@ -29,21 +33,18 @@ export async function generateImage(_: any, formData: FormData) {
       model: formData.get('model'),
     })
 
-    const id = Randomstring.generate({
-      charset: 'hex',
-      length: 10,
-    })
-
     const model_input: any = {
       prompt: data.prompt || '',
+    }
+
+    if (data.neg_prompt) {
+      model_input.neg_prompt = data.neg_prompt
     }
 
     if (data.num_iterations) {
       model_input.num_iterations = Number(data.num_iterations)
     }
-    if (data.neg_prompt) {
-      model_input.neg_prompt = data.neg_prompt
-    }
+
     if (data.guidance_scale) {
       model_input.guidance_scale = Number(data.guidance_scale)
     }
@@ -62,52 +63,15 @@ export async function generateImage(_: any, formData: FormData) {
     }
 
     const params = {
-      job_id: `imagine-${id}`,
-      model_input: {
-        SD: model_input,
-      },
-      model_type: 'SD',
-      model_id: data.model,
-      deadline: 30,
-      priority: 1,
+      model: data.model as ImageModel,
+      ...model_input,
     }
 
-    const path = `${env.NEXT_PUBLIC_BASE_URL}/submit_job`
-
-    const response = await fetch(path, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${env.AUTH_KEY}`,
-      },
-      body: JSON.stringify(params),
-    })
-
-    if (!response.ok) {
-      if (
-        String(response.status).startsWith('5') ||
-        String(response.status).startsWith('4')
-      ) {
-        throw new Error(`Request timed out. Please try again`)
-      }
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const url = await response.text()
-    const dataUrl = url.replaceAll('"', '')
+    const response = await heurist.images.generate(params)
 
     return {
       status: 200,
-      data: {
-        url: dataUrl,
-        prompt: data.prompt,
-        neg_prompt: data.neg_prompt,
-        num_iterations: Number(data.num_iterations),
-        guidance_scale: Number(data.guidance_scale),
-        width: Number(data.width),
-        height: Number(data.height),
-        seed: data.seed,
-      },
+      data: response,
     }
   } catch (error: any) {
     console.log(error.message, 'generateImage error')
