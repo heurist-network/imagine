@@ -6,12 +6,10 @@ import { Button } from '@/components/ui/button'
 export default function Share({ params }: { params: { slug: string } }) {
   const { slug } = params
 
-  console.log(slug, 'slug')
-
   const url = `https://d1dagtixswu0qn.cloudfront.net/${slug}.png`
 
   return (
-    <div className="container pt-16 text-center">
+    <div className="container py-16 pb-20 text-center">
       <div className="mb-2 flex justify-center">
         <Image
           className="rounded-md"
