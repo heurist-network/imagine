@@ -1508,5 +1508,10 @@
     "address": "0xe2ebb65392c77b7f45a54f6e3a333cc023f144df",
     "hash": "0xcddc40fd25551fe4d14e6ff0bdc604ae8929583e2790a3adb3e59bd675cfbb67",
     "signature": "0x10adff6b3dd9e5a98c9e95cdd5f97b62c99e51963d766698a45fc19e0eb4cb751f45c27bf54e5055cd12e1b9486bff7803f93551dbf597bc1db5ffd1f01d91991b"
+  },
+  {
+    "address": "0x1d79399c702976e0cc7a6159ca0bf9b35490898a",
+    "hash": "0x970dda3b30ca8922c0fb49fc1e0b87c33decbadc9cf36ababa7dac1f067c93a5",
+    "signature": "0x389565e33f1ad589b0387f24be72e4cb6532f3c7a7cc10f1a92acd32e413bc8c4106cff8f97e1ac8bccec33e7be1cfd81e68fe173ce7e95d31515a2b546ac52a1b"
   }
 ]
