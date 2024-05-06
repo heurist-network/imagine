@@ -1,38 +1,22 @@
 'use server'
 
 import Heurist, { ImageModel } from 'heurist'
-import { z } from 'zod'
 
 import { env } from '@/env.mjs'
+import { Gateway, UserIdentifierType } from '@gateway-dao/sdk'
 
 const heurist = new Heurist({
   apiKey: env.AUTH_KEY,
 })
 
-const formSchema = z.object({
-  prompt: z.string().optional(),
-  neg_prompt: z.string().optional(),
-  num_iterations: z.string(),
-  guidance_scale: z.string(),
-  width: z.string(),
-  height: z.string(),
-  seed: z.string().optional(),
-  model: z.string().optional(),
+const gateway = new Gateway({
+  apiKey: env.GATEWAY_API_KEY,
+  token: env.GATEWAY_TOKEN,
+  url: 'https://protocol.mygateway.xyz/graphql',
 })
 
-export async function generateImage(_: any, formData: FormData) {
+export async function generateImage(data: any) {
   try {
-    const data = formSchema.parse({
-      prompt: formData.get('prompt'),
-      neg_prompt: formData.get('neg_prompt'),
-      num_iterations: formData.get('num_iterations'),
-      guidance_scale: formData.get('guidance_scale'),
-      width: formData.get('width'),
-      height: formData.get('height'),
-      seed: formData.get('seed'),
-      model: formData.get('model'),
-    })
-
     const model_input: any = {
       prompt: data.prompt || '',
     }
@@ -69,12 +53,36 @@ export async function generateImage(_: any, formData: FormData) {
 
     const response = await heurist.images.generate(params)
 
-    return {
-      status: 200,
-      data: response,
-    }
+    return { status: 200, data: response }
   } catch (error: any) {
     console.log(error.message, 'generateImage error')
+    return { status: 500, message: error.message }
+  }
+}
+
+export async function issueToGateway(data: any, address: string) {
+  try {
+    const obj = {
+      dataModelId: 'c93708e1-e660-4db5-b2d0-87573de6826f',
+      description: 'A data model for iamge generation from Heurist.',
+      title: 'Heurist AI Data Model',
+      claim: {
+        guidance_scale: data.guidance_scale,
+        image_url: data.url,
+        model_id: data.model,
+        num_steps: data.num_inference_steps,
+        prompt: data.prompt,
+        seed: data.seed,
+      },
+      owner: {
+        type: UserIdentifierType.EVM,
+        value: address,
+      },
+    }
+    const { createPDA } = await gateway.pda.createPDA(obj)
+    return { status: 200, data: createPDA }
+  } catch (error: any) {
+    console.log(error, 'issueToGateway error') // Can log it for debugging
     return { status: 500, message: error.message }
   }
 }
