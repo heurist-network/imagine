@@ -99,6 +99,8 @@ function Submit({ url, onReset }: { url: string; onReset: () => void }) {
 
 export default function Generate({ model, models }: GenerateProps) {
   const [state, formAction] = useFormState(generateImage, null)
+  const [showRecommend, setShowRecommend] = useState(false)
+  const [modelInfo, setModelInfo] = useState({ recommend: '' })
   const [history, setHistory] = useLocalStorage<any[]>('IMAGINE_HISTORY', [])
   const [result, setResult] = useState({
     url: '',
@@ -118,6 +120,9 @@ export default function Generate({ model, models }: GenerateProps) {
       seed: '-1',
     },
   })
+  useEffect(() => {
+    getModelData()
+  }, [])
 
   useEffect(() => {
     if (!state) return
@@ -173,6 +178,20 @@ export default function Generate({ model, models }: GenerateProps) {
     }, 100)
   }, [state])
 
+  const getModelData = async () => {
+    const res: any[] = await fetch(
+      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
+      {
+        next: { revalidate: 3600 },
+      },
+    ).then((res) => res.json())
+    const nowModel = res.find((item) => item.name.includes(model))
+    if (nowModel.type.includes('composite15')) {
+      form.setValue('prompt', nowModel.autofill)
+      setModelInfo(nowModel)
+      setShowRecommend(true)
+    }
+  }
   return (
     <div>
       <div className="md:3/4 grid w-full grid-cols-3 gap-4 py-4 md:grid-cols-4 lg:w-4/5">
@@ -234,7 +253,12 @@ export default function Generate({ model, models }: GenerateProps) {
               <FormItem>
                 <FormLabel>Prompt</FormLabel>
                 <FormControl>
-                  <Input placeholder="Prompt" autoComplete="off" {...field} />
+                  <>
+                    <Input placeholder="Prompt" autoComplete="off" {...field} />
+                    {showRecommend && (
+                      <div> Recommended key words: {modelInfo.recommend}</div>
+                    )}
+                  </>
                 </FormControl>
                 <FormMessage />
               </FormItem>
