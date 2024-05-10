@@ -86,3 +86,15 @@ export async function issueToGateway(data: any, address: string) {
     return { status: 500, message: error.message }
   }
 }
+
+export async function getPDAs(address: string) {
+  try {
+    const pdas = await gateway.pda.getPDAs({
+      filter: { owner: { type: 'EVM', value: address } },
+    })
+    return { status: 200, data: pdas }
+  } catch (error: any) {
+    console.log(error, 'getPDAs error') // Can log it for debugging
+    return { status: 500, message: error.message }
+  }
+}

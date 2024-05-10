@@ -152,6 +152,7 @@ export default function Generate({ model, models }: GenerateProps) {
     try {
       setLoadingUpload(true)
       const res = await issueToGateway({ ...info, model }, account.address)
+      console.log(res, 'res')
       if (res.status !== 200) {
         return toast.error(
           res.message || 'Issue to Gateway failed, please try again.',
