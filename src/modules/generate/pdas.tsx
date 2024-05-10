@@ -55,6 +55,8 @@ export default function PDAs() {
     )
   }
 
+  if (!list.length) return <div className="py-4">No data</div>
+
   return (
     <div className="mt-4 flex flex-col gap-2">
       {list.map((item) => (
