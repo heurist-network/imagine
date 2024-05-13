@@ -256,7 +256,9 @@ export default function Generate({ model, models }: GenerateProps) {
                   <>
                     <Input placeholder="Prompt" autoComplete="off" {...field} />
                     {showRecommend && (
-                      <div> Recommended key words: {modelInfo.recommend}</div>
+                      <FormDescription>
+                        Recommended key words: {modelInfo.recommend}
+                      </FormDescription>
                     )}
                   </>
                 </FormControl>
