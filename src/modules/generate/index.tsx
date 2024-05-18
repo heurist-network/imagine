@@ -73,6 +73,7 @@ export default function Generate({ model, models }: GenerateProps) {
     height: 0,
   })
   const [info, setInfo] = useState<any>(null)
+  const [gatewayId, setGatewayId] = useState('')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -149,6 +150,8 @@ export default function Generate({ model, models }: GenerateProps) {
   const onUpload = async () => {
     if (!account.address) return openConnectModal?.()
 
+    setGatewayId('')
+
     try {
       setLoadingUpload(true)
       const res = await issueToGateway({ ...info, model }, account.address)
@@ -158,6 +161,8 @@ export default function Generate({ model, models }: GenerateProps) {
           res.message || 'Issue to Gateway failed, please try again.',
         )
       }
+
+      setGatewayId(res.data?.id!)
 
       toast.success('Issue to Gateway successfully.')
     } finally {
@@ -373,22 +378,23 @@ export default function Generate({ model, models }: GenerateProps) {
               Submit
             </Button>
             {!!result.url && (
+              <Button
+                variant="outline"
+                disabled={loadingUpload}
+                onClick={onUpload}
+              >
+                {loadingUpload && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Upload to Gateway
+              </Button>
+            )}
+            {!!result.url && (
               <>
                 <div className="hidden gap-2 md:flex">
                   <Link href={result.url}>
                     <Button variant="outline">Download</Button>
                   </Link>
-                  <Button
-                    variant="outline"
-                    disabled={loadingUpload}
-                    onClick={onUpload}
-                  >
-                    {loadingUpload && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Upload
-                  </Button>
-
                   <Button
                     type="button"
                     variant="outline"
@@ -431,9 +437,6 @@ export default function Generate({ model, models }: GenerateProps) {
                     <DropdownMenuItem asChild>
                       <Link href={result.url}>Download</Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={onUpload}>
-                      Upload
-                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <div
                         className="flex items-center gap-1.5"
@@ -469,6 +472,20 @@ export default function Generate({ model, models }: GenerateProps) {
               </>
             )}
           </div>
+          {!!gatewayId && (
+            <div className="flex gap-2">
+              <div className="flex-shrink-0 whitespace-nowrap">
+                Transaction Details:{' '}
+              </div>
+              <Link
+                className="line-clamp-3 text-muted-foreground transition-colors hover:text-primary"
+                href={`https://mygateway.xyz/dashboard/user/asset/${gatewayId}`}
+                target="_blank"
+              >
+                {`https://mygateway.xyz/dashboard/user/asset/${gatewayId}`}
+              </Link>
+            </div>
+          )}
         </div>
       </Form>
       {result.url && (

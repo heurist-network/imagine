@@ -63,24 +63,26 @@ export async function generateImage(data: any) {
 export async function issueToGateway(data: any, address: string) {
   try {
     const obj = {
-      dataModelId: 'c93708e1-e660-4db5-b2d0-87573de6826f',
+      dataModelId: 'ed6f1213-fe9f-4d5f-b239-7105fe2ab590',
       description: 'A data model for iamge generation from Heurist.',
       title: 'Heurist AI Data Model',
       claim: {
-        guidance_scale: data.guidance_scale,
-        image_url: data.url,
         model_id: data.model,
-        num_steps: data.num_inference_steps,
         prompt: data.prompt,
+        negative_prompt: data.neg_prompt || '',
+        num_steps: data.num_inference_steps,
+        guidance_scale: data.guidance_scale,
         seed: data.seed,
+        image_url: data.url,
       },
       owner: {
         type: UserIdentifierType.EVM,
         value: address,
       },
     }
-    const { createPDA } = await gateway.pda.createPDA(obj)
-    return { status: 200, data: createPDA }
+    const res = await gateway.pda.createPDA(obj)
+
+    return { status: 200, data: res.createPDA }
   } catch (error: any) {
     console.log(error, 'issueToGateway error') // Can log it for debugging
     return { status: 500, message: error.message }
@@ -90,7 +92,7 @@ export async function issueToGateway(data: any, address: string) {
 export async function getPDAs(address: string) {
   try {
     const pdas = await gateway.pda.getPDAs({
-      filter: { owner: { type: 'EVM', value: address } },
+      filter: { owner: { type: UserIdentifierType.EVM, value: address } },
     })
     return { status: 200, data: pdas }
   } catch (error: any) {
