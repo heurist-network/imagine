@@ -62,27 +62,57 @@ export async function generateImage(data: any) {
 
 export async function issueToGateway(data: any, address: string) {
   try {
-    const obj = {
-      dataModelId: 'ed6f1213-fe9f-4d5f-b239-7105fe2ab590',
-      description: 'A data model for iamge generation from Heurist.',
-      title: 'Heurist AI Data Model',
-      claim: {
-        model_id: data.model,
-        prompt: data.prompt,
-        negative_prompt: data.neg_prompt || '',
-        num_steps: data.num_inference_steps,
-        guidance_scale: data.guidance_scale,
-        seed: data.seed,
-        image_url: data.url,
+    const res = await fetch('https://protocol.mygateway.xyz/graphql', {
+      method: 'POST',
+      headers: {
+        'X-Api-Key': env.GATEWAY_API_KEY,
+        Authorization: `Bearer ${env.GATEWAY_TOKEN}`,
+        'Content-Type': 'application/json',
       },
-      owner: {
-        type: UserIdentifierType.EVM,
-        value: address,
-      },
-    }
-    const res = await gateway.pda.createPDA(obj)
+      body: JSON.stringify({
+        query: `
+        mutation createPDA {
+          createPDA(
+            input: {
+              dataModelId: "ed6f1213-fe9f-4d5f-b239-7105fe2ab590"
+              description: "A data model for iamge generation from Heurist."
+              title: "Heurist AI Data Model"
+              claim: {
+                model_id: "${data.model}"
+                prompt: "${data.prompt}"
+                negative_prompt: "${data.neg_prompt || ''}"
+                num_steps: ${data.num_inference_steps}
+                guidance_scale: ${data.guidance_scale}
+                seed: ${data.seed}
+                image_url: "${data.url}"
+              }
+              owner: { type: EVM, value: "${address}" }
+            }
+          ) {
+            id
+            dataAsset {
+              owner {
+                id
+                gatewayId
+              }
+              issuer {
+                id
+                gatewayId
+              }
+            }
+            transactionId
+          }
+        }
+        `,
+        variables: {},
+      }),
+    })
+      .then((res) => res.json())
+      .catch((error) => {
+        console.log(error, 'error')
+      })
 
-    return { status: 200, data: res.createPDA }
+    return { status: 200, data: res.data.createPDA }
   } catch (error: any) {
     console.log(error, 'issueToGateway error') // Can log it for debugging
     return { status: 500, message: error.message }

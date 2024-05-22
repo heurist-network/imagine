@@ -73,7 +73,7 @@ export default function Generate({ model, models }: GenerateProps) {
     height: 0,
   })
   const [info, setInfo] = useState<any>(null)
-  const [gatewayId, setGatewayId] = useState('')
+  const [transactionId, setTransactionId] = useState('')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -150,19 +150,19 @@ export default function Generate({ model, models }: GenerateProps) {
   const onUpload = async () => {
     if (!account.address) return openConnectModal?.()
 
-    setGatewayId('')
+    setTransactionId('')
 
     try {
       setLoadingUpload(true)
       const res = await issueToGateway({ ...info, model }, account.address)
-      console.log(res, 'res')
+
       if (res.status !== 200) {
         return toast.error(
           res.message || 'Issue to Gateway failed, please try again.',
         )
       }
 
-      setGatewayId(res.data?.id!)
+      setTransactionId(res.data?.transactionId!)
 
       toast.success('Issue to Gateway successfully.')
     } finally {
@@ -472,17 +472,17 @@ export default function Generate({ model, models }: GenerateProps) {
               </>
             )}
           </div>
-          {!!gatewayId && (
+          {!!transactionId && (
             <div className="flex gap-2">
               <div className="flex-shrink-0 whitespace-nowrap">
                 Transaction Details:{' '}
               </div>
               <Link
                 className="line-clamp-3 text-muted-foreground transition-colors hover:text-primary"
-                href={`https://mygateway.xyz/dashboard/user/asset/${gatewayId}`}
+                href={`https://mygateway.xyz/explorer/transactions/${transactionId}`}
                 target="_blank"
               >
-                {`https://mygateway.xyz/dashboard/user/asset/${gatewayId}`}
+                {`https://mygateway.xyz/explorer/transactions/${transactionId}`}
               </Link>
             </div>
           )}
