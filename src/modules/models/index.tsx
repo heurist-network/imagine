@@ -20,7 +20,7 @@ export async function Models() {
     ).then((res) => res.json())
 
     const lists = res.filter(
-      (item) => item.type === 'sd15' || item.type === 'sdxl10',
+      (item) => item.type === 'sd15' || item.type === 'sdxl10' || item.type.includes("composite")
     )
 
     if (!lists.length) return null

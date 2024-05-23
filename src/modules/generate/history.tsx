@@ -17,7 +17,7 @@ export default function History({ model }: { model: string }) {
     history.find((item) => item.model === model)?.lists ?? []
   )
     .sort((a: any, b: any) => +new Date(b.create_at) - +new Date(a.create_at))
-    .slice(0, 10)
+    .slice(0, 50)
 
   if (!findModelHistory.length) return <div className="py-4">No data</div>
 

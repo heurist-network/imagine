@@ -56,7 +56,7 @@ export default async function Models({ params }: { params: { slug: string } }) {
               <TabsTrigger value="generate">Generate</TabsTrigger>
               <TabsTrigger value="history" className="items-end gap-1">
                 History
-                <span className="text-muted-foreground">(Latest 10)</span>
+                <span className="text-muted-foreground">(Latest 50)</span>
               </TabsTrigger>
               {/* <TabsTrigger value="pdas" className="items-end gap-1">
                 PDAs
