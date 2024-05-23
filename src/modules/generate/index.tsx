@@ -1,7 +1,7 @@
 'use client'
 
 import { Loader2, MoreVertical } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { nanoid } from 'nanoid'
@@ -66,7 +66,6 @@ export default function Generate({ model, models }: GenerateProps) {
 
   const [loadingGenerate, setLoadingGenerate] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
-  const [state, formAction] = useFormState(generateImage, null)
   const [showRecommend, setShowRecommend] = useState(false)
   const [modelInfo, setModelInfo] = useState({ recommend: '' })
   const [history, setHistory] = useLocalStorage<any[]>('IMAGINE_HISTORY', [])
