@@ -1,17 +1,17 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
+import { Loader2, MoreVertical } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useFormState, useFormStatus } from 'react-dom'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useLocalStorage } from 'usehooks-ts'
+import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
-import { generateImage } from '@/app/actions'
+import { generateImage, issueToGateway } from '@/app/actions'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +25,12 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
   Form,
   FormControl,
   FormDescription,
@@ -36,6 +42,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useConnectModal } from '@rainbow-me/rainbowkit'
 
 interface GenerateProps {
   model: string
@@ -53,52 +60,12 @@ const formSchema = z.object({
   model: z.string().optional(),
 })
 
-function Submit({ url, onReset }: { url: string; onReset: () => void }) {
-  const status = useFormStatus()
-
-  return (
-    <div className="flex gap-2">
-      <Button type="submit" disabled={status.pending} onClick={onReset}>
-        {status.pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Submit
-      </Button>
-      {!!url && (
-        <>
-          <Link href={url}>
-            <Button variant="outline">Download</Button>
-          </Link>
-          <Button
-            type="button"
-            variant="outline"
-            className="gap-1.5"
-            onClick={() => {
-              const link = `https://d1dagtixswu0qn.cloudfront.net/${
-                url.split('/').slice(-1)[0].split('?')[0]
-              }`
-
-              const path = link.split('/')
-              const name = path[path.length - 1].split('.')[0]
-              const intentUrl =
-                'https://twitter.com/intent/tweet?text=' +
-                encodeURIComponent(
-                  'My latest #AIart creation with Imagine #Heurist 🎨',
-                ) +
-                '&url=' +
-                encodeURIComponent(`https://imagine.heurist.ai/share/${name}`)
-              window.open(intentUrl, '_blank', 'width=550,height=420')
-            }}
-          >
-            <span>Share on</span>
-            <span className="i-ri-twitter-x-fill h-4 w-4" />
-          </Button>
-        </>
-      )}
-    </div>
-  )
-}
-
 export default function Generate({ model, models }: GenerateProps) {
-  const [state, formAction] = useFormState(generateImage, null)
+  const account = useAccount()
+  const { openConnectModal } = useConnectModal()
+
+  const [loadingGenerate, setLoadingGenerate] = useState(false)
+  const [loadingUpload, setLoadingUpload] = useState(false)
   const [showRecommend, setShowRecommend] = useState(false)
   const [modelInfo, setModelInfo] = useState({ recommend: '' })
   const [history, setHistory] = useLocalStorage<any[]>('IMAGINE_HISTORY', [])
@@ -107,6 +74,8 @@ export default function Generate({ model, models }: GenerateProps) {
     width: 0,
     height: 0,
   })
+  const [info, setInfo] = useState<any>(null)
+  const [transactionId, setTransactionId] = useState('')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -124,59 +93,87 @@ export default function Generate({ model, models }: GenerateProps) {
     getModelData()
   }, [])
 
-  useEffect(() => {
-    if (!state) return
+  const onSubmit = async () => {
+    setResult({ url: '', width: 0, height: 0 })
 
-    if (state.status !== 200) {
-      toast.error(
-        state.message || 'Failed to generate image, please try again.',
-      )
-      return
+    try {
+      setLoadingGenerate(true)
+      const params = { ...form.getValues(), model }
+
+      const res = await generateImage(params)
+      if (res.status !== 200) {
+        return toast.error(
+          res.message || 'Failed to generate image, please try again.',
+        )
+      }
+
+      const data: any = res.data
+
+      setResult({ url: data.url, width: data.width, height: data.height })
+
+      const findModel = history.find((item) => item.model === model)
+
+      const url = `https://d1dagtixswu0qn.cloudfront.net/${
+        data.url.split('/').slice(-1)[0].split('?')[0]
+      }`
+
+      const item = {
+        id: nanoid(),
+        url,
+        prompt: data.prompt,
+        neg_prompt: data.neg_prompt,
+        seed: data.seed,
+        width: data.width,
+        height: data.height,
+        num_inference_steps: data.num_iterations,
+        guidance_scale: data.guidance_scale,
+        create_at: new Date().toISOString(),
+      }
+
+      setInfo(item)
+
+      if (!findModel) {
+        const obj = { model, lists: [item] }
+        setHistory([...history, obj])
+      } else {
+        findModel.lists.push(item)
+        setHistory(history)
+      }
+
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          left: 0,
+          behavior: 'smooth',
+        })
+      }, 100)
+    } finally {
+      setLoadingGenerate(false)
     }
+  }
 
-    const data: any = state.data
+  const onUpload = async () => {
+    if (!account.address) return openConnectModal?.()
 
-    setResult({
-      url: data.url,
-      width: data.width,
-      height: data.height,
-    })
+    setTransactionId('')
 
-    const findModel = history.find((item) => item.model === model)
+    try {
+      setLoadingUpload(true)
+      const res = await issueToGateway({ ...info, model }, account.address)
 
-    const url = `https://d1dagtixswu0qn.cloudfront.net/${
-      data.url.split('/').slice(-1)[0].split('?')[0]
-    }`
+      if (res.status !== 200) {
+        return toast.error(
+          res.message || 'Issue to Gateway failed, please try again.',
+        )
+      }
 
-    const item = {
-      id: nanoid(),
-      url,
-      prompt: data.prompt,
-      neg_prompt: data.neg_prompt,
-      seed: data.seed,
-      width: data.width,
-      height: data.height,
-      num_inference_steps: data.num_inference_steps,
-      guidance_scale: data.guidance_scale,
-      create_at: new Date().toISOString(),
+      setTransactionId(res.data?.transactionId!)
+
+      toast.success('Issue to Gateway successfully.')
+    } finally {
+      setLoadingUpload(false)
     }
-
-    if (!findModel) {
-      const obj = { model, lists: [item] }
-      setHistory([...history, obj])
-    } else {
-      findModel.lists.push(item)
-      setHistory(history)
-    }
-
-    setTimeout(() => {
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        left: 0,
-        behavior: 'smooth',
-      })
-    }, 100)
-  }, [state])
+  }
 
   const getModelData = async () => {
     const res: any[] = await fetch(
@@ -244,8 +241,7 @@ export default function Generate({ model, models }: GenerateProps) {
         ))}
       </div>
       <Form {...form}>
-        <form action={formAction} className="space-y-8">
-          <input type="hidden" name="model" value={model} />
+        <div className="space-y-8">
           <FormField
             control={form.control}
             name="prompt"
@@ -400,13 +396,123 @@ export default function Generate({ model, models }: GenerateProps) {
               </FormItem>
             )}
           />
-          <Submit
-            url={result.url}
-            onReset={() => {
-              setResult({ url: '', width: 0, height: 0 })
-            }}
-          />
-        </form>
+          <div className="flex gap-2">
+            <Button disabled={loadingGenerate} onClick={onSubmit}>
+              {loadingGenerate && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Submit
+            </Button>
+            {!!result.url && (
+              <Button
+                variant="outline"
+                disabled={loadingUpload}
+                onClick={onUpload}
+              >
+                {loadingUpload && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Upload to Gateway
+              </Button>
+            )}
+            {!!result.url && (
+              <>
+                <div className="hidden gap-2 md:flex">
+                  <Link href={result.url}>
+                    <Button variant="outline">Download</Button>
+                  </Link>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="gap-1.5"
+                    onClick={() => {
+                      const link = `https://d1dagtixswu0qn.cloudfront.net/${
+                        result.url.split('/').slice(-1)[0].split('?')[0]
+                      }`
+
+                      const path = link.split('/')
+                      const name = path[path.length - 1].split('.')[0]
+                      const intentUrl =
+                        'https://twitter.com/intent/tweet?text=' +
+                        encodeURIComponent(
+                          'My latest #AIart creation with Imagine #Heurist 🎨',
+                        ) +
+                        '&url=' +
+                        encodeURIComponent(
+                          `https://imagine.heurist.ai/share/${name}`,
+                        )
+                      window.open(intentUrl, '_blank', 'width=550,height=420')
+                    }}
+                  >
+                    <span>Share on</span>
+                    <span className="i-ri-twitter-x-fill h-4 w-4" />
+                  </Button>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="flex md:hidden"
+                    >
+                      <MoreVertical className="h-3.5 w-3.5" />
+                      <span className="sr-only">More</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link href={result.url}>Download</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <div
+                        className="flex items-center gap-1.5"
+                        onClick={() => {
+                          const link = `https://d1dagtixswu0qn.cloudfront.net/${
+                            result.url.split('/').slice(-1)[0].split('?')[0]
+                          }`
+
+                          const path = link.split('/')
+                          const name = path[path.length - 1].split('.')[0]
+                          const intentUrl =
+                            'https://twitter.com/intent/tweet?text=' +
+                            encodeURIComponent(
+                              'My latest #AIart creation with Imagine #Heurist 🎨',
+                            ) +
+                            '&url=' +
+                            encodeURIComponent(
+                              `https://imagine.heurist.ai/share/${name}`,
+                            )
+                          window.open(
+                            intentUrl,
+                            '_blank',
+                            'width=550,height=420',
+                          )
+                        }}
+                      >
+                        <span>Share on</span>
+                        <span className="i-ri-twitter-x-fill h-4 w-4" />
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            )}
+          </div>
+          {!!transactionId && (
+            <div className="flex gap-2">
+              <div className="flex-shrink-0 whitespace-nowrap">
+                Transaction Details:{' '}
+              </div>
+              <Link
+                className="line-clamp-3 text-muted-foreground transition-colors hover:text-primary"
+                href={`https://mygateway.xyz/explorer/transactions/${transactionId}`}
+                target="_blank"
+              >
+                {`https://mygateway.xyz/explorer/transactions/${transactionId}`}
+              </Link>
+            </div>
+          )}
+        </div>
       </Form>
       {result.url && (
         <div className="mt-8">

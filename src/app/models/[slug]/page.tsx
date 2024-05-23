@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Generate from '@/modules/generate'
 import History from '@/modules/generate/history'
+import PDAs from '@/modules/generate/pdas'
 
 export const maxDuration = 30
 
@@ -57,12 +58,18 @@ export default async function Models({ params }: { params: { slug: string } }) {
                 History
                 <span className="text-muted-foreground">(Latest 50)</span>
               </TabsTrigger>
+              {/* <TabsTrigger value="pdas" className="items-end gap-1">
+                PDAs
+              </TabsTrigger> */}
             </TabsList>
             <TabsContent value="generate">
               <Generate model={model} models={models} />
             </TabsContent>
             <TabsContent value="history">
               <History model={model} />
+            </TabsContent>
+            <TabsContent value="pdas">
+              <PDAs />
             </TabsContent>
           </Tabs>
         </div>
