@@ -41,6 +41,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
+import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
@@ -405,12 +406,20 @@ export default function Generate({ model, models }: GenerateProps) {
             </Button>
             {!!result.url && (
               <Button
+                className={cn({ 'gap-2': !loadingUpload })}
                 variant="outline"
                 disabled={loadingUpload}
                 onClick={onUpload}
               >
-                {loadingUpload && (
+                {loadingUpload ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Image
+                    src="/gateway.svg"
+                    alt="gateway"
+                    width={26}
+                    height={26}
+                  />
                 )}
                 Upload to Gateway
               </Button>
