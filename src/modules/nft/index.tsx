@@ -154,6 +154,7 @@ export function NFTModule() {
   }
 
   if (error) {
+    console.error(error)
     return (
       <Card className="mt-4 flex h-44 w-full items-center justify-center">
         <p className="text-center">
