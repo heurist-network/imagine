@@ -3,7 +3,9 @@
 import { motion, Variants } from 'framer-motion'
 import Link from 'next/link'
 
+import AnimatedGradientText from '@/components/magicui/animated-gradient-text'
 import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 const VARIANTS: Variants = {
   hidden: { opacity: 0, y: -10 },
@@ -62,30 +64,35 @@ export function Hero() {
           <div className="flex h-6 items-center justify-center rounded-full bg-[#d4f7f0] px-2.5 text-xs text-[#067a6e]">
             New
           </div>
-          <div className="text-muted-foreground">
+          <div className="mr-2 text-muted-foreground">
             🎁 Imaginaries NFT Airdrop is here!
           </div>
-          <Link
-            href="/nft"
-            className="group flex h-8 cursor-pointer select-none items-center gap-3 rounded-full border px-3 text-sm transition-colors hover:bg-[hsla(0,0%,95%,1)]"
-          >
-            <span>Get the gift</span>
-            <span className="i-mingcute-right-fill text-muted-foreground group-hover:animate-bounce-horizontal" />
+          <Link href="/nft">
+            <AnimatedGradientText>
+              ✨ <hr className="mx-2 h-4 w-[1px] shrink-0 bg-gray-300" />{' '}
+              <span
+                className={cn(
+                  `animate-gradient inline bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
+                )}
+              >
+                Get the gift
+              </span>
+              <span className="i-mingcute-right-fill ml-1 text-muted-foreground group-hover:animate-bounce-horizontal" />
+            </AnimatedGradientText>
           </Link>
         </motion.div>
-        <Link href="/nft">
-          <motion.div
-            variants={VARIANTS}
-            className="group mt-8 flex h-8 cursor-pointer select-none items-center justify-center gap-1.5 rounded-full border px-1.5 transition-colors hover:bg-[hsla(0,0%,95%,1)] md:hidden"
-          >
-            <div className="flex h-6 items-center justify-center rounded-full bg-[#d4f7f0] px-2.5 text-xs text-[#067a6e]">
-              New
-            </div>
-            <div className="text-sm text-muted-foreground">
-              🎁 Imaginaries NFT Airdrop is here!
-            </div>
-            <span className="i-mingcute-right-fill text-muted-foreground group-hover:animate-bounce-horizontal" />
-          </motion.div>
+        <Link className="flex md:hidden" href="/nft">
+          <AnimatedGradientText>
+            🎁 <hr className="mx-2 h-4 w-[1px] shrink-0 bg-gray-300" />{' '}
+            <span
+              className={cn(
+                `animate-gradient inline bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
+              )}
+            >
+              Imaginaries NFT Airdrop is here!
+            </span>
+            <span className="i-mingcute-right-fill ml-1 text-muted-foreground group-hover:animate-bounce-horizontal" />
+          </AnimatedGradientText>
         </Link>
       </section>
     </motion.div>
