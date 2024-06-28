@@ -98,12 +98,27 @@ const config = {
           '50%': { backgroundPosition: '100% 50%' },
           '100%': { backgroundPosition: '0 50%' },
         },
+        shimmer: {
+          '0%, 90%, 100%': {
+            'background-position': 'calc(-100% - var(--shimmer-width)) 0',
+          },
+          '30%, 60%': {
+            'background-position': 'calc(100% + var(--shimmer-width)) 0',
+          },
+        },
+        gradient: {
+          to: {
+            backgroundPosition: 'var(--bg-size) 0',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         flow: 'flow 6s linear infinite',
         'bounce-horizontal': 'bounce-horizontal 1s infinite',
+        shimmer: 'shimmer 8s infinite',
+        gradient: 'gradient 8s linear infinite',
       },
     },
   },

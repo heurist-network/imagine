@@ -20,7 +20,10 @@ export async function Models() {
     ).then((res) => res.json())
 
     const lists = res.filter(
-      (item) => item.type === 'sd15' || item.type === 'sdxl10' || item.type.includes("composite")
+      (item) =>
+        item.type === 'sd15' ||
+        item.type === 'sdxl10' ||
+        item.type.includes('composite'),
     )
 
     if (!lists.length) return null
@@ -33,7 +36,7 @@ export async function Models() {
             <Link
               className="flex"
               key={item.name}
-              href={`/models/${item.name}-${item.author}`}
+              href={`/models/${item.name}`}
             >
               <ImageWrapper name={item.name} index={index}>
                 <Image
