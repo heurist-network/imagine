@@ -7,13 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Generate from '@/modules/generate'
 import History from '@/modules/generate/history'
 import PDAs from '@/modules/generate/pdas'
+import { Author } from '@/modules/models/author'
 
 export const maxDuration = 30
 
 export default async function Models({ params }: { params: { slug: string } }) {
   const { slug } = params
-  const [model, author] = slug.split('-')
-  if (!model || !author) return notFound()
+  const [model] = slug.split('-')
+  if (!model) return notFound()
 
   try {
     const model1 = await fetch(
@@ -47,9 +48,7 @@ export default async function Models({ params }: { params: { slug: string } }) {
           <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
             {model}
           </h2>
-          <p className="text-muted-foreground">
-            Created by <b className="text-foreground">{author}</b>
-          </p>
+          <Author model={model} />
           <Separator className="my-6" />
           <Tabs defaultValue="generate">
             <TabsList>
