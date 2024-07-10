@@ -41,6 +41,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
+import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
@@ -64,6 +65,11 @@ const formSchema = z.object({
 export default function Generate({ model, models }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
+  const { mint, data, error, isPending } = useMintZkImagine()
+
+  console.log(data, 'data')
+  console.log(error, 'error')
+  console.log(isPending, 'isPending')
 
   const [loadingGenerate, setLoadingGenerate] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
@@ -90,9 +96,14 @@ export default function Generate({ model, models }: GenerateProps) {
       seed: '-1',
     },
   })
-  useEffect(() => {
-    getModelData()
-  }, [])
+
+  const onMintToNFT = async () => {
+    const arr = info.url.split('/').slice(-1)[0].split('-').slice(-3)
+    const imageId = `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
+    const tx = await mint(model, imageId)
+
+    console.log(tx, 'tx')
+  }
 
   const onSubmit = async () => {
     setResult({ url: '', width: 0, height: 0 })
@@ -190,6 +201,11 @@ export default function Generate({ model, models }: GenerateProps) {
       setShowRecommend(true)
     }
   }
+
+  useEffect(() => {
+    getModelData()
+  }, [])
+
   return (
     <div>
       <div className="md:3/4 grid w-full grid-cols-3 gap-4 py-4 md:grid-cols-4 lg:w-4/5">
@@ -505,6 +521,11 @@ export default function Generate({ model, models }: GenerateProps) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
+            )}
+            {!!result.url && (
+              <Button variant="secondary" onClick={onMintToNFT}>
+                Mint to NFT
+              </Button>
             )}
           </div>
           {!!transactionId && (
