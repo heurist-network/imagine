@@ -10,18 +10,18 @@ export type MarketDataType = {
 }
 
 export enum Market {
-  zkSyncSepoliaTestnet = 'zkSyncSepoliaTestnet',
+  test_zkSync = 'test_zkSync',
   // zkSync = 'zkSync',
 }
 
 export const MarketConfig: {
   [key in keyof typeof Market]: MarketDataType
 } = {
-  zkSyncSepoliaTestnet: {
-    market: Market.zkSyncSepoliaTestnet,
+  test_zkSync: {
+    market: Market.test_zkSync,
     chain: zkSyncSepoliaTestnet,
     addresses: {
-      ZkImagine: '0x76Aab445e30F8e51Af2aeCd8620B1dd6bFAfC117',
+      ZkImagine: '0xD70D1F2b4fd3146D351CCA79A4f2d956E67b8874',
     },
   },
 }

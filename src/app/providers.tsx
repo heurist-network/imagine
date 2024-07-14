@@ -36,11 +36,11 @@ const connectors = connectorsForWallets(
 
 const config = createConfig({
   connectors,
-  chains: [zkSyncSepoliaTestnet],
-  // chains: [mainnet, ...supportedChains],
+  chains: [mainnet, zkSyncSepoliaTestnet],
   transports: {
     // http,
     [zkSyncSepoliaTestnet.id]: http(),
+    [mainnet.id]: http(),
   },
 })
 

@@ -1,58 +1,71 @@
-import { Address, parseEther } from 'viem'
-import { useAccount, useWriteContract } from 'wagmi'
+import { useCallback, useEffect } from 'react'
+import { Address, createPublicClient, http, parseEther } from 'viem'
+import { zkSyncSepoliaTestnet } from 'viem/zksync'
+import { useAccount, useSwitchChain, useWalletClient } from 'wagmi'
 
-import ZkImagineABI from '../abis/ZkImagine.json'
-import { MarketConfig } from '../constants/MarketConfig'
+import ZkImagineABI from '@/abis/ZkImagine.json'
+import { MarketConfig, MarketDataType } from '@/constants/MarketConfig'
 
 export const useMintZkImagine = () => {
   const { address, chain } = useAccount()
-  const { writeContract, data, error, isPending } = useWriteContract()
-  const mintFee = '0'
+  const { data: walletClient } = useWalletClient()
+  const { switchChain } = useSwitchChain()
 
-  const referralAddress =
-    '0x0000000000000000000000000000000000000000' as Address // zero address
+  useEffect(() => {
+    switchChain({
+      chainId: zkSyncSepoliaTestnet.id,
+    })
+  }, [chain])
 
-  const market = Object.values(MarketConfig).find(
-    (config) => config.chain.id === chain?.id,
+  if (!chain || !address) {
+    throw new Error(
+      'useMintZkImagine: Chain or address not found, ensure you are connected to a wallet',
+    )
+  }
+
+  const currentMarket = chain
+    ? Object.values(MarketConfig).find((m) => m.chain.id === chain.id)
+    : undefined
+
+  const publicClient = createPublicClient({
+    chain: chain,
+    transport: http(),
+  })
+
+  const createContractFunction = useCallback(
+    (functionName: string) => {
+      return async (
+        mintFee: string,
+        referralAddress: string,
+        modelId: string,
+        imageId: string,
+      ) => {
+        if (!currentMarket) throw new Error('currentMarket not found')
+
+        if (!walletClient) {
+          throw new Error('useMintZkImagine: Wallet client not found')
+        }
+
+        // @ts-ignore
+        const { request } = await publicClient.simulateContract({
+          address: currentMarket.addresses.ZkImagine,
+          abi: ZkImagineABI,
+          functionName,
+          args: [address, referralAddress as Address, modelId, imageId],
+          account: address,
+          value: parseEther(mintFee),
+        })
+
+        const hash = await walletClient.writeContract(request)
+        await publicClient.waitForTransactionReceipt({ hash })
+
+        return hash
+      }
+    },
+    [address, chain, currentMarket, walletClient, publicClient],
   )
 
-  const contractAddress = market?.addresses.ZkImagine
-
-  if (!contractAddress) {
-    console.error('Contract address not found')
-  }
-
-  const mint = async (modelId: string, imageId: string) => {
-    if (!address || !contractAddress) {
-      throw new Error('Address or contract not available')
-    }
-
-    console.log(contractAddress, 'contractAddress')
-    console.log(address, 'address')
-    console.log(referralAddress, 'referralAddress')
-    console.log(modelId, 'modelId')
-    console.log(imageId, 'imageId')
-
-    try {
-      const tx = writeContract({
-        address: contractAddress,
-        abi: ZkImagineABI,
-        functionName: 'mint',
-        args: [address, referralAddress, modelId, imageId],
-        value: parseEther(mintFee), // Assuming a 0.01 ETH mint fee, adjust as needed
-      })
-
-      return tx
-    } catch (err) {
-      console.error('Error minting:', err)
-      throw err
-    }
-  }
-
   return {
-    mint,
-    data,
-    error,
-    isPending,
+    mint: createContractFunction('mint'),
   }
 }

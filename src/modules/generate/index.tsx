@@ -65,11 +65,7 @@ const formSchema = z.object({
 export default function Generate({ model, models }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
-  const { mint, data, error, isPending } = useMintZkImagine()
-
-  console.log(data, 'data')
-  console.log(error, 'error')
-  console.log(isPending, 'isPending')
+  const { mint } = useMintZkImagine()
 
   const [loadingGenerate, setLoadingGenerate] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
@@ -100,9 +96,16 @@ export default function Generate({ model, models }: GenerateProps) {
   const onMintToNFT = async () => {
     const arr = info.url.split('/').slice(-1)[0].split('-').slice(-3)
     const imageId = `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
-    const tx = await mint(model, imageId)
 
-    console.log(tx, 'tx')
+    const defaultReferralAddress = '0xAEC3B3ec3aCd7BF66bC2a5d6A0D2619477BE8CcD'
+    const mintFee = '0.00009'
+    try {
+      const hash = await mint(mintFee, defaultReferralAddress, model, imageId)
+      console.log('Transaction hash:', hash)
+    } catch (error) {
+      console.error('Failed to mint to NFT:', error)
+      toast.error('Failed to mint to NFT, please try again.')
+    }
   }
 
   const onSubmit = async () => {
