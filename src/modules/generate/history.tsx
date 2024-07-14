@@ -20,16 +20,26 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
+import { useConnectModal } from '@rainbow-me/rainbowkit'
 
 import 'react-photo-view/dist/react-photo-view.css'
 
+import { Loader2 } from 'lucide-react'
+import { Address, formatEther, isAddress } from 'viem'
+import { useAccount } from 'wagmi'
+
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 export default function History({ model }: { model: string }) {
-  const { mint } = useMintZkImagine()
+  const { mint, mintFee } = useMintZkImagine()
+  const account = useAccount()
+  const { openConnectModal } = useConnectModal()
 
   const [history] = useLocalStorage<any[]>('IMAGINE_HISTORY', [])
   const [loadingMintNFT, setLoadingMintNFT] = useState(false)
+  const [referralAddress, setReferralAddress] = useState('')
+  const [isValidReferral, setIsValidReferral] = useState(false)
 
   const findModelHistory: any[] = (
     history.find((item) => item.model === model)?.lists ?? []
@@ -38,23 +48,30 @@ export default function History({ model }: { model: string }) {
     .slice(0, 50)
 
   const onMintToNFT = async (url: string) => {
+    // if wallet is not connected, open connect modal
+    if (!account.address) return openConnectModal?.()
+
     const arr = url.split('/').slice(-1)[0].split('-').slice(-3)
     const imageId = `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
-    const defaultReferralAddress = '0xAEC3B3ec3aCd7BF66bC2a5d6A0D2619477BE8CcD'
-    const mintFee = '0.00009'
+
+    const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
+
     setLoadingMintNFT(true)
     try {
-      const hash = await mint(mintFee, defaultReferralAddress, model, imageId)
-      console.log('Transaction hash:', hash)
+      const hash = await mint(
+        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
+        model,
+        imageId,
+      )
       toast.success('Imagine mint to NFT successfully.')
     } catch (error) {
       console.error('Failed to mint to NFT:', error)
       toast.error('Failed to mint to NFT, please try again.')
     } finally {
       setLoadingMintNFT(false)
+      setReferralAddress('')
     }
   }
-
   if (!findModelHistory.length) return <div className="py-4">No data</div>
 
   return (
@@ -114,26 +131,45 @@ export default function History({ model }: { model: string }) {
                 </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button size="sm" variant="outline">
-                      <div>
-                        <span>Mint</span>{' '}
-                        <span className="hidden md:inline-block">to NTF</span>
-                      </div>
+                    <Button variant="outline" disabled={loadingMintNFT}>
+                      {loadingMintNFT && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Mint to NFT
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Are you absolutely sure?
-                      </AlertDialogTitle>
+                      <AlertDialogTitle>Mint Imagine NFT</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to mint to NFT?
+                        <span className="text-sm font-bold text-black">
+                          {'Referral Address (Optional)'}
+                        </span>
+                        <Input
+                          placeholder="Referral Address"
+                          value={referralAddress}
+                          onChange={(e) =>
+                            setReferralAddress(e.target.value as Address)
+                          }
+                        />
+                        <span>
+                          Use referral address to receive 10% mint discount
+                        </span>
+                      </AlertDialogDescription>
+                      <AlertDialogDescription>
+                        Mint fee:{' '}
+                        {mintFee
+                          ? isValidReferral
+                            ? formatEther((mintFee * BigInt(9)) / BigInt(10))
+                            : formatEther(mintFee)
+                          : '-'}{' '}
+                        ETH
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction onClick={() => onMintToNFT(item.url)}>
-                        Continue
+                        Mint
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
