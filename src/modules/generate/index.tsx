@@ -79,6 +79,8 @@ export default function Generate({ model, models }: GenerateProps) {
   })
   const [info, setInfo] = useState<any>(null)
   const [transactionId, setTransactionId] = useState('')
+  const [alertOpen, setAlertOpen] = useState(false)
+  const [loadingMintNFT, setLoadingMintNFT] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -99,6 +101,7 @@ export default function Generate({ model, models }: GenerateProps) {
 
     const defaultReferralAddress = '0xAEC3B3ec3aCd7BF66bC2a5d6A0D2619477BE8CcD'
     const mintFee = '0.00009'
+    setLoadingMintNFT(true)
     try {
       const hash = await mint(mintFee, defaultReferralAddress, model, imageId)
       console.log('Transaction hash:', hash)
@@ -106,6 +109,8 @@ export default function Generate({ model, models }: GenerateProps) {
     } catch (error) {
       console.error('Failed to mint to NFT:', error)
       toast.error('Failed to mint to NFT, please try again.')
+    } finally {
+      setLoadingMintNFT(false)
     }
   }
 
@@ -476,6 +481,32 @@ export default function Generate({ model, models }: GenerateProps) {
                     <span>Share on</span>
                     <span className="i-ri-twitter-x-fill h-4 w-4" />
                   </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="secondary" disabled={loadingMintNFT}>
+                        {loadingMintNFT && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Mint to NFT
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to mint to NFT?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={onMintToNFT}>
+                          Continue
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -522,14 +553,18 @@ export default function Generate({ model, models }: GenerateProps) {
                         <span className="i-ri-twitter-x-fill h-4 w-4" />
                       </div>
                     </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setTimeout(() => {
+                          setAlertOpen(true)
+                        }, 200)
+                      }}
+                    >
+                      Mint to NFT
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
-            )}
-            {!!result.url && (
-              <Button variant="secondary" onClick={onMintToNFT}>
-                Mint to NFT
-              </Button>
             )}
           </div>
           {!!transactionId && (
@@ -561,6 +596,22 @@ export default function Generate({ model, models }: GenerateProps) {
           />
         </div>
       )}
+      <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to mint to NFT?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onMintToNFT}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
