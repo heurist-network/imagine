@@ -8,7 +8,8 @@ import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useLocalStorage } from 'usehooks-ts'
-import { useAccount } from 'wagmi'
+import { Address, formatEther, isAddress } from 'viem'
+import { useAccount, useReadContract } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
@@ -65,8 +66,7 @@ const formSchema = z.object({
 export default function Generate({ model, models }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
-  const { mint } = useMintZkImagine()
-
+  const { mint, mintFee } = useMintZkImagine()
   const [loadingGenerate, setLoadingGenerate] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
   const [showRecommend, setShowRecommend] = useState(false)
@@ -81,6 +81,8 @@ export default function Generate({ model, models }: GenerateProps) {
   const [transactionId, setTransactionId] = useState('')
   const [alertOpen, setAlertOpen] = useState(false)
   const [loadingMintNFT, setLoadingMintNFT] = useState(false)
+  const [referralAddress, setReferralAddress] = useState('')
+  const [isValidReferral, setIsValidReferral] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -95,15 +97,31 @@ export default function Generate({ model, models }: GenerateProps) {
     },
   })
 
+  useEffect(() => {
+    if (
+      isAddress(referralAddress) &&
+      referralAddress !== account.address &&
+      referralAddress !== '0x0000000000000000000000000000000000000000'
+    ) {
+      setIsValidReferral(true)
+    } else {
+      setIsValidReferral(false)
+    }
+  }, [referralAddress])
+
   const onMintToNFT = async () => {
     const arr = info.url.split('/').slice(-1)[0].split('-').slice(-3)
     const imageId = `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
 
-    const defaultReferralAddress = '0xAEC3B3ec3aCd7BF66bC2a5d6A0D2619477BE8CcD'
-    const mintFee = '0.00009'
+    const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
+
     setLoadingMintNFT(true)
     try {
-      const hash = await mint(mintFee, defaultReferralAddress, model, imageId)
+      const hash = await mint(
+        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
+        model,
+        imageId,
+      )
       console.log('Transaction hash:', hash)
       toast.success('Imagine mint to NFT successfully.')
     } catch (error) {
@@ -492,17 +510,36 @@ export default function Generate({ model, models }: GenerateProps) {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Are you absolutely sure?
-                        </AlertDialogTitle>
+                        <AlertDialogTitle>Mint Imagine NFT</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to mint to NFT?
+                          <span className="text-sm font-bold text-black">
+                            {'Referral Address (Optional)'}
+                          </span>
+                          <Input
+                            placeholder="Referral Address"
+                            value={referralAddress}
+                            onChange={(e) =>
+                              setReferralAddress(e.target.value as Address)
+                            }
+                          />
+                          <span>
+                            Use referral address to receive 10% mint discount
+                          </span>
+                        </AlertDialogDescription>
+                        <AlertDialogDescription>
+                          Mint fee:{' '}
+                          {mintFee
+                            ? isValidReferral
+                              ? formatEther((mintFee * BigInt(9)) / BigInt(10))
+                              : formatEther(mintFee)
+                            : '-'}{' '}
+                          ETH
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={onMintToNFT}>
-                          Continue
+                          Mint
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
