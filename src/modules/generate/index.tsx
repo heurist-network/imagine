@@ -102,6 +102,7 @@ export default function Generate({ model, models }: GenerateProps) {
     try {
       const hash = await mint(mintFee, defaultReferralAddress, model, imageId)
       console.log('Transaction hash:', hash)
+      toast.success('Imagine mint to NFT successfully.')
     } catch (error) {
       console.error('Failed to mint to NFT:', error)
       toast.error('Failed to mint to NFT, please try again.')
