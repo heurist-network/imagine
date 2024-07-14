@@ -110,6 +110,9 @@ export default function Generate({ model, models }: GenerateProps) {
   }, [referralAddress])
 
   const onMintToNFT = async () => {
+    // if wallet is not connected, open connect modal
+    if (!account.address) return openConnectModal?.()
+
     const arr = info.url.split('/').slice(-1)[0].split('-').slice(-3)
     const imageId = `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
 
@@ -129,6 +132,7 @@ export default function Generate({ model, models }: GenerateProps) {
       toast.error('Failed to mint to NFT, please try again.')
     } finally {
       setLoadingMintNFT(false)
+      setReferralAddress('')
     }
   }
 
@@ -501,7 +505,7 @@ export default function Generate({ model, models }: GenerateProps) {
                   </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="secondary" disabled={loadingMintNFT}>
+                      <Button variant="outline" disabled={loadingMintNFT}>
                         {loadingMintNFT && (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         )}
