@@ -75,9 +75,7 @@ export const useMintZkImagine = () => {
     try {
       const [discountedFee, discount] = (await publicClient.readContract({
         address: currentMarket.addresses.ZkImagine,
-        abi: parseAbi([
-          'function getDiscountedMintFee() view returns (uint256, uint256)',
-        ]),
+        abi: ZkImagineABI,
         functionName: 'getDiscountedMintFee',
       })) as [bigint, bigint]
       setDiscountedFee({ fee: discountedFee, discount })
