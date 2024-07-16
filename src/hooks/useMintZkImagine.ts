@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Address, parseAbi, parseEther } from 'viem'
+import { Address } from 'viem'
 import { zkSyncSepoliaTestnet } from 'viem/zksync'
 import {
   useAccount,
@@ -10,6 +10,8 @@ import {
 
 import ZkImagineABI from '@/abis/ZkImagine.json'
 import { MarketConfig } from '@/constants/MarketConfig'
+
+import { usePartnerFreeMint } from './usePartnerFreeMint'
 
 /**
  * Custom hook for minting ZkImagine NFTs.
@@ -23,6 +25,8 @@ export const useMintZkImagine = () => {
   const { address, chain } = useAccount()
   const { data: walletClient } = useWalletClient()
   const { switchChain } = useSwitchChain()
+
+  const { findUsablePartnerNFT, canPartnerFreeMint } = usePartnerFreeMint()
 
   // State for storing mint fees
   const [mintFee, setMintFee] = useState<bigint | null>(null)
@@ -157,24 +161,15 @@ export const useMintZkImagine = () => {
     ],
   )
 
-  /**
-   * Performs a partner free mint of a ZkImagine NFT.
-   *
-   * @param to - The address to mint the NFT to
-   * @param partnerNFTAddress - The address of the partner's NFT contract
-   * @param modelId - The ID of the model used for the NFT
-   * @param imageId - The ID of the image used for the NFT
-   * @returns The transaction hash of the mint transaction
-   */
   const partnerFreeMint = useCallback(
-    async (
-      to: string,
-      partnerNFTAddress: string,
-      modelId: string,
-      imageId: string,
-    ) => {
+    async (modelId: string, imageId: string) => {
       if (!currentMarket || !walletClient || !publicClient || !address) {
         throw new Error('Wallet not connected or unsupported chain')
+      }
+
+      const usablePartnerNFT = await findUsablePartnerNFT()
+      if (!usablePartnerNFT) {
+        throw new Error('No usable partner NFT found for free minting')
       }
 
       // Simulate the contract interaction
@@ -182,7 +177,7 @@ export const useMintZkImagine = () => {
         address: currentMarket.addresses.ZkImagine,
         abi: ZkImagineABI,
         functionName: 'partnerFreeMint',
-        args: [to as Address, partnerNFTAddress as Address, modelId, imageId],
+        args: [address, usablePartnerNFT as Address, modelId, imageId],
         account: address,
       })
 
@@ -192,9 +187,8 @@ export const useMintZkImagine = () => {
 
       return hash
     },
-    [address, currentMarket, walletClient, publicClient],
+    [address, currentMarket, walletClient, publicClient, findUsablePartnerNFT],
   )
-
   // Return placeholder functions if wallet is not connected or chain is not supported
   if (!chain || !address || !publicClient) {
     return {
@@ -212,6 +206,7 @@ export const useMintZkImagine = () => {
       readDiscountedMintFee: async () => {
         throw new Error('Wallet not connected or unsupported chain')
       },
+      canPartnerFreeMint: false,
     }
   }
 
@@ -223,5 +218,6 @@ export const useMintZkImagine = () => {
     discountedFee,
     readMintFee,
     readDiscountedMintFee,
+    canPartnerFreeMint,
   }
 }
