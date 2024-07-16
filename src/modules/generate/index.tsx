@@ -66,7 +66,7 @@ const formSchema = z.object({
 export default function Generate({ model, models }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
-  const { mint, mintFee } = useMintZkImagine()
+  const { mint, mintFee, discountedFee } = useMintZkImagine()
   const [loadingGenerate, setLoadingGenerate] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
   const [showRecommend, setShowRecommend] = useState(false)
@@ -531,9 +531,9 @@ export default function Generate({ model, models }: GenerateProps) {
                         </AlertDialogDescription>
                         <AlertDialogDescription>
                           Mint fee:{' '}
-                          {mintFee
+                          {mintFee && discountedFee
                             ? isValidReferral
-                              ? formatEther((mintFee * BigInt(9)) / BigInt(10))
+                              ? formatEther(discountedFee.fee)
                               : formatEther(mintFee)
                             : '-'}{' '}
                           ETH

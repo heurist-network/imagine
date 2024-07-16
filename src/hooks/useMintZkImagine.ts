@@ -78,6 +78,7 @@ export const useMintZkImagine = () => {
         abi: ZkImagineABI,
         functionName: 'getDiscountedMintFee',
       })) as [bigint, bigint]
+
       setDiscountedFee({ fee: discountedFee, discount })
       return { fee: discountedFee, discount }
     } catch (error) {
