@@ -158,10 +158,51 @@ export const useMintZkImagine = () => {
     ],
   )
 
+  /**
+   * Performs a partner free mint of a ZkImagine NFT.
+   *
+   * @param to - The address to mint the NFT to
+   * @param partnerNFTAddress - The address of the partner's NFT contract
+   * @param modelId - The ID of the model used for the NFT
+   * @param imageId - The ID of the image used for the NFT
+   * @returns The transaction hash of the mint transaction
+   */
+  const partnerFreeMint = useCallback(
+    async (
+      to: string,
+      partnerNFTAddress: string,
+      modelId: string,
+      imageId: string,
+    ) => {
+      if (!currentMarket || !walletClient || !publicClient || !address) {
+        throw new Error('Wallet not connected or unsupported chain')
+      }
+
+      // Simulate the contract interaction
+      const { request } = await publicClient.simulateContract({
+        address: currentMarket.addresses.ZkImagine,
+        abi: ZkImagineABI,
+        functionName: 'partnerFreeMint',
+        args: [to as Address, partnerNFTAddress as Address, modelId, imageId],
+        account: address,
+      })
+
+      // Execute the actual transaction
+      const hash = await walletClient.writeContract(request)
+      await publicClient.waitForTransactionReceipt({ hash })
+
+      return hash
+    },
+    [address, currentMarket, walletClient, publicClient],
+  )
+
   // Return placeholder functions if wallet is not connected or chain is not supported
   if (!chain || !address || !publicClient) {
     return {
       mint: async () => {
+        throw new Error('Wallet not connected or unsupported chain')
+      },
+      partnerFreeMint: async () => {
         throw new Error('Wallet not connected or unsupported chain')
       },
       mintFee: null,
@@ -178,6 +219,7 @@ export const useMintZkImagine = () => {
   // Return the hook's functions and data
   return {
     mint,
+    partnerFreeMint,
     mintFee,
     discountedFee,
     readMintFee,
