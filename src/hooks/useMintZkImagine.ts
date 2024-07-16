@@ -172,6 +172,13 @@ export const useMintZkImagine = () => {
         throw new Error('No usable partner NFT found for free minting')
       }
 
+      console.log('>>> partnerFreeMint:', {
+        address,
+        usablePartnerNFT,
+        modelId,
+        imageId,
+      })
+
       // Simulate the contract interaction
       const { request } = await publicClient.simulateContract({
         address: currentMarket.addresses.ZkImagine,

@@ -13,6 +13,7 @@ import { useAccount, useReadContract } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
+import { PartnerFreeMintButton } from '@/components/PartnerFreeMintButton'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -108,6 +109,16 @@ export default function Generate({ model, models }: GenerateProps) {
       setIsValidReferral(false)
     }
   }, [referralAddress])
+
+  const handlePartnerMintSuccess = (hash: string) => {
+    console.log('Minting successful, transaction hash:', hash)
+    // Handle success (e.g., show a success message, update UI)
+  }
+
+  const handlePartnerMintError = (error: Error) => {
+    console.error('Minting failed:', error)
+    // Handle error (e.g., show an error message)
+  }
 
   const onMintToNFT = async () => {
     // if wallet is not connected, open connect modal
@@ -547,6 +558,13 @@ export default function Generate({ model, models }: GenerateProps) {
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
+
+                  <PartnerFreeMintButton
+                    modelId={model}
+                    imageId={result.url.split('/').slice(-1)[0].split('?')[0]}
+                    onSuccess={handlePartnerMintSuccess}
+                    onError={handlePartnerMintError}
+                  />
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

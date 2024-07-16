@@ -5,8 +5,7 @@ import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 import ZkImagineABI from '@/abis/ZkImagine.json'
 import { MarketConfig } from '@/constants/MarketConfig'
 
-const AVAILABLE_FREE_MINT_API =
-  'https://mrlkq2kv5f.execute-api.us-east-1.amazonaws.com/test/available-free-mint'
+const PARTNER_NFTS_API = '/api/partner-nfts'
 
 export const usePartnerFreeMint = () => {
   const { address, chain } = useAccount()
@@ -15,27 +14,40 @@ export const usePartnerFreeMint = () => {
     chainId: walletClient?.chain.id,
   })
   const [partnerNFTs, setPartnerNFTs] = useState<string[]>([])
+  const [error, setError] = useState<string | null>(null)
 
   const fetchPartnerNFTs = useCallback(async () => {
     if (!address) return
 
     try {
-      const response = await fetch(AVAILABLE_FREE_MINT_API, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ minterAddress: address }),
-      })
+      const response = await fetch(
+        `${PARTNER_NFTS_API}?minterAddress=${address}`,
+      )
+      const textData = await response.text()
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch partner NFTs')
+      let data
+      try {
+        data = JSON.parse(textData)
+      } catch (e) {
+        console.error('Failed to parse JSON:', textData)
+        throw new Error('Invalid response format')
       }
 
-      const data = await response.json()
-      setPartnerNFTs(data.canMintForPartnerNFTs)
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch partner NFTs')
+      }
+
+      console.log('>>> User address:', address)
+      console.log('>>> Partner NFTs:', data.canMintForPartnerNFTs)
+
+      setPartnerNFTs(data.canMintForPartnerNFTs || [])
+      setError(null)
     } catch (error) {
       console.error('Error fetching partner NFTs:', error)
+      setError(
+        error instanceof Error ? error.message : 'Unknown error occurred',
+      )
+      setPartnerNFTs([])
     }
   }, [address])
 
@@ -68,6 +80,7 @@ export const usePartnerFreeMint = () => {
   const findUsablePartnerNFT = useCallback(async () => {
     for (const nftAddress of partnerNFTs) {
       if (await checkCanMintForPartnerNFT(nftAddress)) {
+        console.log('>>> Found usable partner NFT:', nftAddress)
         return nftAddress
       }
     }
