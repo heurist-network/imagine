@@ -52,14 +52,6 @@ export const PartnerFreeMintButton: React.FC<PartnerFreeMintButtonProps> = ({
       {canPartnerFreeMint && (
         <Button onClick={handlePartnerFreeMint}>Partner Free Mint</Button>
       )}
-      {isLoading ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Minting...
-        </>
-      ) : (
-        'Partner Free Mint'
-      )}{' '}
     </div>
   )
 }

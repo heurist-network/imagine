@@ -21,7 +21,7 @@ export const MarketConfig: {
     market: Market.test_zkSync,
     chain: zkSyncSepoliaTestnet,
     addresses: {
-      ZkImagine: '0xD6cA951835184C1F6BF4faee5C8C5960b4742ded',
+      ZkImagine: '0xa031c0c14b7b45748880db8075b815943E7837De',
     },
   },
 }

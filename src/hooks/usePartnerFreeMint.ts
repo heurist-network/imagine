@@ -1,3 +1,4 @@
+import { ClipboardSignature } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { Address } from 'viem'
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
@@ -36,9 +37,6 @@ export const usePartnerFreeMint = () => {
       if (!response.ok) {
         throw new Error(data.error || 'Failed to fetch partner NFTs')
       }
-
-      console.log('>>> User address:', address)
-      console.log('>>> Partner NFTs:', data.canMintForPartnerNFTs)
 
       setPartnerNFTs(data.canMintForPartnerNFTs || [])
       setError(null)

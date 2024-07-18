@@ -17,27 +17,24 @@ export async function GET(request: Request) {
 
   const headersList = {
     Accept: '*/*',
-    'User-Agent': 'Imagine-App',
+    'User-Agent': 'YourAppName',
     'Content-Type': 'application/json',
   }
 
-  const bodyContent = JSON.stringify({
-    minterAddress: minterAddress,
-  })
-
   try {
-    const apiRes = await fetch(`${AVAILABLE_FREE_MINT_API}`, {
-      method: 'GET',
-      headers: headersList,
-      body: bodyContent,
-    })
-
-    console.log('>>> API Response:', apiRes)
+    const apiRes = await fetch(
+      `${AVAILABLE_FREE_MINT_API}?minterAddress=${minterAddress}`,
+      {
+        method: 'GET',
+        headers: headersList,
+      },
+    )
 
     const data = await apiRes.text()
 
     if (!apiRes.ok) {
       console.error('API Error:', data)
+
       return NextResponse.json(
         { error: 'Failed to fetch partner NFTs', details: data },
         { status: apiRes.status },
