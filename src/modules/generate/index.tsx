@@ -145,26 +145,20 @@ export default function Generate({ model, models }: GenerateProps) {
       clearTimeout(timeoutId)
 
       if (!response) {
-        console.log('Proceeding to next step due to timeout')
+        console.log('Mint-Proxy API: Proceeding to next step due to timeout')
       } else if (!response.ok) {
         const data = await response.json()
-        console.error('API Error:', data)
-        throw new Error(
-          data.error || `API request failed with status ${response.status}`,
-        )
-      } else {
-        const data = await response.json()
-        console.log('API response:', data)
+        console.error('Mint-Proxy API: Error:', data)
       }
 
-      const hash = await mint(
+      const txHash = await mint(
         isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
         model,
         imageId,
       )
 
       // View in Etherscan
-      const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${hash}`
+      const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
       toast.success(
         <div>
           <div>Mint to NFT successfully.</div>
@@ -183,9 +177,14 @@ export default function Generate({ model, models }: GenerateProps) {
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error('Failed to mint to NFT:', error)
-        toast.error(
-          `Failed to mint to NFT: ${error.message}. Please try again later.`,
-        )
+        // error handler - user rejected transaction
+        if (error.message.includes('User rejected the request.')) {
+          toast.error('User rejected transaction signature.')
+        } else {
+          toast.error(
+            `Failed to mint to NFT: ${error.message}. Please try again later.`,
+          )
+        }
       }
     } finally {
       setLoadingMintNFT(false)
