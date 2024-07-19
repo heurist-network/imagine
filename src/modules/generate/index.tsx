@@ -508,24 +508,51 @@ export default function Generate({ model, models }: GenerateProps) {
               Submit
             </Button>
             {!!result.url && (
-              <Button
-                className={cn({ 'gap-2': !loadingUpload })}
-                variant="outline"
-                disabled={loadingUpload}
-                onClick={onUpload}
-              >
-                {loadingUpload ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Image
-                    src="/gateway.svg"
-                    alt="gateway"
-                    width={26}
-                    height={26}
-                  />
-                )}
-                Upload to Gateway
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" disabled={loadingMintNFT}>
+                    {loadingMintNFT && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Mint to NFT
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Mint Imagine NFT</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <span className="text-sm font-bold text-black">
+                        {'Referral Address (Optional)'}
+                      </span>
+                      <Input
+                        placeholder="Referral Address"
+                        value={referralAddress}
+                        onChange={(e) =>
+                          setReferralAddress(e.target.value as Address)
+                        }
+                      />
+                      <span>
+                        Use referral address to receive 10% mint discount
+                      </span>
+                    </AlertDialogDescription>
+                    <AlertDialogDescription>
+                      Mint fee:{' '}
+                      {mintFee && discountedFee
+                        ? isValidReferral
+                          ? formatEther(discountedFee.fee)
+                          : formatEther(mintFee)
+                        : '-'}{' '}
+                      ETH
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={onMintToNFT}>
+                      Mint
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
             {!!result.url && (
               <>
@@ -559,51 +586,24 @@ export default function Generate({ model, models }: GenerateProps) {
                     <span>Share on</span>
                     <span className="i-ri-twitter-x-fill h-4 w-4" />
                   </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="outline" disabled={loadingMintNFT}>
-                        {loadingMintNFT && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        Mint to NFT
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Mint Imagine NFT</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          <span className="text-sm font-bold text-black">
-                            {'Referral Address (Optional)'}
-                          </span>
-                          <Input
-                            placeholder="Referral Address"
-                            value={referralAddress}
-                            onChange={(e) =>
-                              setReferralAddress(e.target.value as Address)
-                            }
-                          />
-                          <span>
-                            Use referral address to receive 10% mint discount
-                          </span>
-                        </AlertDialogDescription>
-                        <AlertDialogDescription>
-                          Mint fee:{' '}
-                          {mintFee && discountedFee
-                            ? isValidReferral
-                              ? formatEther(discountedFee.fee)
-                              : formatEther(mintFee)
-                            : '-'}{' '}
-                          ETH
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={onMintToNFT}>
-                          Mint
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <Button
+                    className={cn({ 'gap-2': !loadingUpload })}
+                    variant="outline"
+                    disabled={loadingUpload}
+                    onClick={onUpload}
+                  >
+                    {loadingUpload ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Image
+                        src="/gateway.svg"
+                        alt="gateway"
+                        width={26}
+                        height={26}
+                      />
+                    )}
+                    Upload to Gateway
+                  </Button>
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -650,20 +650,20 @@ export default function Generate({ model, models }: GenerateProps) {
                         <span className="i-ri-twitter-x-fill h-4 w-4" />
                       </div>
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        setTimeout(() => {
-                          setAlertOpen(true)
-                        }, 200)
-                      }}
-                    >
-                      Mint to NFT
+                    <DropdownMenuItem onClick={onUpload}>
+                      Upload to Gateway
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
             )}
           </div>
+          {loadingUpload && (
+            <div className="flex items-center">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Loading Upload to Gateway
+            </div>
+          )}
           {!!transactionId && (
             <div className="flex gap-2">
               <div className="flex-shrink-0 whitespace-nowrap">

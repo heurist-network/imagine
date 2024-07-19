@@ -98,40 +98,15 @@ export default function History({ model }: { model: string }) {
                 {item.prompt}
               </div>
             </div>
-            <div className="mt-4 flex items-center justify-between">
+            <div className="mt-4 flex flex-col gap-4">
               <div className="flex gap-2">
-                <Link href={item.url} download>
-                  <Button size="sm" variant="outline">
-                    Download
-                  </Button>
-                </Link>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    const path = item.url.split('/')
-                    const name = path[path.length - 1].split('.')[0]
-                    const intentUrl =
-                      'https://twitter.com/intent/tweet?text=' +
-                      encodeURIComponent(
-                        'My latest #AIart creation with Imagine #Heurist 🎨',
-                      ) +
-                      '&url=' +
-                      encodeURIComponent(
-                        `https://imagine.heurist.ai/share/${name}`,
-                      )
-                    // "&via=" +
-                    // encodeURIComponent("asf") +
-                    // "&hashtags=" +
-                    // encodeURIComponent("Heurist");
-                    window.open(intentUrl, '_blank', 'width=550,height=420')
-                  }}
-                >
-                  <span className="i-ri-twitter-x-fill" />
-                </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="outline" disabled={loadingMintNFT}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={loadingMintNFT}
+                    >
                       {loadingMintNFT && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
@@ -174,6 +149,35 @@ export default function History({ model }: { model: string }) {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
+                <Link href={item.url} download>
+                  <Button size="sm" variant="outline">
+                    Download
+                  </Button>
+                </Link>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const path = item.url.split('/')
+                    const name = path[path.length - 1].split('.')[0]
+                    const intentUrl =
+                      'https://twitter.com/intent/tweet?text=' +
+                      encodeURIComponent(
+                        'My latest #AIart creation with Imagine #Heurist 🎨',
+                      ) +
+                      '&url=' +
+                      encodeURIComponent(
+                        `https://imagine.heurist.ai/share/${name}`,
+                      )
+                    // "&via=" +
+                    // encodeURIComponent("asf") +
+                    // "&hashtags=" +
+                    // encodeURIComponent("Heurist");
+                    window.open(intentUrl, '_blank', 'width=550,height=420')
+                  }}
+                >
+                  <span className="i-ri-twitter-x-fill" />
+                </Button>
               </div>
               <div className="text-[13px] leading-[20px] text-[rgb(142,141,145)]">
                 {formatDistance(new Date(item.create_at), new Date(), {
