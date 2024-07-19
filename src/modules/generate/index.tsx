@@ -110,7 +110,6 @@ export default function Generate({ model, models }: GenerateProps) {
   }, [referralAddress])
 
   const onMintToNFT = async () => {
-    // if wallet is not connected, open connect modal
     if (!account.address) return openConnectModal?.()
 
     const arr = info.url.split('/').slice(-1)[0].split('-').slice(-3)
@@ -120,6 +119,27 @@ export default function Generate({ model, models }: GenerateProps) {
 
     setLoadingMintNFT(true)
     try {
+      const response = await fetch('/api/mint-proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageId: imageId,
+          modelId: model,
+          url: info.url,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        console.error('API Error:', data)
+        throw new Error(
+          data.error || `API request failed with status ${response.status}`,
+        )
+      }
+
       const hash = await mint(
         isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
         model,
@@ -128,7 +148,10 @@ export default function Generate({ model, models }: GenerateProps) {
       toast.success('Imagine mint to NFT successfully.')
     } catch (error) {
       console.error('Failed to mint to NFT:', error)
-      toast.error('Failed to mint to NFT, please try again.')
+      toast.error(
+        //@ts-ignore
+        `Failed to mint to NFT: ${error.message}. Please try again later.`,
+      )
     } finally {
       setLoadingMintNFT(false)
       setReferralAddress('')

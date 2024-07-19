@@ -17,7 +17,7 @@ export async function GET(request: Request) {
 
   const headersList = {
     Accept: '*/*',
-    'User-Agent': 'YourAppName',
+    'User-Agent': 'ZKImagine-App',
     'Content-Type': 'application/json',
   }
 
