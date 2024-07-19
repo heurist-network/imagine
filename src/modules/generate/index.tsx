@@ -119,6 +119,9 @@ export default function Generate({ model, models }: GenerateProps) {
 
     setLoadingMintNFT(true)
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+
       const response = await fetch('/api/mint-proxy', {
         method: 'POST',
         headers: {
@@ -129,15 +132,28 @@ export default function Generate({ model, models }: GenerateProps) {
           modelId: model,
           url: info.url,
         }),
+        signal: controller.signal,
+      }).catch((err) => {
+        if (err.name === 'AbortError') {
+          console.log('Request timed out')
+          return null
+        }
+        throw err
       })
 
-      const data = await response.json()
+      clearTimeout(timeoutId)
 
-      if (!response.ok) {
+      if (!response) {
+        console.log('Proceeding to next step due to timeout')
+      } else if (!response.ok) {
+        const data = await response.json()
         console.error('API Error:', data)
         throw new Error(
           data.error || `API request failed with status ${response.status}`,
         )
+      } else {
+        const data = await response.json()
+        console.log('API response:', data)
       }
 
       const hash = await mint(
@@ -145,13 +161,15 @@ export default function Generate({ model, models }: GenerateProps) {
         model,
         imageId,
       )
+
       toast.success('Imagine mint to NFT successfully.')
-    } catch (error) {
-      console.error('Failed to mint to NFT:', error)
-      toast.error(
-        //@ts-ignore
-        `Failed to mint to NFT: ${error.message}. Please try again later.`,
-      )
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Failed to mint to NFT:', error)
+        toast.error(
+          `Failed to mint to NFT: ${error.message}. Please try again later.`,
+        )
+      }
     } finally {
       setLoadingMintNFT(false)
       setReferralAddress('')
