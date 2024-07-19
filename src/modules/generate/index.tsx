@@ -9,7 +9,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useLocalStorage } from 'usehooks-ts'
 import { Address, formatEther, isAddress } from 'viem'
-import { useAccount } from 'wagmi'
+import { useAccount, useClient } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
@@ -83,6 +83,7 @@ export default function Generate({ model, models }: GenerateProps) {
   const [loadingMintNFT, setLoadingMintNFT] = useState(false)
   const [referralAddress, setReferralAddress] = useState('')
   const [isValidReferral, setIsValidReferral] = useState(false)
+  const client = useClient()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -162,7 +163,23 @@ export default function Generate({ model, models }: GenerateProps) {
         imageId,
       )
 
-      toast.success('Imagine mint to NFT successfully.')
+      // View in Etherscan
+      const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${hash}`
+      toast.success(
+        <div>
+          <div>Mint to NFT successfully.</div>
+          {client?.chain?.blockExplorers?.default.url && (
+            <a
+              href={txUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-800 underline"
+            >
+              View in explorer.
+            </a>
+          )}
+        </div>,
+      )
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error('Failed to mint to NFT:', error)
