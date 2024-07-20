@@ -1,4 +1,3 @@
-import { ClipboardSignature } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { Address } from 'viem'
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi'

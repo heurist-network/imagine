@@ -8,8 +8,7 @@ import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useLocalStorage } from 'usehooks-ts'
-import { Address, formatEther, isAddress } from 'viem'
-import { useAccount, useClient } from 'wagmi'
+import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
@@ -42,8 +41,8 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
-import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { cn } from '@/lib/utils'
+import { MintToNFT, useMintToNFT } from '@/modules/mintToNFT'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
@@ -66,7 +65,6 @@ const formSchema = z.object({
 export default function Generate({ model, models }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
-  const { mint, mintFee, discountedFee } = useMintZkImagine()
   const [loadingGenerate, setLoadingGenerate] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
   const [showRecommend, setShowRecommend] = useState(false)
@@ -79,11 +77,7 @@ export default function Generate({ model, models }: GenerateProps) {
   })
   const [info, setInfo] = useState<any>(null)
   const [transactionId, setTransactionId] = useState('')
-  const [alertOpen, setAlertOpen] = useState(false)
-  const [loadingMintNFT, setLoadingMintNFT] = useState(false)
-  const [referralAddress, setReferralAddress] = useState('')
-  const [isValidReferral, setIsValidReferral] = useState(false)
-  const client = useClient()
+  const { loading: loadingMintNFT } = useMintToNFT()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -97,100 +91,6 @@ export default function Generate({ model, models }: GenerateProps) {
       seed: '-1',
     },
   })
-
-  useEffect(() => {
-    if (
-      isAddress(referralAddress) &&
-      referralAddress !== account.address &&
-      referralAddress !== '0x0000000000000000000000000000000000000000'
-    ) {
-      setIsValidReferral(true)
-    } else {
-      setIsValidReferral(false)
-    }
-  }, [referralAddress])
-
-  const onMintToNFT = async () => {
-    if (!account.address) return openConnectModal?.()
-
-    const arr = info.url.split('/').slice(-1)[0].split('-').slice(-3)
-    const imageId = `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
-
-    const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
-
-    setLoadingMintNFT(true)
-    try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
-
-      const response = await fetch('/api/mint-proxy', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          imageId: imageId,
-          modelId: model,
-          url: info.url,
-        }),
-        signal: controller.signal,
-      }).catch((err) => {
-        if (err.name === 'AbortError') {
-          console.log('Request timed out')
-          return null
-        }
-        throw err
-      })
-
-      clearTimeout(timeoutId)
-
-      if (!response) {
-        console.log('Mint-Proxy API: Proceeding to next step due to timeout')
-      } else if (!response.ok) {
-        const data = await response.json()
-        console.error('Mint-Proxy API: Error:', data)
-      }
-
-      const txHash = await mint(
-        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
-        model,
-        imageId,
-      )
-
-      // View in Etherscan
-      const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
-      toast.success(
-        <div>
-          <div>Mint to NFT successfully.</div>
-          {client?.chain?.blockExplorers?.default.url && (
-            <a
-              href={txUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-800 underline"
-            >
-              View in explorer.
-            </a>
-          )}
-        </div>,
-      )
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('Failed to mint to NFT:', error)
-        // error handler - user rejected transaction
-        if (error.message.includes('User rejected the request.')) {
-          toast.error('User rejected transaction signature.')
-        } else {
-          toast.error(
-            `Failed to mint to NFT: ${error.message}. Please try again later.`,
-          )
-        }
-      }
-    } finally {
-      setLoadingMintNFT(false)
-      setReferralAddress('')
-    }
-  }
 
   const onSubmit = async () => {
     setResult({ url: '', width: 0, height: 0 })
@@ -508,54 +408,15 @@ export default function Generate({ model, models }: GenerateProps) {
               Submit
             </Button>
             {!!result.url && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
+              <>
+                <MintToNFT url={info.url} model={model}>
                   <Button variant="outline" disabled={loadingMintNFT}>
                     {loadingMintNFT && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Mint to NFT
                   </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Mint Imagine NFT</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      <span className="text-sm font-bold text-black">
-                        {'Referral Address (Optional)'}
-                      </span>
-                      <Input
-                        placeholder="Referral Address"
-                        value={referralAddress}
-                        onChange={(e) =>
-                          setReferralAddress(e.target.value as Address)
-                        }
-                      />
-                      <span>
-                        Use referral address to receive 10% mint discount
-                      </span>
-                    </AlertDialogDescription>
-                    <AlertDialogDescription>
-                      Mint fee:{' '}
-                      {mintFee && discountedFee
-                        ? isValidReferral
-                          ? formatEther(discountedFee.fee)
-                          : formatEther(mintFee)
-                        : '-'}{' '}
-                      ETH
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={onMintToNFT}>
-                      Mint
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-            {!!result.url && (
-              <>
+                </MintToNFT>
                 <div className="hidden gap-2 md:flex">
                   <Link href={result.url}>
                     <Button variant="outline">Download</Button>
@@ -693,22 +554,6 @@ export default function Generate({ model, models }: GenerateProps) {
           />
         </div>
       )}
-      <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to mint to NFT?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onMintToNFT}>
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   )
 }
