@@ -414,7 +414,7 @@ export default function Generate({ model, models }: GenerateProps) {
                     {loadingMintNFT && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    Mint to NFT
+                    Mint zkImagine NFT
                   </Button>
                 </MintToNFT>
                 <div className="hidden gap-2 md:flex">

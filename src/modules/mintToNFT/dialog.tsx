@@ -89,7 +89,7 @@ export function MintToNFT({
       const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
       toast.success(
         <div>
-          <div>Mint to NFT successfully.</div>
+          <div>Mint zkImagine NFT successfully.</div>
           {client?.chain?.blockExplorers?.default.url && (
             <a
               href={txUrl}
@@ -104,13 +104,13 @@ export function MintToNFT({
       )
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.error('Failed to mint to NFT:', error)
+        console.error('Failed to Mint zkImagine NFT:', error)
         // error handler - user rejected transaction
         if (error.message.includes('User rejected the request.')) {
           toast.error('User rejected transaction signature.')
         } else {
           toast.error(
-            `Failed to mint to NFT: ${error.message}. Please try again later.`,
+            `Failed to Mint zkImagine NFT: ${error.message}. Please try again later.`,
           )
         }
       }
