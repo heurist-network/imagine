@@ -1,25 +1,31 @@
 import { NextResponse } from 'next/server'
+import { Hash } from 'viem'
 
 const API_ENDPOINT =
   'https://uhqro81r0k.execute-api.us-east-1.amazonaws.com/dev/imageGen'
 
 const X_API_KEY = 'rUvdjh39jx7xLhXRdUCxV4jy3XNctgvTos6xSpl4'
 
+type Payload = {
+  imageId: string
+  modelId: string
+  url: string
+  transactionHash: Hash
+}
+
 export async function POST(request: Request) {
   console.log('Received request to /api/mint-proxy')
 
   try {
-    const body = await request.json()
+    const body: Payload = await request.json()
 
     // Input validation
-    if (!body.imageId || !body.modelId || !body.url) {
+    if (!body.imageId || !body.modelId || !body.url || !body.transactionHash) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 },
       )
     }
-
-    console.log('Request body:', JSON.stringify(body))
 
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
@@ -30,8 +36,6 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify(body),
     })
-
-    console.log('API response status:', response.status)
 
     if (!response.ok) {
       const errorBody = await response.text()
@@ -46,8 +50,6 @@ export async function POST(request: Request) {
     }
 
     const data = await response.json()
-
-    console.log('Successful response:', JSON.stringify(data))
 
     return NextResponse.json(data)
   } catch (error: unknown) {

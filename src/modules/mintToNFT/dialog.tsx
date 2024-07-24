@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Address, formatEther, isAddress } from 'viem'
+import { Address, formatEther, Hash, isAddress } from 'viem'
 import { useAccount, useClient } from 'wagmi'
 
 import { Button } from '@/components/ui/button'
@@ -51,6 +51,14 @@ export function MintToNFT({
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
 
+      const txHash = await mint(
+        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
+        model,
+        imageId,
+      )
+
+      // TODO: Post the image after mint tx sent
+      //@dev post image to mint-proxy
       const response = await fetch('/api/mint-proxy', {
         method: 'POST',
         headers: {
@@ -59,7 +67,8 @@ export function MintToNFT({
         body: JSON.stringify({
           imageId: imageId,
           modelId: model,
-          url,
+          url: url,
+          transactionHash: txHash as Hash,
         }),
         signal: controller.signal,
       }).catch((err) => {
@@ -78,12 +87,6 @@ export function MintToNFT({
         const data = await response.json()
         console.error('Mint-Proxy API: Error:', data)
       }
-
-      const txHash = await mint(
-        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
-        model,
-        imageId,
-      )
 
       // View in Etherscan
       const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`

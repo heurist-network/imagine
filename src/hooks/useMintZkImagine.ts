@@ -143,6 +143,7 @@ export const useMintZkImagine = () => {
         args: [address, referralAddress as Address, modelId, imageId],
         account: address,
         value: mintFeeToUse,
+        gas: BigInt(5250000),
       })
 
       // Execute the actual transaction
