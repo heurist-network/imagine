@@ -6870,13 +6870,11 @@ packages:
     dev: false
 
   /lit-html/2.3.1:
-    resolution: {integrity: sha512-o9t+MQM3P4y7M7yNzqAyjp7z+mQGa4NS4CxiyLqFPyFWyc4O+nodLrkrxSaCTrla6M5YOLaT3RpbbqjszB5g3Q==}
     dependencies:
       '@types/trusted-types': 2.0.7
     dev: false
 
   /lit/2.3.1:
-    resolution: {integrity: sha512-4Sc3OFX9QHOJaHbmTMk28SYgVxLN3ePDjg7hofEft2zWlehFL3LiAuapWc4U/kYwMYJSh2hTCPZ6/LIC7ii0MA==}
     dependencies:
       '@lit/reactive-element': 1.6.3
       lit-element: 3.3.3
