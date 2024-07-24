@@ -13,7 +13,7 @@ import {
 export async function Models() {
   try {
     const res: any[] = await fetch(
-      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
+      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models-new.json',
       {
         next: { revalidate: 3600 },
       },

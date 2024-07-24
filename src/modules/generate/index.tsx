@@ -178,13 +178,13 @@ export default function Generate({ model, models }: GenerateProps) {
 
   const getModelData = async () => {
     const res: any[] = await fetch(
-      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
+      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models-new.json',
       {
         next: { revalidate: 3600 },
       },
     ).then((res) => res.json())
     const nowModel = res.find((item) => item.name.includes(model))
-    if (nowModel.type.includes('composite15')) {
+    if (nowModel.type.includes('composite')) {
       form.setValue('prompt', nowModel.autofill)
       setModelInfo(nowModel)
       setShowRecommend(true)

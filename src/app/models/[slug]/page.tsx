@@ -75,6 +75,37 @@ export default async function Models({ params }: { params: { slug: string } }) {
       </main>
     )
   } catch (error) {
-    return notFound()
+    return (
+      <main className="flex-1">
+        <div className="container pb-20 pt-8">
+          <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+            {model}
+          </h2>
+          <Author model={model} />
+          <Separator className="my-6" />
+          <Tabs defaultValue="generate">
+            <TabsList>
+              <TabsTrigger value="generate">Generate</TabsTrigger>
+              <TabsTrigger value="history" className="items-end gap-1">
+                History
+                <span className="text-muted-foreground">(Latest 50)</span>
+              </TabsTrigger>
+              {/* <TabsTrigger value="pdas" className="items-end gap-1">
+                PDAs
+              </TabsTrigger> */}
+            </TabsList>
+            <TabsContent value="generate">
+              <Generate model={model} models={[]} />
+            </TabsContent>
+            <TabsContent value="history">
+              <History model={model} />
+            </TabsContent>
+            <TabsContent value="pdas">
+              <PDAs />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
+    )
   }
 }
