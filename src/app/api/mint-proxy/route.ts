@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Hash } from 'viem'
 
-const API_ENDPOINT =
-  'https://uhqro81r0k.execute-api.us-east-1.amazonaws.com/dev/imageGen'
+const API_ENDPOINT = 'https://imagine-seven.vercel.app/api/mint-proxy'
 
 const X_API_KEY = 'rUvdjh39jx7xLhXRdUCxV4jy3XNctgvTos6xSpl4'
 
