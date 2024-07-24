@@ -184,7 +184,7 @@ export default function Generate({ model, models }: GenerateProps) {
       },
     ).then((res) => res.json())
     const nowModel = res.find((item) => item.name.includes(model))
-    if (nowModel.type.includes('composite15')) {
+    if (nowModel.type.includes('composite')) {
       form.setValue('prompt', nowModel.autofill)
       setModelInfo(nowModel)
       setShowRecommend(true)
