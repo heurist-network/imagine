@@ -178,7 +178,7 @@ export default function Generate({ model, models }: GenerateProps) {
 
   const getModelData = async () => {
     const res: any[] = await fetch(
-      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
+      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models-new.json',
       {
         next: { revalidate: 3600 },
       },
