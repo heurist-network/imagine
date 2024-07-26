@@ -62,7 +62,7 @@ export default function History({ model }: { model: string }) {
                     {loadingMintNFT && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    Mint zkImagine NFT
+                    ✨ Mint zkImagine NFT
                   </Button>
                 </MintToNFT>
                 <Link href={item.url} download>
