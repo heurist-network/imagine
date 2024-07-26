@@ -53,7 +53,12 @@ export default function History({ model }: { model: string }) {
             <div className="mt-4 flex flex-col gap-4">
               <div className="flex gap-2">
                 <MintToNFT url={item.url} model={model}>
-                  <Button size="sm" variant="outline" disabled={loadingMintNFT}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={loadingMintNFT}
+                    className="bg-gradient-to-r from-[#f08e9b] to-[#f2a583]"
+                  >
                     {loadingMintNFT && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}

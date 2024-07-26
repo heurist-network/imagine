@@ -405,12 +405,16 @@ export default function Generate({ model, models }: GenerateProps) {
               {loadingGenerate && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Submit
+              Generate
             </Button>
             {!!result.url && (
               <>
                 <MintToNFT url={info.url} model={model}>
-                  <Button variant="outline" disabled={loadingMintNFT}>
+                  <Button
+                    variant="outline"
+                    disabled={loadingMintNFT}
+                    className="bg-gradient-to-r from-[#f08e9b] to-[#f2a583] hover:bg-gradient-to-l"
+                  >
                     {loadingMintNFT && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
