@@ -36,6 +36,17 @@ export default async function Models({ params }: { params: { slug: string } }) {
       },
     ).then((res) => res.json())
 
+    const res: any[] = await fetch(
+      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models-new.json',
+      {
+        next: { revalidate: 3600 },
+      },
+    ).then((res) => res.json())
+
+    const findModel = res.find((item) => item.name === model)
+
+    console.log(findModel, 'findModel')
+
     const models = [
       { label: model, data: model1 },
       { label: `${model}-2`, data: model2 },
@@ -62,7 +73,11 @@ export default async function Models({ params }: { params: { slug: string } }) {
               </TabsTrigger> */}
             </TabsList>
             <TabsContent value="generate">
-              <Generate model={model} models={models} />
+              <Generate
+                model={model}
+                models={models}
+                isXl={findModel?.type?.endsWith('xl')}
+              />
             </TabsContent>
             <TabsContent value="history">
               <History model={model} />

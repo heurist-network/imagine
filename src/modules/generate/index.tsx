@@ -1,10 +1,10 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
-import { Loader2, MoreVertical, Info } from 'lucide-react'
+import { Info, Loader2, MoreVertical } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { AnimatePresence, motion } from 'framer-motion'
 import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -49,10 +49,11 @@ import { useConnectModal } from '@rainbow-me/rainbowkit'
 interface GenerateProps {
   model: string
   models: any[]
+  isXl?: boolean
 }
 
 interface TooltipProps {
-  content: any,
+  content: any
   children: any
 }
 
@@ -69,16 +70,16 @@ const formSchema = z.object({
 
 function Tooltip({ content, children }: TooltipProps) {
   return (
-    <div className="relative group">
+    <div className="group relative">
       {children}
-      <div className="absolute z-10 invisible group-hover:visible bg-gray-800 text-white text-xs rounded p-2 -mt-2 left-full ml-2 w-48">
+      <div className="invisible absolute left-full z-10 -mt-2 ml-2 w-48 rounded bg-gray-800 p-2 text-xs text-white group-hover:visible">
         {content}
       </div>
     </div>
   )
 }
 
-export default function Generate({ model, models }: GenerateProps) {
+export default function Generate({ model, models, isXl }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
 
@@ -102,11 +103,12 @@ export default function Generate({ model, models }: GenerateProps) {
       neg_prompt: '(worst quality: 1.4), bad quality, nsfw',
       num_iterations: 25,
       guidance_scale: 7,
-      width: 512,
-      height: 768,
+      width: isXl ? 680 : 512,
+      height: isXl ? 1024 : 768,
       seed: '-1',
     },
   })
+
   useEffect(() => {
     getModelData()
   }, [])
@@ -285,7 +287,7 @@ export default function Generate({ model, models }: GenerateProps) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="neg_prompt"
@@ -308,7 +310,7 @@ export default function Generate({ model, models }: GenerateProps) {
               </FormItem>
             )}
           />
-          
+
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -340,7 +342,7 @@ export default function Generate({ model, models }: GenerateProps) {
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="guidance_scale"
@@ -372,7 +374,7 @@ export default function Generate({ model, models }: GenerateProps) {
               )}
             />
           </div>
-          
+
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             <FormField
               control={form.control}
@@ -399,7 +401,7 @@ export default function Generate({ model, models }: GenerateProps) {
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="height"
@@ -425,7 +427,7 @@ export default function Generate({ model, models }: GenerateProps) {
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="seed"
@@ -447,13 +449,15 @@ export default function Generate({ model, models }: GenerateProps) {
           </div>
           <div className="space-y-4">
             <motion.button
-              className="w-full py-6 px-6 text-3xl font-bold text-white rounded-lg shadow-lg overflow-hidden"
+              className="w-full overflow-hidden rounded-lg px-6 py-6 text-3xl font-bold text-white shadow-lg"
               style={{
                 background: 'linear-gradient(45deg, #00ff9d, #ffff00, #00ff9d)',
                 backgroundSize: '200% 200%',
               }}
               animate={{
-                backgroundPosition: isGenerating ? ['0% 50%', '100% 50%', '0% 50%'] : ['0% 50%', '100% 50%'],
+                backgroundPosition: isGenerating
+                  ? ['0% 50%', '100% 50%', '0% 50%']
+                  : ['0% 50%', '100% 50%'],
               }}
               transition={{
                 duration: isGenerating ? 3 : 6,
@@ -465,14 +469,17 @@ export default function Generate({ model, models }: GenerateProps) {
             >
               <motion.div
                 animate={{ scale: isGenerating ? [1, 1.1, 1] : [1, 1.05, 1] }}
-                transition={{ duration: isGenerating ? 0.5 : 2, repeat: Infinity }}
+                transition={{
+                  duration: isGenerating ? 0.5 : 2,
+                  repeat: Infinity,
+                }}
               >
                 {isGenerating ? 'Generating...' : 'Generate'}
               </motion.div>
             </motion.button>
-            
+
             {!!result.url && (
-              <div className="flex flex-wrap gap-2 justify-center">
+              <div className="flex flex-wrap justify-center gap-2">
                 <Button
                   className={cn({ 'gap-2': !loadingUpload })}
                   variant="outline"
