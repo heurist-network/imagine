@@ -523,24 +523,6 @@ export default function Generate({ model, models }: GenerateProps) {
               </div>
             )}
           </div>
-
-          <AnimatePresence>
-            {isGenerating && (
-              <motion.div
-                className="absolute inset-0 flex items-center justify-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <motion.div
-                  className="w-32 h-32 rounded-full border-4 border-t-transparent"
-                  style={{ borderColor: 'rgba(0, 255, 157, 0.2)' }}
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
           {!!transactionId && (
             <div className="flex gap-2">
               <div className="flex-shrink-0 whitespace-nowrap">
