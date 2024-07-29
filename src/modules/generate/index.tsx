@@ -13,6 +13,7 @@ import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
+import PulsatingButton from '@/components/magicui/pulsating-button'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -448,8 +449,25 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             />
           </div>
           <div className="space-y-4">
-            <motion.button
-              className="w-full overflow-hidden rounded-lg px-6 py-6 text-3xl font-bold text-white shadow-lg"
+            <PulsatingButton
+              className={cn(
+                'h-14 w-full text-2xl font-semibold',
+                isGenerating ? 'bg-blue-500/50' : 'bg-blue-500',
+                isGenerating ? 'cursor-not-allowed' : 'cursor-pointer',
+              )}
+              onClick={onSubmit}
+              disabled={isGenerating}
+              pulseColor={isGenerating ? 'transparent' : '#0096ff'}
+            >
+              <div className="flex flex-row items-center">
+                {isGenerating && (
+                  <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                )}
+                {isGenerating ? 'Generating...' : 'Generate'}
+              </div>
+            </PulsatingButton>
+            {/* <motion.button
+              className="rounded-lg font-bold shadow-lg text-white w-full py-6 px-6 text-3xl overflow-hidden"
               style={{
                 background: 'linear-gradient(45deg, #00ff9d, #ffff00, #00ff9d)',
                 backgroundSize: '200% 200%',
@@ -476,7 +494,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
               >
                 {isGenerating ? 'Generating...' : 'Generate'}
               </motion.div>
-            </motion.button>
+            </motion.button> */}
 
             {!!result.url && (
               <div className="flex flex-wrap justify-center gap-2">

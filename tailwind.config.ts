@@ -111,6 +111,10 @@ const config = {
             backgroundPosition: 'var(--bg-size) 0',
           },
         },
+        pulse: {
+          '0%, 100%': { boxShadow: '0 0 0 0 var(--pulse-color)' },
+          '50%': { boxShadow: '0 0 0 8px var(--pulse-color)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -119,6 +123,7 @@ const config = {
         'bounce-horizontal': 'bounce-horizontal 1s infinite',
         shimmer: 'shimmer 8s infinite',
         gradient: 'gradient 8s linear infinite',
+        pulse: 'pulse var(--duration) ease-out infinite',
       },
     },
   },
