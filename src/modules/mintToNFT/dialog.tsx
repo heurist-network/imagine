@@ -49,7 +49,7 @@ export function MintToNFT({
     setLoading(true)
     try {
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
 
       const txHash = await mint(
         isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
