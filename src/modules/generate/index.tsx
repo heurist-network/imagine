@@ -1,9 +1,10 @@
 'use client'
 
-import { Loader2, MoreVertical } from 'lucide-react'
+import { Info, Loader2, MoreVertical } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { AnimatePresence, motion } from 'framer-motion'
 import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,6 +13,7 @@ import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
+import PulsatingButton from '@/components/magicui/pulsating-button'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,6 +51,12 @@ import { useConnectModal } from '@rainbow-me/rainbowkit'
 interface GenerateProps {
   model: string
   models: any[]
+  isXl?: boolean
+}
+
+interface TooltipProps {
+  content: any
+  children: any
 }
 
 const formSchema = z.object({
@@ -62,10 +70,23 @@ const formSchema = z.object({
   model: z.string().optional(),
 })
 
-export default function Generate({ model, models }: GenerateProps) {
+function Tooltip({ content, children }: TooltipProps) {
+  return (
+    <div className="group relative">
+      {children}
+      <div className="invisible absolute left-full z-10 -mt-2 ml-2 w-48 rounded bg-gray-800 p-2 text-xs text-white group-hover:visible">
+        {content}
+      </div>
+    </div>
+  )
+}
+
+export default function Generate({ model, models, isXl }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
   const [loadingGenerate, setLoadingGenerate] = useState(false)
+
+  const [isGenerating, setIsGenerating] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
   const [showRecommend, setShowRecommend] = useState(false)
   const [modelInfo, setModelInfo] = useState({ recommend: '' })
@@ -83,11 +104,11 @@ export default function Generate({ model, models }: GenerateProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       prompt: '',
-      neg_prompt: '',
-      num_iterations: 30,
-      guidance_scale: 10,
-      width: 512,
-      height: 768,
+      neg_prompt: '(worst quality: 1.4), bad quality, nsfw',
+      num_iterations: 25,
+      guidance_scale: 7,
+      width: isXl ? 680 : 512,
+      height: isXl ? 1024 : 768,
       seed: '-1',
     },
   })
@@ -96,7 +117,7 @@ export default function Generate({ model, models }: GenerateProps) {
     setResult({ url: '', width: 0, height: 0 })
 
     try {
-      setLoadingGenerate(true)
+      setIsGenerating(true)
       const params = { ...form.getValues(), model }
 
       const res = await generateImage(params)
@@ -147,7 +168,7 @@ export default function Generate({ model, models }: GenerateProps) {
         })
       }, 100)
     } finally {
-      setLoadingGenerate(false)
+      setIsGenerating(false)
     }
   }
 
@@ -182,7 +203,7 @@ export default function Generate({ model, models }: GenerateProps) {
       },
     ).then((res) => res.json())
     const nowModel = res.find((item) => item.name.includes(model))
-    if (nowModel.type.includes('composite15')) {
+    if (nowModel.type.includes('composite')) {
       form.setValue('prompt', nowModel.autofill)
       setModelInfo(nowModel)
       setShowRecommend(true)
@@ -251,7 +272,12 @@ export default function Generate({ model, models }: GenerateProps) {
             name="prompt"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Prompt</FormLabel>
+                <FormLabel className="flex items-center">
+                  Prompt
+                  <Tooltip content="Enter a description or a list of key words of the image you want to generate">
+                    <Info className="ml-2 h-4 w-4 cursor-help" />
+                  </Tooltip>
+                </FormLabel>
                 <FormControl>
                   <>
                     <Input placeholder="Prompt" autoComplete="off" {...field} />
@@ -266,12 +292,18 @@ export default function Generate({ model, models }: GenerateProps) {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="neg_prompt"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Negative Prompt</FormLabel>
+                <FormLabel className="flex items-center">
+                  Negative Prompt
+                  <Tooltip content="Enter elements you don't want in the generated image">
+                    <Info className="ml-2 h-4 w-4 cursor-help" />
+                  </Tooltip>
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Negative Prompt"
@@ -283,244 +315,241 @@ export default function Generate({ model, models }: GenerateProps) {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="num_iterations"
-            render={({ field }) => (
-              <FormItem className="space-y-4">
-                <FormLabel>Sampling Steps ({field.value})</FormLabel>
-                <Input
-                  className="hidden"
-                  name="num_iterations"
-                  value={field.value}
-                  onChange={() => {}}
-                />
-                <FormControl>
-                  <Slider
-                    value={[field.value]}
-                    onValueChange={(value) => field.onChange(value[0])}
-                    min={1}
-                    max={50}
-                    step={1}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="guidance_scale"
-            render={({ field }) => (
-              <FormItem className="space-y-4">
-                <FormLabel>Guidance Scale ({field.value})</FormLabel>
-                <Input
-                  className="hidden"
-                  name="guidance_scale"
-                  value={field.value}
-                  onChange={() => {}}
-                />
-                <FormControl>
-                  <Slider
-                    value={[field.value]}
-                    onValueChange={(value) => field.onChange(value[0])}
-                    min={1}
-                    max={20}
-                    step={0.1}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="width"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Width</FormLabel>
-                <FormControl>
+
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="num_iterations"
+              render={({ field }) => (
+                <FormItem className="space-y-4">
+                  <FormLabel className="flex items-center">
+                    Sampling Steps ({field.value})
+                    <Tooltip content="Recommended: 20-30. Higher values may produce better quality but take longer.">
+                      <Info className="ml-2 h-4 w-4 cursor-help" />
+                    </Tooltip>
+                  </FormLabel>
                   <Input
-                    placeholder="Width"
-                    type="number"
-                    {...field}
-                    onBlur={(e) => {
-                      if (Number(e.target.value) < 512) {
-                        field.onChange(512)
-                      }
-                      if (Number(e.target.value) > 1024) {
-                        field.onChange(1024)
-                      }
-                    }}
+                    className="hidden"
+                    name="num_iterations"
+                    value={field.value}
+                    onChange={() => {}}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="height"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Height</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Height"
-                    type="number"
-                    {...field}
-                    onBlur={(e) => {
-                      if (Number(e.target.value) < 512) {
-                        field.onChange(512)
-                      }
-                      if (Number(e.target.value) > 1024) {
-                        field.onChange(1024)
-                      }
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="seed"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Seed</FormLabel>
-                <FormControl>
-                  <Input placeholder="Seed" {...field} />
-                </FormControl>
-                <FormDescription>
-                  Use -1 for random results. Use non-negative number for
-                  deterministic results.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="flex gap-2">
-            <Button disabled={loadingGenerate} onClick={onSubmit}>
-              {loadingGenerate && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <FormControl>
+                    <Slider
+                      value={[field.value]}
+                      onValueChange={(value) => field.onChange(value[0])}
+                      min={1}
+                      max={50}
+                      step={1}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-              Generate
-            </Button>
+            />
+
+            <FormField
+              control={form.control}
+              name="guidance_scale"
+              render={({ field }) => (
+                <FormItem className="space-y-4">
+                  <FormLabel className="flex items-center">
+                    Guidance Scale ({field.value})
+                    <Tooltip content="Recommended: 4-10. Higher values adhere more strictly to the prompt.">
+                      <Info className="ml-2 h-4 w-4 cursor-help" />
+                    </Tooltip>
+                  </FormLabel>
+                  <Input
+                    className="hidden"
+                    name="guidance_scale"
+                    value={field.value}
+                    onChange={() => {}}
+                  />
+                  <FormControl>
+                    <Slider
+                      value={[field.value]}
+                      onValueChange={(value) => field.onChange(value[0])}
+                      min={1}
+                      max={12}
+                      step={0.1}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            <FormField
+              control={form.control}
+              name="width"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Width</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Width"
+                      type="number"
+                      {...field}
+                      onBlur={(e) => {
+                        if (Number(e.target.value) < 512) {
+                          field.onChange(512)
+                        }
+                        if (Number(e.target.value) > 1024) {
+                          field.onChange(1024)
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="height"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Height</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Height"
+                      type="number"
+                      {...field}
+                      onBlur={(e) => {
+                        if (Number(e.target.value) < 512) {
+                          field.onChange(512)
+                        }
+                        if (Number(e.target.value) > 1024) {
+                          field.onChange(1024)
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="seed"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center">
+                    Seed
+                    <Tooltip content="Use -1 for random results. Use non-negative number for deterministic results.">
+                      <Info className="ml-2 h-4 w-4 cursor-help" />
+                    </Tooltip>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="Seed" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="space-y-4">
+            {/* <PulsatingButton
+              className={cn(
+                'h-14 w-full text-2xl font-semibold',
+                isGenerating ? 'bg-blue-500/50' : 'bg-blue-500',
+                isGenerating ? 'cursor-not-allowed' : 'cursor-pointer',
+              )}
+              onClick={onSubmit}
+              disabled={isGenerating}
+              pulseColor={isGenerating ? 'transparent' : '#0096ff'}
+            >
+              <div className="flex flex-row items-center">
+                {isGenerating && (
+                  <Loader2 className="h-6 mr-2 animate-spin w-6" />
+                )}
+                {isGenerating ? 'Generating...' : 'Generate'}
+              </div>
+            </PulsatingButton> */}
+            <motion.button
+              className="h-14 w-full overflow-hidden rounded-lg text-2xl font-semibold text-white shadow-lg"
+              style={{
+                background: 'linear-gradient(45deg, #00ff9d, #ffff00, #00ff9d)',
+                backgroundSize: '200% 200%',
+              }}
+              animate={{
+                backgroundPosition: isGenerating
+                  ? ['0% 50%', '100% 50%', '0% 50%']
+                  : ['0% 50%', '100% 50%'],
+              }}
+              transition={{
+                duration: isGenerating ? 3 : 6,
+                ease: 'linear',
+                repeat: Infinity,
+              }}
+              onClick={onSubmit}
+              disabled={isGenerating}
+            >
+              <motion.div
+                animate={{ scale: isGenerating ? [1, 1.1, 1] : [1, 1.05, 1] }}
+                transition={{
+                  duration: isGenerating ? 0.5 : 2,
+                  repeat: Infinity,
+                }}
+              >
+                {isGenerating ? 'Generating...' : 'Generate'}
+              </motion.div>
+            </motion.button>
+
             {!!result.url && (
-              <>
-                <MintToNFT url={info.url} model={model}>
-                  <Button
-                    variant="outline"
-                    disabled={loadingMintNFT}
-                    className="bg-gradient-to-r from-[#f08e9b] to-[#f2a583] hover:bg-gradient-to-l"
-                  >
-                    {loadingMintNFT && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    ✨ Mint zkImagine NFT
-                  </Button>
-                </MintToNFT>
-                <div className="hidden gap-2 md:flex">
-                  <Link href={result.url}>
-                    <Button variant="outline">Download</Button>
-                  </Link>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="gap-1.5"
-                    onClick={() => {
-                      const link = `https://d1dagtixswu0qn.cloudfront.net/${
-                        result.url.split('/').slice(-1)[0].split('?')[0]
-                      }`
+              <div className="flex flex-wrap justify-center gap-2">
+                <Button
+                  className={cn({ 'gap-2': !loadingUpload })}
+                  variant="outline"
+                  disabled={loadingUpload}
+                  onClick={onUpload}
+                >
+                  {loadingUpload ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Image
+                      src="/gateway.svg"
+                      alt="gateway"
+                      width={26}
+                      height={26}
+                    />
+                  )}
+                  Upload to Gateway
+                </Button>
+                <Link href={result.url}>
+                  <Button variant="outline">Download</Button>
+                </Link>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="gap-1.5"
+                  onClick={() => {
+                    const link = `https://d1dagtixswu0qn.cloudfront.net/${
+                      result.url.split('/').slice(-1)[0].split('?')[0]
+                    }`
 
-                      const path = link.split('/')
-                      const name = path[path.length - 1].split('.')[0]
-                      const intentUrl =
-                        'https://twitter.com/intent/tweet?text=' +
-                        encodeURIComponent(
-                          'My latest #AIart creation with Imagine #Heurist 🎨',
-                        ) +
-                        '&url=' +
-                        encodeURIComponent(
-                          `https://imagine.heurist.ai/share/${name}`,
-                        )
-                      window.open(intentUrl, '_blank', 'width=550,height=420')
-                    }}
-                  >
-                    <span>Share on</span>
-                    <span className="i-ri-twitter-x-fill h-4 w-4" />
-                  </Button>
-                  <Button
-                    className={cn({ 'gap-2': !loadingUpload })}
-                    variant="outline"
-                    disabled={loadingUpload}
-                    onClick={onUpload}
-                  >
-                    {loadingUpload ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Image
-                        src="/gateway.svg"
-                        alt="gateway"
-                        width={26}
-                        height={26}
-                      />
-                    )}
-                    Upload to Gateway
-                  </Button>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="flex md:hidden"
-                    >
-                      <MoreVertical className="h-3.5 w-3.5" />
-                      <span className="sr-only">More</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link href={result.url}>Download</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <div
-                        className="flex items-center gap-1.5"
-                        onClick={() => {
-                          const link = `https://d1dagtixswu0qn.cloudfront.net/${
-                            result.url.split('/').slice(-1)[0].split('?')[0]
-                          }`
-
-                          const path = link.split('/')
-                          const name = path[path.length - 1].split('.')[0]
-                          const intentUrl =
-                            'https://twitter.com/intent/tweet?text=' +
-                            encodeURIComponent(
-                              'My latest #AIart creation with Imagine #Heurist 🎨',
-                            ) +
-                            '&url=' +
-                            encodeURIComponent(
-                              `https://imagine.heurist.ai/share/${name}`,
-                            )
-                          window.open(
-                            intentUrl,
-                            '_blank',
-                            'width=550,height=420',
-                          )
-                        }}
-                      >
-                        <span>Share on</span>
-                        <span className="i-ri-twitter-x-fill h-4 w-4" />
-                      </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={onUpload}>
-                      Upload to Gateway
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
+                    const path = link.split('/')
+                    const name = path[path.length - 1].split('.')[0]
+                    const intentUrl =
+                      'https://twitter.com/intent/tweet?text=' +
+                      encodeURIComponent(
+                        'My latest #AIart creation with Imagine #Heurist 🎨',
+                      ) +
+                      '&url=' +
+                      encodeURIComponent(
+                        `https://imagine.heurist.ai/share/${name}`,
+                      )
+                    window.open(intentUrl, '_blank', 'width=550,height=420')
+                  }}
+                >
+                  <span>Share on</span>
+                  <span className="i-ri-twitter-x-fill h-4 w-4" />
+                </Button>
+              </div>
             )}
           </div>
           {loadingUpload && (
@@ -546,9 +575,14 @@ export default function Generate({ model, models }: GenerateProps) {
         </div>
       </Form>
       {result.url && (
-        <div className="mt-8">
+        <motion.div
+          className="mt-8 flex justify-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <Image
-            className="rounded-lg"
+            className="rounded-lg shadow-xl"
             unoptimized
             width={result.width}
             height={result.height}
@@ -556,7 +590,7 @@ export default function Generate({ model, models }: GenerateProps) {
             src={result.url}
             alt="image result"
           />
-        </div>
+        </motion.div>
       )}
     </div>
   )

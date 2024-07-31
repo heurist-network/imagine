@@ -12,7 +12,7 @@ import '../styles/globals.css'
 
 const title = 'Imagine | AI Image generator by Heurist'
 const description =
-  'We host best Stable Diffusion models on a decentralized network of GPUs and offer them for free'
+  'Access Stable Diffusion models on a decentralized network of GPUs. Create and reproduce IP without limiation. Showcase your creativity and earn cryptocurrencies.'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://imagine.heurist.ai'),
