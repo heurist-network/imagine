@@ -449,7 +449,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             />
           </div>
           <div className="space-y-4">
-            <PulsatingButton
+            {/* <PulsatingButton
               className={cn(
                 'h-14 w-full text-2xl font-semibold',
                 isGenerating ? 'bg-blue-500/50' : 'bg-blue-500',
@@ -465,9 +465,9 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                 )}
                 {isGenerating ? 'Generating...' : 'Generate'}
               </div>
-            </PulsatingButton>
-            {/* <motion.button
-              className="rounded-lg font-bold shadow-lg text-white w-full py-6 px-6 text-3xl overflow-hidden"
+            </PulsatingButton> */}
+            <motion.button
+              className="h-14 w-full overflow-hidden rounded-lg text-2xl font-semibold text-white shadow-lg"
               style={{
                 background: 'linear-gradient(45deg, #00ff9d, #ffff00, #00ff9d)',
                 backgroundSize: '200% 200%',
@@ -494,7 +494,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
               >
                 {isGenerating ? 'Generating...' : 'Generate'}
               </motion.div>
-            </motion.button> */}
+            </motion.button>
 
             {!!result.url && (
               <div className="flex flex-wrap justify-center gap-2">
