@@ -45,8 +45,6 @@ export default async function Models({ params }: { params: { slug: string } }) {
 
     const findModel = res.find((item) => item.name === model)
 
-    console.log(findModel, 'findModel')
-
     const models = [
       { label: model, data: model1 },
       { label: `${model}-2`, data: model2 },
@@ -55,8 +53,8 @@ export default async function Models({ params }: { params: { slug: string } }) {
 
     return (
       <main className="flex-1">
-        <div className="container pb-20 pt-8">
-          <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+        <div className="container pt-8 pb-20">
+          <h2 className="font-semibold tracking-tight pb-2 text-3xl scroll-m-20 first:mt-0">
             {model}
           </h2>
           <Author model={model} />
@@ -64,11 +62,11 @@ export default async function Models({ params }: { params: { slug: string } }) {
           <Tabs defaultValue="generate">
             <TabsList>
               <TabsTrigger value="generate">Generate</TabsTrigger>
-              <TabsTrigger value="history" className="items-end gap-1">
+              <TabsTrigger value="history" className="gap-1 items-end">
                 History
                 <span className="text-muted-foreground">(Latest 50)</span>
               </TabsTrigger>
-              {/* <TabsTrigger value="pdas" className="items-end gap-1">
+              {/* <TabsTrigger value="pdas" className="gap-1 items-end">
                 PDAs
               </TabsTrigger> */}
             </TabsList>
@@ -92,8 +90,8 @@ export default async function Models({ params }: { params: { slug: string } }) {
   } catch (error) {
     return (
       <main className="flex-1">
-        <div className="container pb-20 pt-8">
-          <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+        <div className="container pt-8 pb-20">
+          <h2 className="font-semibold tracking-tight pb-2 text-3xl scroll-m-20 first:mt-0">
             {model}
           </h2>
           <Author model={model} />
@@ -101,11 +99,11 @@ export default async function Models({ params }: { params: { slug: string } }) {
           <Tabs defaultValue="generate">
             <TabsList>
               <TabsTrigger value="generate">Generate</TabsTrigger>
-              <TabsTrigger value="history" className="items-end gap-1">
+              <TabsTrigger value="history" className="gap-1 items-end">
                 History
                 <span className="text-muted-foreground">(Latest 50)</span>
               </TabsTrigger>
-              {/* <TabsTrigger value="pdas" className="items-end gap-1">
+              {/* <TabsTrigger value="pdas" className="gap-1 items-end">
                 PDAs
               </TabsTrigger> */}
             </TabsList>
