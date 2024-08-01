@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 
 import {
   AlertDialog,
@@ -16,6 +15,14 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
@@ -102,111 +109,153 @@ const invoices = [
 export default function Mint() {
   const [mintType, setMintType] = useState<'quick' | 'advanced'>('quick')
   const [images, setImages] = useState([
-    {
-      id: '1',
-      name: 'image1',
-    },
-    {
-      id: '2',
-      name: 'image2',
-    },
-    {
-      id: '3',
-      name: 'image3',
-    },
+    { id: '1', name: 'image1' },
+    { id: '2', name: 'image2' },
+    { id: '3', name: 'image3' },
   ])
 
   return (
-    <main className="flex flex-col flex-1 pb-20">
+    <main className="flex flex-1 flex-col pb-20">
       <div className="container pt-8">
-        <div className="font-semibold text-3xl text-neutral-900 -tracking-[0.0075em]">
+        <div className="text-2xl font-semibold -tracking-[0.0075em] text-neutral-900 lg:text-3xl">
           Campaign Statistics & Rewards
         </div>
-        <div className="border border-neutral-200 rounded-[6px] mt-8 grid grid-cols-4 overflow-hidden">
-          <div className="bg-[red] border-b border-r flex flex-col font-semibold border-neutral-200 pt-6 pb-4 text-neutral-900 -tracking-[0.005em] gap-4 items-center md:bg-transparent">
-            <div className="text-xl">Sprint</div>
-            <div className="text-2xl">1</div>
-          </div>
-          <div className="border-b border-r flex flex-col font-semibold border-neutral-200 pt-6 pb-4 text-neutral-900 -tracking-[0.005em] gap-4 items-center">
-            <div className="text-xl">Reward Pool</div>
-            <div className="text-2xl">9,999.99 ETH</div>
-          </div>
-          <div className="border-b border-r flex flex-col font-semibold border-neutral-200 pt-6 pb-4 text-neutral-900 -tracking-[0.005em] gap-4 items-center">
-            <div className="text-xl">My Power</div>
-            <div className="text-2xl">2,000</div>
-          </div>
-          <div className="border-b flex flex-col font-semibold border-neutral-200 pt-6 pb-4 text-neutral-900 -tracking-[0.005em] gap-4 items-center">
-            <div className="text-xl">My ZK Reward</div>
-            <div className="text-2xl">123,456 ZK</div>
-          </div>
-          <div className="border-r flex bg-slate-50 border-neutral-200 py-5 gap-2 items-center justify-center">
-            <Image src="/icon/timer.svg" alt="timer" width={24} height={24} />
-            <div className="text-sm text-neutral-900 leading-6">
-              <span className="font-bold">13 </span>
-              <span>Days, </span>
-              <span className="font-bold">20 </span>
-              <span>Hours</span>
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:mt-8 lg:grid-cols-4 lg:gap-0">
+          <div className="overflow-hidden rounded-[6px] border-y border-l border-r border-neutral-200 lg:rounded-r-none">
+            <div className="flex flex-col items-center gap-4 pb-4 pt-6 font-semibold">
+              <div className="text-xl -tracking-[0.005em]">Sprint</div>
+              <div className="text-2xl -tracking-[0.006em]">1</div>
+            </div>
+            <div className="flex items-center justify-center gap-2 border-t border-neutral-200 bg-slate-50 py-5">
+              <Image src="/icon/timer.svg" alt="timer" width={24} height={24} />
+              <div className="text-sm leading-6 text-neutral-900">
+                <span className="font-bold">13 </span>
+                <span>Days, </span>
+                <span className="font-bold">20 </span>
+                <span>Hours</span>
+              </div>
             </div>
           </div>
-          <div className="border-r flex bg-slate-50 border-neutral-200 items-center justify-center">
-            <Button className="rounded-full">How to Earn Rewards</Button>
+          <div className="overflow-hidden rounded-[6px] border-y border-l border-r border-neutral-200 lg:rounded-none lg:border-l-0">
+            <div className="flex flex-col items-center gap-4 pb-4 pt-6 font-semibold">
+              <div className="text-xl -tracking-[0.005em]">Reward Pool</div>
+              <div className="text-2xl -tracking-[0.006em]">9,999.99 ETH</div>
+            </div>
+            <div className="flex items-center justify-center border-t border-neutral-200 bg-slate-50 py-3">
+              <Button className="rounded-full">How to Earn Rewards</Button>
+            </div>
           </div>
-          <div className="border-r flex bg-slate-50 border-neutral-200 items-center justify-center">
-            <Link className="text-sm text-neutral-900 underline" href="#">
-              What’s My Power?
-            </Link>
+          <div className="overflow-hidden rounded-[6px] border-y border-l border-r border-neutral-200 lg:rounded-none lg:border-l-0">
+            <div className="flex flex-col items-center gap-4 pb-4 pt-6 font-semibold">
+              <div className="text-xl -tracking-[0.005em]">My Power</div>
+              <div className="text-2xl -tracking-[0.006em]">2,000</div>
+            </div>
+            <div className="flex items-center justify-center border-t border-neutral-200 bg-slate-50 py-3">
+              <Button
+                className="rounded-full text-sm underline"
+                variant="ghost"
+              >
+                What’s My Power?
+              </Button>
+            </div>
           </div>
-          <div className="flex bg-slate-50 items-center justify-center">
-            <Button className="rounded-full">Claim Rewards</Button>
+          <div className="overflow-hidden rounded-[6px] border-y border-l border-r border-neutral-200 lg:rounded-l-none lg:border-l-0">
+            <div className="flex flex-col items-center gap-4 pb-4 pt-6 font-semibold">
+              <div className="text-xl -tracking-[0.005em]">My ZK Reward</div>
+              <div className="text-2xl -tracking-[0.006em]">123,456 ZK</div>
+            </div>
+            <div className="flex items-center justify-center border-t border-neutral-200 bg-slate-50 py-3">
+              <Button className="rounded-full">Claim Rewards</Button>
+            </div>
           </div>
         </div>
       </div>
-      <div className="bg-slate-50 mt-16">
+      <div className="mt-16 lg:bg-slate-50">
         <div className="container py-8">
-          <div className="font-semibold text-3xl text-neutral-900 -tracking-[0.0075em]">
+          <div className="text-2xl font-semibold -tracking-[0.0075em] text-neutral-900 lg:text-3xl">
             Featured Models of the Day
           </div>
-          <div className="mt-1.5 text-sm mb-8 text-neutral-500 leading-6">
+          <div className="mb-4 mt-1.5 text-sm leading-6 text-neutral-500 lg:mb-8">
             Select a model from today's curated collection to generate and mint.
           </div>
-
-          <div className="flex gap-16 items-center">
-            <div className="flex flex-col flex-1 h-[552px] gap-8">
-              <Tabs defaultValue="model1">
-                <TabsList className="bg-white border border-slate-300">
+          <div className="flex flex-col items-center gap-4 lg:flex-row lg:gap-16">
+            <div className="flex h-[552px] w-full flex-1 flex-col gap-4 lg:gap-8">
+              <Tabs defaultValue="model1" className="flex">
+                <TabsList className="flex-1 border border-slate-300 bg-white">
                   <TabsTrigger
-                    className="w-[117px] data-[state=active]:bg-black data-[state=active]:text-white"
+                    className="flex-1 data-[state=active]:bg-black data-[state=active]:text-white"
                     value="model1"
                   >
                     Model 1
                   </TabsTrigger>
                   <TabsTrigger
-                    className="w-[117px] data-[state=active]:bg-black data-[state=active]:text-white"
+                    className="flex-1 data-[state=active]:bg-black data-[state=active]:text-white"
                     value="model2"
                   >
                     Model 2
                   </TabsTrigger>
                   <TabsTrigger
-                    className="w-[117px] data-[state=active]:bg-black data-[state=active]:text-white"
+                    className="flex-1 data-[state=active]:bg-black data-[state=active]:text-white"
                     value="model3"
                   >
                     Model 3
                   </TabsTrigger>
                   <TabsTrigger
-                    className="w-[117px] data-[state=active]:bg-black data-[state=active]:text-white"
+                    className="flex-1 data-[state=active]:bg-black data-[state=active]:text-white"
                     value="model4"
                   >
                     Model 4
                   </TabsTrigger>
-                  <TabsTrigger
-                    className="w-[117px] data-[state=active]:bg-black data-[state=active]:text-white"
+                  {/* <TabsTrigger
+                    className="flex-1 data-[state=active]:bg-black data-[state=active]:text-white"
                     value="model5"
                   >
                     Model 5
-                  </TabsTrigger>
+                  </TabsTrigger> */}
                 </TabsList>
               </Tabs>
-              <div>
+              <div className="flex justify-center lg:hidden">
+                <Carousel className="w-[259px]">
+                  <CarouselContent>
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <CarouselItem key={index} className="flex justify-center">
+                        <div className="flex h-[408px] w-[259px] p-1">
+                          <Card className="flex flex-1">
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <CardContent className="flex flex-1 cursor-pointer items-center justify-center p-6">
+                                  <span className="text-4xl font-semibold">
+                                    {index + 1}
+                                  </span>
+                                </CardContent>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Prompt</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will
+                                    permanently delete your account and remove
+                                    your data from our servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction>
+                                    Use this prompt
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </Card>
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
+              </div>
+              <div className="hidden lg:block">
                 <div className="flex items-center justify-center">
                   {images.map((image, index) => (
                     <AlertDialog>
@@ -242,11 +291,11 @@ export default function Mint() {
                     </AlertDialog>
                   ))}
                 </div>
-                <div className="flex flex-col mt-8 items-center justify-center">
-                  <div className="font-semibold text-lg text-neutral-900">
+                <div className="mt-8 flex flex-col items-center justify-center">
+                  <div className="text-lg font-semibold text-neutral-900">
                     YamersCartoonArcadia
                   </div>
-                  <div className="font-semibold text-lg text-gray-500">
+                  <div className="text-lg font-semibold text-gray-500">
                     Created by <span className="text-neutral-900">Yamer</span>
                   </div>
                 </div>
@@ -254,14 +303,14 @@ export default function Mint() {
             </div>
             {mintType === 'quick' ? (
               <div className="flex-1">
-                <div className="font-semibold text-lg">
+                <div className="text-lg font-semibold">
                   Quick Generate and Mint
                 </div>
-                <div className="mt-1.5 text-sm mb-4 text-slate-500 leading-6">
+                <div className="mb-4 mt-1.5 text-sm leading-6 text-slate-500">
                   Generate an image instantly with a pre-filled prompt. For more
                   customization options, use Advanced Mint.
                 </div>
-                <div className="w-full grid gap-1.5 items-center">
+                <div className="grid w-full items-center gap-1.5">
                   <Label htmlFor="prompt">Prompt</Label>
                   <Input
                     className="rounded-[6px]"
@@ -270,13 +319,13 @@ export default function Mint() {
                     autoComplete="off"
                   />
                 </div>
-                <div className="flex mt-4 gap-2 items-center">
+                <div className="mt-4 flex items-center gap-2">
                   <Button className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90">
                     Generate and Mint
                   </Button>
                   <Button
                     variant="ghost"
-                    className="rounded-full text-sm text-black leading-6 underline"
+                    className="rounded-full text-sm leading-6 text-black underline"
                     onClick={() => {
                       setMintType('advanced')
                     }}
@@ -286,11 +335,11 @@ export default function Mint() {
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col flex-1 gap-4">
-                <div className="font-semibold text-lg">
+              <div className="flex flex-1 flex-col gap-4">
+                <div className="text-lg font-semibold">
                   Advanced Generate and Mint
                 </div>
-                <div className="w-full grid gap-1.5 items-center">
+                <div className="grid w-full items-center gap-1.5">
                   <Label htmlFor="prompt">Prompt</Label>
                   <Input
                     className="rounded-[6px]"
@@ -299,7 +348,7 @@ export default function Mint() {
                     autoComplete="off"
                   />
                 </div>
-                <div className="w-full grid gap-1.5 items-center">
+                <div className="grid w-full items-center gap-1.5">
                   <Label htmlFor="prompt">Negative Prompt</Label>
                   <Input
                     className="rounded-[6px]"
@@ -308,14 +357,14 @@ export default function Mint() {
                     autoComplete="off"
                   />
                 </div>
-                <div className="flex">
-                  <div className="flex-1 grid gap-3 items-center">
+                <div className="flex flex-col gap-6 lg:flex-row">
+                  <div className="grid flex-1 items-center gap-3">
                     <Label className="text-sm leading-[14px]">
                       Sampling Steps (24)
                     </Label>
                     <Slider defaultValue={[50]} max={100} step={1} />
                   </div>
-                  <div className="flex-1 grid gap-3 items-center">
+                  <div className="grid flex-1 items-center gap-3">
                     <Label className="text-sm leading-[14px]">
                       Guidance Scale (10)
                     </Label>
@@ -323,7 +372,7 @@ export default function Mint() {
                   </div>
                 </div>
                 <div className="flex gap-6">
-                  <div className="flex-1 grid gap-1.5 items-center">
+                  <div className="grid flex-1 items-center gap-1.5">
                     <Label htmlFor="width">Width</Label>
                     <Input
                       className="rounded-[6px]"
@@ -332,7 +381,7 @@ export default function Mint() {
                       autoComplete="off"
                     />
                   </div>
-                  <div className="flex-1 grid gap-1.5 items-center">
+                  <div className="grid flex-1 items-center gap-1.5">
                     <Label htmlFor="height">Height</Label>
                     <Input
                       className="rounded-[6px]"
@@ -341,7 +390,7 @@ export default function Mint() {
                       autoComplete="off"
                     />
                   </div>
-                  <div className="flex-1 grid gap-1.5 items-center">
+                  <div className="grid flex-1 items-center gap-1.5">
                     <Label htmlFor="seed">Seed</Label>
                     <Input
                       className="rounded-[6px]"
@@ -351,13 +400,13 @@ export default function Mint() {
                     />
                   </div>
                 </div>
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-2">
                   <Button className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90">
                     Generate and Mint
                   </Button>
                   <Button
                     variant="ghost"
-                    className="rounded-full text-sm text-black leading-6 underline"
+                    className="rounded-full text-sm leading-6 text-black underline"
                     onClick={() => {
                       setMintType('quick')
                     }}
@@ -371,14 +420,14 @@ export default function Mint() {
         </div>
       </div>
       <div className="container mt-16">
-        <div className="font-semibold text-3xl text-neutral-900 -tracking-[0.0075em]">
+        <div className="text-3xl font-semibold -tracking-[0.0075em] text-neutral-900">
           Mint Leaderboard
         </div>
-        <div className="border border-neutral-200 rounded-[6px] mt-8 overflow-hidden">
+        <div className="mt-8 overflow-hidden rounded-[6px] border border-neutral-200">
           <Table>
             <TableHeader className="bg-slate-50">
               <TableRow>
-                <TableHead className="text-neutral-900 w-[100px]">
+                <TableHead className="w-[100px] text-neutral-900">
                   Rank
                 </TableHead>
                 <TableHead className="text-neutral-900">
