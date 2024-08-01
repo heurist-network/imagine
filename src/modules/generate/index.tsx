@@ -501,55 +501,69 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             </motion.button>
 
             {!!result.url && (
-              <div className="flex flex-wrap justify-center gap-2">
-                <Button
-                  className={cn({ 'gap-2': !loadingUpload })}
-                  variant="outline"
-                  disabled={loadingUpload}
-                  onClick={onUpload}
-                >
-                  {loadingUpload ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Image
-                      src="/gateway.svg"
-                      alt="gateway"
-                      width={26}
-                      height={26}
-                    />
-                  )}
-                  Upload to Gateway
-                </Button>
-                <Link href={result.url}>
-                  <Button variant="outline">Download</Button>
-                </Link>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="gap-1.5"
-                  onClick={() => {
-                    const link = `https://d1dagtixswu0qn.cloudfront.net/${
-                      result.url.split('/').slice(-1)[0].split('?')[0]
-                    }`
+              <>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <MintToNFT url={info.url} model={model}>
+                    <Button
+                      variant="outline"
+                      disabled={loadingMintNFT}
+                      className="bg-gradient-to-r from-[#f08e9b] to-[#f2a583] hover:bg-gradient-to-l"
+                    >
+                      {loadingMintNFT && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      ✨ Mint zkImagine NFT
+                    </Button>
+                  </MintToNFT>
+                  <Button
+                    className={cn({ 'gap-2': !loadingUpload })}
+                    variant="outline"
+                    disabled={loadingUpload}
+                    onClick={onUpload}
+                  >
+                    {loadingUpload ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Image
+                        src="/gateway.svg"
+                        alt="gateway"
+                        width={26}
+                        height={26}
+                      />
+                    )}
+                    Upload to Gateway
+                  </Button>
+                  <Link href={result.url}>
+                    <Button variant="outline">Download</Button>
+                  </Link>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="gap-1.5"
+                    onClick={() => {
+                      const link = `https://d1dagtixswu0qn.cloudfront.net/${
+                        result.url.split('/').slice(-1)[0].split('?')[0]
+                      }`
 
-                    const path = link.split('/')
-                    const name = path[path.length - 1].split('.')[0]
-                    const intentUrl =
-                      'https://twitter.com/intent/tweet?text=' +
-                      encodeURIComponent(
-                        'My latest #AIart creation with Imagine #Heurist 🎨',
-                      ) +
-                      '&url=' +
-                      encodeURIComponent(
-                        `https://imagine.heurist.ai/share/${name}`,
-                      )
-                    window.open(intentUrl, '_blank', 'width=550,height=420')
-                  }}
-                >
-                  <span>Share on</span>
-                  <span className="i-ri-twitter-x-fill h-4 w-4" />
-                </Button>
-              </div>
+                      const path = link.split('/')
+                      const name = path[path.length - 1].split('.')[0]
+                      const intentUrl =
+                        'https://twitter.com/intent/tweet?text=' +
+                        encodeURIComponent(
+                          'My latest #AIart creation with Imagine #Heurist 🎨',
+                        ) +
+                        '&url=' +
+                        encodeURIComponent(
+                          `https://imagine.heurist.ai/share/${name}`,
+                        )
+                      window.open(intentUrl, '_blank', 'width=550,height=420')
+                    }}
+                  >
+                    <span>Share on</span>
+                    <span className="i-ri-twitter-x-fill h-4 w-4" />
+                  </Button>
+                </div>
+              </>
             )}
           </div>
           {loadingUpload && (
