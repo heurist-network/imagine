@@ -57,7 +57,7 @@ export default function History({ model }: { model: string }) {
                     size="sm"
                     variant="outline"
                     disabled={loadingMintNFT}
-                    className="bg-gradient-to-r from-[#f08e9b] to-[#f2a583]"
+                    className="bg-gradient-to-r from-[#9ffd8d] to-[#eaff61]"
                   >
                     {loadingMintNFT && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
