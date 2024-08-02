@@ -686,8 +686,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             <div className="flex justify-center w-full">
               <PixelatedImage
                 src={result.url}
-                width={result.width}
-                height={result.height}
               />
             </div>
           )}
