@@ -77,7 +77,6 @@ export const usePartnerFreeMint = () => {
   const findUsablePartnerNFT = useCallback(async () => {
     for (const nftAddress of partnerNFTs) {
       if (await checkCanMintForPartnerNFT(nftAddress)) {
-        console.log('>>> Found usable partner NFT:', nftAddress)
         return nftAddress
       }
     }

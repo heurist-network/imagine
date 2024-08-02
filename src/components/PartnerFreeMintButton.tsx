@@ -31,7 +31,7 @@ export const PartnerFreeMintButton: React.FC<PartnerFreeMintButtonProps> = ({
     setIsLoading(true)
     try {
       const hash = await partnerFreeMint(modelId, imageId)
-      console.log('Partner free minting successful, transaction hash:', hash)
+      // console.log('Partner free minting successful, transaction hash:', hash)
       onSuccess?.(hash)
     } catch (error) {
       console.error('Partner free minting failed:', error)
