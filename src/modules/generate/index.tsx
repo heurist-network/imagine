@@ -80,6 +80,80 @@ function Tooltip({ content, children }: TooltipProps) {
   )
 }
 
+interface PixelatedImageProps {
+  src: string;
+  pixelSize?: number;
+}
+
+interface PixelatedImageProps {
+  src: string;
+  pixelSize?: number;
+}
+
+const PixelatedImage: React.FC<PixelatedImageProps> = ({ src, pixelSize = 16 }) => {
+  const [pixelatedSrc, setPixelatedSrc] = useState<string>('');
+
+  useEffect(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = pixelSize;
+    canvas.height = pixelSize;
+    const ctx = canvas.getContext('2d');
+    
+    if (ctx) {
+      const img = document.createElement('img');
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        // Calculate aspect ratio
+        const aspectRatio = img.width / img.height;
+        let drawWidth = pixelSize;
+        let drawHeight = pixelSize;
+        
+        if (aspectRatio > 1) {
+          drawHeight = pixelSize / aspectRatio;
+        } else {
+          drawWidth = pixelSize * aspectRatio;
+        }
+        
+        // Draw small
+        ctx.drawImage(img, 0, 0, drawWidth, drawHeight);
+        
+        // Get the pixel data
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        ctx.putImageData(imageData, 0, 0);
+        
+        // Create a new canvas for the final image
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = 512;
+        finalCanvas.height = 512;
+        const finalCtx = finalCanvas.getContext('2d');
+        
+        if (finalCtx) {
+          // Disable image smoothing
+          finalCtx.imageSmoothingEnabled = false;
+          
+          // Scale up the pixelated image
+          finalCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 512, 512);
+          
+          setPixelatedSrc(finalCanvas.toDataURL());
+        }
+      };
+      img.src = src;
+    }
+  }, [src, pixelSize]);
+
+  return (
+    <Image
+      className="rounded-lg shadow-xl"
+      unoptimized
+      width={512}
+      height={512}
+      priority
+      src={pixelatedSrc || src}
+      alt="pixelated image result"
+    />
+  );
+};
+
 export default function Generate({ model, models, isXl }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
@@ -208,7 +282,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
 
   const getModelData = async () => {
     const res: any[] = await fetch(
-      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
+      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models-new.json',
       {
         next: { revalidate: 3600 },
       },
@@ -603,20 +677,31 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       </Form>
       {result.url && (
         <motion.div
-          className="mt-8 flex justify-center"
+          className="mt-8 flex flex-col items-center space-y-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Image
-            className="rounded-lg shadow-xl"
-            unoptimized
-            width={result.width}
-            height={result.height}
-            priority
-            src={result.url}
-            alt="image result"
-          />
+          {isPhiland && (
+            <div className="flex justify-center w-full">
+              <PixelatedImage
+                src={result.url}
+                width={result.width}
+                height={result.height}
+              />
+            </div>
+          )}
+          <div className="flex justify-center w-full">
+            <Image
+              className="rounded-lg shadow-xl"
+              unoptimized
+              width={result.width}
+              height={result.height}
+              priority
+              src={result.url}
+              alt="image result"
+            />
+          </div>
         </motion.div>
       )}
     </div>

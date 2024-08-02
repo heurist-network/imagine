@@ -37,7 +37,7 @@ export default async function Models({ params }: { params: { slug: string } }) {
     ).then((res) => res.json())
 
     const res: any[] = await fetch(
-      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
+      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models-new.json',
       {
         next: { revalidate: 3600 },
       },
