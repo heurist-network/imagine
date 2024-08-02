@@ -174,11 +174,11 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   const { loading: loadingMintNFT } = useMintToNFT()
 
   // Philand results need pixelation
-  const [isPhiland, setIsPhiland] = useState(false);
+  const [isPhiland, setIsPhiland] = useState(false)
   useEffect(() => {
-    setIsPhiland(model === "Philand");
-    console.log("model name", model)
-  }, [model]);
+    setIsPhiland(model === 'Philand')
+    console.log('model name', model)
+  }, [model])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -191,12 +191,12 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       height: 768,
       seed: '-1',
     },
-  });
-  
+  })
+
   useEffect(() => {
-    form.setValue('width', isPhiland ? 1024 : (isXl ? 680 : 512));
-    form.setValue('height', isPhiland ? 1024 : (isXl ? 1024 : 768));
-  }, [isPhiland, isXl, form]);
+    form.setValue('width', isPhiland ? 1024 : isXl ? 680 : 512)
+    form.setValue('height', isPhiland ? 1024 : isXl ? 1024 : 768)
+  }, [isPhiland, isXl, form])
 
   const onSubmit = async () => {
     setResult({ url: '', width: 0, height: 0 })
@@ -594,7 +594,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                     <Button
                       variant="outline"
                       disabled={loadingMintNFT}
-                      className="bg-gradient-to-r from-[#f08e9b] to-[#f2a583] hover:bg-gradient-to-l"
+                      className="bg-gradient-to-r from-[#9ffd8d] to-[#eaff61] hover:bg-gradient-to-l"
                     >
                       {loadingMintNFT && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
