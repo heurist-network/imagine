@@ -99,6 +99,13 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   const [transactionId, setTransactionId] = useState('')
   const { loading: loadingMintNFT } = useMintToNFT()
 
+  // Philand results need pixelation
+  const [isPhiland, setIsPhiland] = useState(false);
+  useEffect(() => {
+    setIsPhiland(model === "Philand");
+    console.log("model name", model)
+  }, [model]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -106,11 +113,16 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       neg_prompt: '(worst quality: 1.4), bad quality, nsfw',
       num_iterations: 25,
       guidance_scale: 7,
-      width: isXl ? 680 : 512,
-      height: isXl ? 1024 : 768,
+      width: 512,
+      height: 768,
       seed: '-1',
     },
-  })
+  });
+  
+  useEffect(() => {
+    form.setValue('width', isPhiland ? 1024 : (isXl ? 680 : 512));
+    form.setValue('height', isPhiland ? 1024 : (isXl ? 1024 : 768));
+  }, [isPhiland, isXl, form]);
 
   const onSubmit = async () => {
     setResult({ url: '', width: 0, height: 0 })
@@ -390,6 +402,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                     <Input
                       placeholder="Width"
                       type="number"
+                      disabled={isPhiland}
                       {...field}
                       onBlur={(e) => {
                         if (Number(e.target.value) < 512) {
@@ -417,6 +430,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                       placeholder="Height"
                       type="number"
                       {...field}
+                      disabled={isPhiland}
                       onBlur={(e) => {
                         if (Number(e.target.value) < 512) {
                           field.onChange(512)

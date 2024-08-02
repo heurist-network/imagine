@@ -76,7 +76,7 @@ export default async function Models({ params }: { params: { slug: string } }) {
               <Generate
                 model={model}
                 models={models}
-                isXl={findModel?.type?.endsWith('xl')}
+                isXl={findModel?.type?.includes('xl')}
               />
             </TabsContent>
             <TabsContent value="history">
