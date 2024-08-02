@@ -23,6 +23,15 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
@@ -113,6 +122,10 @@ export default function Mint() {
     { id: '2', name: 'image2' },
     { id: '3', name: 'image3' },
   ])
+
+  const onGenerate = () => {
+    console.log(214124)
+  }
 
   return (
     <main className="flex flex-1 flex-col pb-20">
@@ -258,7 +271,7 @@ export default function Mint() {
               <div className="hidden lg:block">
                 <div className="flex items-center justify-center">
                   {images.map((image, index) => (
-                    <AlertDialog>
+                    <AlertDialog key={index}>
                       <AlertDialogTrigger asChild>
                         <div
                           className={cn(
@@ -320,9 +333,20 @@ export default function Mint() {
                   />
                 </div>
                 <div className="mt-4 flex items-center gap-2">
-                  <Button className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90">
-                    Generate and Mint
-                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90">
+                        Generate and Mint
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-[804px]">
+                      <div className="flex">
+                        <div className="flex-1">Left</div>
+                        <div className="flex-1">Right</div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
                   <Button
                     variant="ghost"
                     className="rounded-full text-sm leading-6 text-black underline"
@@ -401,7 +425,10 @@ export default function Mint() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90">
+                  <Button
+                    className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
+                    onClick={onGenerate}
+                  >
                     Generate and Mint
                   </Button>
                   <Button
