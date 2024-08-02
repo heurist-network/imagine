@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Address, formatEther, Hash, isAddress } from 'viem'
-import { useAccount, useClient } from 'wagmi'
+import { useAccount, useBalance, useClient } from 'wagmi'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -38,6 +38,11 @@ export function MintToNFT({
   const [open, setOpen] = useState(false)
   const [isValidReferral, setIsValidReferral] = useState(false)
 
+  const balance =
+    (useBalance({
+      address: account.address,
+    }).data?.value as bigint) || BigInt(0)
+
   const onMintToNFT = async () => {
     if (!account.address) return openConnectModal?.()
 
@@ -50,6 +55,12 @@ export function MintToNFT({
     try {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
+
+      // check wallet balance, balance should > mintFee
+      if (mintFee && balance < mintFee) {
+        toast.error('Insufficient ETH balance to mint NFT.')
+        return
+      }
 
       const txHash = await mint(
         isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
