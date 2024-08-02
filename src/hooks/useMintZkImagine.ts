@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Address } from 'viem'
-import { zkSyncSepoliaTestnet } from 'viem/zksync'
+import { zkSync, zkSyncSepoliaTestnet } from 'viem/zksync'
 import {
   useAccount,
   usePublicClient,
@@ -93,8 +93,8 @@ export const useMintZkImagine = () => {
 
   // Switch to zkSync Sepolia testnet if not already connected
   useEffect(() => {
-    if (chain && chain.id !== zkSyncSepoliaTestnet.id) {
-      switchChain({ chainId: zkSyncSepoliaTestnet.id })
+    if (chain && chain.id !== zkSync.id) {
+      switchChain({ chainId: zkSync.id })
     }
   }, [chain, switchChain])
 

@@ -13,7 +13,6 @@ import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
-import PulsatingButton from '@/components/magicui/pulsating-button'
 import {
   AlertDialog,
   AlertDialogAction,
