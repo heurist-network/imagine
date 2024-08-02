@@ -13,7 +13,6 @@ import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
-import PulsatingButton from '@/components/magicui/pulsating-button'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,6 +43,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
+import { MintToNFT, useMintToNFT } from '@/modules/mintToNFT'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
@@ -83,6 +83,7 @@ function Tooltip({ content, children }: TooltipProps) {
 export default function Generate({ model, models, isXl }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
+  const [loadingGenerate, setLoadingGenerate] = useState(false)
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
@@ -96,6 +97,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   })
   const [info, setInfo] = useState<any>(null)
   const [transactionId, setTransactionId] = useState('')
+  const { loading: loadingMintNFT } = useMintToNFT()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -109,10 +111,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       seed: '-1',
     },
   })
-
-  useEffect(() => {
-    getModelData()
-  }, [])
 
   const onSubmit = async () => {
     setResult({ url: '', width: 0, height: 0 })
@@ -210,6 +208,11 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       setShowRecommend(true)
     }
   }
+
+  useEffect(() => {
+    getModelData()
+  }, [])
+
   return (
     <div>
       <div className="md:3/4 grid w-full grid-cols-3 gap-4 py-4 md:grid-cols-4 lg:w-4/5">
@@ -461,7 +464,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             >
               <div className="flex flex-row items-center">
                 {isGenerating && (
-                  <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                  <Loader2 className="h-6 mr-2 animate-spin w-6" />
                 )}
                 {isGenerating ? 'Generating...' : 'Generate'}
               </div>
@@ -497,57 +500,77 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             </motion.button>
 
             {!!result.url && (
-              <div className="flex flex-wrap justify-center gap-2">
-                <Button
-                  className={cn({ 'gap-2': !loadingUpload })}
-                  variant="outline"
-                  disabled={loadingUpload}
-                  onClick={onUpload}
-                >
-                  {loadingUpload ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Image
-                      src="/gateway.svg"
-                      alt="gateway"
-                      width={26}
-                      height={26}
-                    />
-                  )}
-                  Upload to Gateway
-                </Button>
-                <Link href={result.url}>
-                  <Button variant="outline">Download</Button>
-                </Link>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="gap-1.5"
-                  onClick={() => {
-                    const link = `https://d1dagtixswu0qn.cloudfront.net/${
-                      result.url.split('/').slice(-1)[0].split('?')[0]
-                    }`
+              <>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <MintToNFT url={info.url} model={model}>
+                    <Button
+                      variant="outline"
+                      disabled={loadingMintNFT}
+                      className="bg-gradient-to-r from-[#f08e9b] to-[#f2a583] hover:bg-gradient-to-l"
+                    >
+                      {loadingMintNFT && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      ✨ Mint zkImagine NFT
+                    </Button>
+                  </MintToNFT>
+                  <Button
+                    className={cn({ 'gap-2': !loadingUpload })}
+                    variant="outline"
+                    disabled={loadingUpload}
+                    onClick={onUpload}
+                  >
+                    {loadingUpload ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Image
+                        src="/gateway.svg"
+                        alt="gateway"
+                        width={26}
+                        height={26}
+                      />
+                    )}
+                    Upload to Gateway
+                  </Button>
+                  <Link href={result.url}>
+                    <Button variant="outline">Download</Button>
+                  </Link>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="gap-1.5"
+                    onClick={() => {
+                      const link = `https://d1dagtixswu0qn.cloudfront.net/${
+                        result.url.split('/').slice(-1)[0].split('?')[0]
+                      }`
 
-                    const path = link.split('/')
-                    const name = path[path.length - 1].split('.')[0]
-                    const intentUrl =
-                      'https://twitter.com/intent/tweet?text=' +
-                      encodeURIComponent(
-                        'My latest #AIart creation with Imagine #Heurist 🎨',
-                      ) +
-                      '&url=' +
-                      encodeURIComponent(
-                        `https://imagine.heurist.ai/share/${name}`,
-                      )
-                    window.open(intentUrl, '_blank', 'width=550,height=420')
-                  }}
-                >
-                  <span>Share on</span>
-                  <span className="i-ri-twitter-x-fill h-4 w-4" />
-                </Button>
-              </div>
+                      const path = link.split('/')
+                      const name = path[path.length - 1].split('.')[0]
+                      const intentUrl =
+                        'https://twitter.com/intent/tweet?text=' +
+                        encodeURIComponent(
+                          'My latest #AIart creation with Imagine #Heurist 🎨',
+                        ) +
+                        '&url=' +
+                        encodeURIComponent(
+                          `https://imagine.heurist.ai/share/${name}`,
+                        )
+                      window.open(intentUrl, '_blank', 'width=550,height=420')
+                    }}
+                  >
+                    <span>Share on</span>
+                    <span className="i-ri-twitter-x-fill h-4 w-4" />
+                  </Button>
+                </div>
+              </>
             )}
           </div>
+          {loadingUpload && (
+            <div className="flex items-center">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Loading Upload to Gateway
+            </div>
+          )}
           {!!transactionId && (
             <div className="flex gap-2">
               <div className="flex-shrink-0 whitespace-nowrap">

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { useAccount, useWriteContract } from 'wagmi'
+import { Chain, mainnet } from 'viem/chains'
+import { useAccount, useSwitchChain, useWriteContract } from 'wagmi'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -48,9 +49,12 @@ export function NFTModule() {
   const [claimed, setClaimed] = useState(false)
 
   const { writeContract } = useWriteContract()
+  const { switchChain } = useSwitchChain()
 
   const handleClaim = () => {
     console.log('Claim function triggered')
+
+    switchChain({ chainId: mainnet.id })
 
     writeContract(
       {
@@ -58,6 +62,7 @@ export function NFTModule() {
         address: env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS as any,
         functionName: 'claimNFT',
         args: [hash, signature],
+        chain: mainnet as Chain, // mainnet
       },
       {
         onSuccess: () => {
@@ -76,6 +81,12 @@ export function NFTModule() {
       },
     )
   }
+
+  useEffect(() => {
+    switchChain({
+      chainId: mainnet.id,
+    })
+  }, [account.chain])
 
   useEffect(() => {
     if (account?.address) {
