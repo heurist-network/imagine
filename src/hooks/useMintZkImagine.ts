@@ -26,7 +26,7 @@ export const useMintZkImagine = () => {
   const { data: walletClient } = useWalletClient()
   const { switchChain } = useSwitchChain()
 
-  const { findUsablePartnerNFT, canPartnerFreeMint } = usePartnerFreeMint()
+  const { findUsablePartnerNFT } = usePartnerFreeMint()
 
   // State for storing mint fees
   const [mintFee, setMintFee] = useState<bigint | null>(null)
@@ -292,7 +292,6 @@ export const useMintZkImagine = () => {
       readDiscountedMintFee: async () => {
         throw new Error('Wallet not connected or unsupported chain')
       },
-      canPartnerFreeMint: false,
     }
   }
 
@@ -304,6 +303,5 @@ export const useMintZkImagine = () => {
     discountedFee,
     readMintFee,
     readDiscountedMintFee,
-    canPartnerFreeMint,
   }
 }

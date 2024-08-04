@@ -81,7 +81,7 @@ export const usePartnerFreeMint = () => {
 
       console.log('>>> Debug: Call Alchemy API to user ownedNfts:', data)
 
-      return data.ownedNfts
+      return data.ownedNfts || []
     } catch (error) {
       console.error('Error fetching NFTs for owner', error)
       return []
@@ -93,6 +93,8 @@ export const usePartnerFreeMint = () => {
     if (!publicClient || !address) return null
 
     const ownedNfts = await fetchNFTsForOwner()
+
+    console.log('>>> Debug: Find usable partner NFT', ownedNfts)
 
     for (const nft of ownedNfts) {
       try {
@@ -130,12 +132,11 @@ export const usePartnerFreeMint = () => {
   // Fetch partner NFTs when the component mounts or address changes
   useEffect(() => {
     fetchPartnerNFTs()
-  }, [fetchPartnerNFTs])
+  }, [fetchPartnerNFTs, address])
 
   return {
     partnerNFTs,
     findUsablePartnerNFT,
     availableNFT,
-    canPartnerFreeMint: partnerNFTs.length > 0,
   }
 }

@@ -19,8 +19,7 @@ export const PartnerFreeMintButton: React.FC<PartnerFreeMintButtonProps> = ({
   onError,
 }) => {
   // Custom hooks for partner free minting
-  const { findUsablePartnerNFT, availableNFT, canPartnerFreeMint } =
-    usePartnerFreeMint()
+  const { findUsablePartnerNFT, availableNFT } = usePartnerFreeMint()
   const { partnerFreeMint } = useMintZkImagine()
 
   // State to manage loading state
@@ -28,14 +27,12 @@ export const PartnerFreeMintButton: React.FC<PartnerFreeMintButtonProps> = ({
 
   // Effect to find a usable partner NFT when component mounts or canPartnerFreeMint changes
   useEffect(() => {
-    if (canPartnerFreeMint) {
-      findUsablePartnerNFT()
-    }
-  }, [canPartnerFreeMint, findUsablePartnerNFT])
+    findUsablePartnerNFT()
+  }, [findUsablePartnerNFT])
 
   // Handler for partner free minting
   const handlePartnerFreeMint = async () => {
-    if (!canPartnerFreeMint || !availableNFT) return
+    if (!availableNFT) return
 
     setIsLoading(true)
     try {
@@ -52,7 +49,7 @@ export const PartnerFreeMintButton: React.FC<PartnerFreeMintButtonProps> = ({
   }
 
   // Don't render the button if partner free minting is not available
-  if (!canPartnerFreeMint || !availableNFT) {
+  if (!availableNFT) {
     return null
   }
 
