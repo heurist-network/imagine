@@ -10,6 +10,7 @@ export const env = createEnv({
     UMAMI_URL: z.string().optional(),
     UMAMI_WEBSITE_ID: z.string().optional(),
     ALCHEMY_API_KEY: z.string().min(1),
+    ZYFI_API_KEY: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_BASE_URL: z.string().min(1),
@@ -23,6 +24,7 @@ export const env = createEnv({
     UMAMI_URL: process.env.UMAMI_URL,
     UMAMI_WEBSITE_ID: process.env.UMAMI_WEBSITE_ID,
     ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
+    ZYFI_API_KEY: process.env.ZYFI_API_KEY,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID:
       process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
