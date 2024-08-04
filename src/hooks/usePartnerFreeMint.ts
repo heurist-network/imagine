@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Address } from 'viem'
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
@@ -48,7 +49,7 @@ export const usePartnerFreeMint = () => {
       }
       const data = await response.json()
 
-      console.log('>>> fetchPartnerNFTs Debug - NFT list from API: ', data)
+      console.log('>>> Debug: Fetch partner NFT list from backend:', data)
 
       if (!response.ok) {
         // @ts-ignore
@@ -82,7 +83,7 @@ export const usePartnerFreeMint = () => {
       })
       const data = await response.json()
 
-      console.log('>>> fetchNFTsForOwner Debug - NFT id:', data)
+      console.log('>>> Debug: Call Alchemy API to user ownedNfts:', data)
 
       return data.ownedNfts
     } catch (error) {
@@ -105,15 +106,15 @@ export const usePartnerFreeMint = () => {
         if (!currentMarket) continue
 
         // Check if the NFT can be used for partner free minting
-        const result = await publicClient.readContract({
+        const result = (await publicClient.readContract({
           address: currentMarket.addresses.ZkImagine,
           abi: ZkImagineABI,
           functionName: 'canMintForPartnerNFT',
           args: [address, nft.contractAddress as Address, BigInt(nft.tokenId)],
-        })
+        })) as { canMint: boolean; reason: string }
 
-        if (result) {
-          console.log('>>> findUsablePartnerNFT Debug - NFT & ID:', nft)
+        if (result.canMint == true) {
+          console.log('>>> Debug: Read contract to get first usable NFT', nft)
           setAvailableNFT({
             address: nft.contractAddress,
             tokenId: nft.tokenId,
@@ -126,6 +127,7 @@ export const usePartnerFreeMint = () => {
     }
 
     setAvailableNFT(null)
+    toast.error('No usable partner NFT found for free minting')
     return null
   }, [publicClient, address, fetchNFTsForOwner])
 
