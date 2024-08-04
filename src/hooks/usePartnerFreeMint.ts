@@ -7,7 +7,8 @@ import { MarketConfig } from '@/constants/MarketConfig'
 
 // API endpoints
 const PARTNER_NFTS_API = '/api/partner-nfts'
-const ALCHEMY_API_URL = 'https://eth-mainnet.g.alchemy.com/nft/v3/your-api-key' // Replace with your Alchemy API key
+const ALCHEMY_API_KEY = 'eidoi0POGaYMIT_BoH8UOsE9O5ojUyYN'
+const ALCHEMY_API_URL = `https://zksync-mainnet.g.alchemy.com/nft/v3/${ALCHEMY_API_KEY}` // Replace with your Alchemy API key
 
 export const usePartnerFreeMint = () => {
   const { address, chain } = useAccount()
@@ -29,12 +30,28 @@ export const usePartnerFreeMint = () => {
     if (!address) return
 
     try {
-      const response = await fetch(
-        `${PARTNER_NFTS_API}?minterAddress=${address}`,
-      )
+      //TODO Uncomment the following code to fetch partner NFTs from the API
+      // const response = await fetch(
+      //   `${PARTNER_NFTS_API}?minterAddress=${address}`,
+      // )
+
+      // @dev in mock mode, API return the mock data ['0x5e0652d510d6823e0A6480b062179658645CBa81']
+      const response = {
+        json: async () => {
+          return {
+            canMintForPartnerNFTs: [
+              '0x5e0652d510d6823e0A6480b062179658645CBa81',
+            ],
+          }
+        },
+        ok: true,
+      }
       const data = await response.json()
 
+      console.log('>>> fetchPartnerNFTs Debug - NFT list from API: ', data)
+
       if (!response.ok) {
+        // @ts-ignore
         throw new Error(data.error || 'Failed to fetch partner NFTs')
       }
 
@@ -65,9 +82,11 @@ export const usePartnerFreeMint = () => {
       })
       const data = await response.json()
 
+      console.log('>>> fetchNFTsForOwner Debug - NFT id:', data)
+
       return data.ownedNfts
     } catch (error) {
-      console.error('Error fetching NFTs for owner:', error)
+      console.error('Error fetching NFTs for owner', error)
       return []
     }
   }, [address, partnerNFTs])
@@ -94,6 +113,7 @@ export const usePartnerFreeMint = () => {
         })
 
         if (result) {
+          console.log('>>> findUsablePartnerNFT Debug - NFT & ID:', nft)
           setAvailableNFT({
             address: nft.contractAddress,
             tokenId: nft.tokenId,

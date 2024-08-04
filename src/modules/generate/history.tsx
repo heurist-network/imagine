@@ -12,6 +12,7 @@ import 'react-photo-view/dist/react-photo-view.css'
 
 import { Loader2 } from 'lucide-react'
 
+import { PartnerFreeMintButton } from '@/components/PartnerFreeMintButton'
 import { Button } from '@/components/ui/button'
 
 export default function History({ model }: { model: string }) {
@@ -65,6 +66,7 @@ export default function History({ model }: { model: string }) {
                     ✨ Mint zkImagine NFT
                   </Button>
                 </MintToNFT>
+
                 <Link href={item.url} download>
                   <Button size="sm" variant="outline">
                     Download

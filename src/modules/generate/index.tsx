@@ -13,6 +13,7 @@ import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
+import { PartnerFreeMintButton } from '@/components/PartnerFreeMintButton'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -81,65 +82,78 @@ function Tooltip({ content, children }: TooltipProps) {
 }
 
 interface PixelatedImageProps {
-  src: string;
-  pixelSize?: number;
+  src: string
+  pixelSize?: number
 }
 
 interface PixelatedImageProps {
-  src: string;
-  pixelSize?: number;
+  src: string
+  pixelSize?: number
 }
 
-const PixelatedImage: React.FC<PixelatedImageProps> = ({ src, pixelSize = 16 }) => {
-  const [pixelatedSrc, setPixelatedSrc] = useState<string>('');
+const PixelatedImage: React.FC<PixelatedImageProps> = ({
+  src,
+  pixelSize = 16,
+}) => {
+  const [pixelatedSrc, setPixelatedSrc] = useState<string>('')
 
   useEffect(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = pixelSize;
-    canvas.height = pixelSize;
-    const ctx = canvas.getContext('2d');
-    
+    const canvas = document.createElement('canvas')
+    canvas.width = pixelSize
+    canvas.height = pixelSize
+    const ctx = canvas.getContext('2d')
+
     if (ctx) {
-      const img = document.createElement('img');
-      img.crossOrigin = 'Anonymous';
+      const img = document.createElement('img')
+      img.crossOrigin = 'Anonymous'
       img.onload = () => {
         // Calculate aspect ratio
-        const aspectRatio = img.width / img.height;
-        let drawWidth = pixelSize;
-        let drawHeight = pixelSize;
-        
+        const aspectRatio = img.width / img.height
+        let drawWidth = pixelSize
+        let drawHeight = pixelSize
+
         if (aspectRatio > 1) {
-          drawHeight = pixelSize / aspectRatio;
+          drawHeight = pixelSize / aspectRatio
         } else {
-          drawWidth = pixelSize * aspectRatio;
+          drawWidth = pixelSize * aspectRatio
         }
-        
+
         // Draw small
-        ctx.drawImage(img, 0, 0, drawWidth, drawHeight);
-        
+        ctx.drawImage(img, 0, 0, drawWidth, drawHeight)
+
         // Get the pixel data
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        ctx.putImageData(imageData, 0, 0);
-        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        ctx.putImageData(imageData, 0, 0)
+
         // Create a new canvas for the final image
-        const finalCanvas = document.createElement('canvas');
-        finalCanvas.width = 512;
-        finalCanvas.height = 512;
-        const finalCtx = finalCanvas.getContext('2d');
-        
+        const finalCanvas = document.createElement('canvas')
+        finalCanvas.width = 512
+        finalCanvas.height = 512
+        const finalCtx = finalCanvas.getContext('2d')
+
         if (finalCtx) {
           // Disable image smoothing
-          finalCtx.imageSmoothingEnabled = false;
-          
+          finalCtx.imageSmoothingEnabled = false
+
           // Scale up the pixelated image
-          finalCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 512, 512);
-          
-          setPixelatedSrc(finalCanvas.toDataURL());
+          finalCtx.drawImage(
+            canvas,
+            0,
+            0,
+            canvas.width,
+            canvas.height,
+            0,
+            0,
+            512,
+            512,
+          )
+
+          setPixelatedSrc(finalCanvas.toDataURL())
         }
-      };
-      img.src = src;
+      }
+      img.src = src
     }
-  }, [src, pixelSize]);
+  }, [src, pixelSize])
 
   return (
     <Image
@@ -151,8 +165,8 @@ const PixelatedImage: React.FC<PixelatedImageProps> = ({ src, pixelSize = 16 }) 
       src={pixelatedSrc || src}
       alt="pixelated image result"
     />
-  );
-};
+  )
+}
 
 export default function Generate({ model, models, isXl }: GenerateProps) {
   const account = useAccount()
@@ -602,6 +616,18 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                       ✨ Mint zkImagine NFT
                     </Button>
                   </MintToNFT>
+
+                  {/* @dev debug modal */}
+                  <PartnerFreeMintButton
+                    modelId={model}
+                    imageId={info.id}
+                    onSuccess={(hash) =>
+                      console.log('Partner free minting:', hash)
+                    }
+                    onError={(error) =>
+                      console.error('Partner free minting:', error)
+                    }
+                  />
                   <Button
                     className={cn({ 'gap-2': !loadingUpload })}
                     variant="outline"
@@ -683,13 +709,11 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
           transition={{ duration: 0.5 }}
         >
           {isPhiland && (
-            <div className="flex justify-center w-full">
-              <PixelatedImage
-                src={result.url}
-              />
+            <div className="flex w-full justify-center">
+              <PixelatedImage src={result.url} />
             </div>
           )}
-          <div className="flex justify-center w-full">
+          <div className="flex w-full justify-center">
             <Image
               className="rounded-lg shadow-xl"
               unoptimized
