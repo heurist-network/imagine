@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Address } from 'viem'
+import { Abi, Address, encodeFunctionData } from 'viem'
 import { eip712WalletActions, zkSync, zkSyncSepoliaTestnet } from 'viem/zksync'
 import {
   useAccount,
@@ -162,6 +162,29 @@ export const useMintZkImagine = () => {
     ],
   )
 
+  // Function to get sponsored paymaster parameters via proxy API
+  const getSponsoredPaymasterParams = useCallback(async (txRequest: any) => {
+    try {
+      const response = await fetch('/api/sponsored-paymaster', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ txRequest }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error during sponsored paymaster API call:', error)
+      throw error
+    }
+  }, [])
+
   // Function to perform partner free minting
   const partnerFreeMint = useCallback(
     async (modelId: string, imageId: string) => {
@@ -169,7 +192,6 @@ export const useMintZkImagine = () => {
         throw new Error('Wallet not connected or unsupported chain')
       }
 
-      // Find a usable partner NFT for free minting
       const usablePartnerNFT = await findUsablePartnerNFT()
       if (!usablePartnerNFT) {
         throw new Error('No usable partner NFT found for free minting')
@@ -190,13 +212,68 @@ export const useMintZkImagine = () => {
         account: address,
       })
 
-      // Execute the actual transaction
-      const hash = await walletClient.writeContract(request)
+      console.log(
+        '>>> Debug: partnerFreeMint simulateContract request',
+        request,
+      )
+
+      // Get sponsored paymaster params
+      const paymasterResponse = await getSponsoredPaymasterParams({
+        from: address,
+        to: request.address,
+        data: encodeFunctionData({
+          abi: request.abi as Abi,
+          functionName: request.functionName as string,
+          args: request.args,
+        }),
+      })
+
+      console.log(
+        '>>> Debug: get sponsored paymaster response',
+        paymasterResponse,
+      )
+
+      // Prepare the transaction with paymaster details
+      const nonce = await publicClient.getTransactionCount({
+        address: address,
+      })
+
+      const txPayload = {
+        account: address,
+        to: paymasterResponse.txData.to,
+        value: BigInt(paymasterResponse.txData.value || '0'),
+        chain: walletClient.chain,
+        gas: BigInt(paymasterResponse.txData.gasLimit),
+        gasPerPubdata: BigInt(
+          paymasterResponse.txData.customData.gasPerPubdata,
+        ),
+        maxFeePerGas: BigInt(paymasterResponse.txData.maxFeePerGas),
+        maxPriorityFeePerGas: BigInt(0),
+        data: paymasterResponse.txData.data,
+        paymaster:
+          paymasterResponse.txData.customData.paymasterParams.paymaster,
+        paymasterInput:
+          paymasterResponse.txData.customData.paymasterParams.paymasterInput,
+        nonce,
+      }
+
+      // Extend wallet client with EIP712 actions
+      const eip712WalletClient = walletClient.extend(eip712WalletActions())
+
+      // Execute the transaction
+      const hash = await eip712WalletClient.sendTransaction(txPayload)
       await publicClient.waitForTransactionReceipt({ hash })
 
       return hash
     },
-    [address, currentMarket, walletClient, publicClient, findUsablePartnerNFT],
+    [
+      address,
+      currentMarket,
+      walletClient,
+      publicClient,
+      findUsablePartnerNFT,
+      getSponsoredPaymasterParams,
+    ],
   )
   // Return placeholder functions if wallet is not connected or chain is not supported
   if (!chain || !address || !publicClient) {

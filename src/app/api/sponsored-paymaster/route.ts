@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           chain: 324, // zkSync Era Mainnet
-          feeTokenAddress: txRequest.feeTokenAddress,
+          feeTokenAddress: '0x000000000000000000000000000000000000800A', // ETH on zkSync
           sponsorshipRatio: 100, // 100% sponsored for partner free mint
           txData: {
             from: txRequest.from,
