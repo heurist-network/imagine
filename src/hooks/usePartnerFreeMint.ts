@@ -5,11 +5,10 @@ import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
 import ZkImagineABI from '@/abis/ZkImagine.json'
 import { MarketConfig } from '@/constants/MarketConfig'
+import { env } from '@/env.mjs'
 
 // API endpoints
 const PARTNER_NFTS_API = '/api/partner-nfts'
-const ALCHEMY_API_KEY = 'eidoi0POGaYMIT_BoH8UOsE9O5ojUyYN'
-const ALCHEMY_API_URL = `https://zksync-mainnet.g.alchemy.com/nft/v3/${ALCHEMY_API_KEY}` // Replace with your Alchemy API key
 
 export const usePartnerFreeMint = () => {
   const { address, chain } = useAccount()
@@ -75,12 +74,9 @@ export const usePartnerFreeMint = () => {
       const contractAddresses = partnerNFTs
         .map((nft) => `contractAddresses[]=${nft}`)
         .join('&')
-      const url = `${ALCHEMY_API_URL}/getNFTsForOwner?owner=${address}&${contractAddresses}&withMetadata=false`
+      const url = `/api/getNFTsForOwner?address=${address}&${contractAddresses}`
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: { accept: 'application/json' },
-      })
+      const response = await fetch(url)
       const data = await response.json()
 
       console.log('>>> Debug: Call Alchemy API to user ownedNfts:', data)

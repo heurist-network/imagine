@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Address } from 'viem'
-import { zkSync, zkSyncSepoliaTestnet } from 'viem/zksync'
+import { eip712WalletActions, zkSync, zkSyncSepoliaTestnet } from 'viem/zksync'
 import {
   useAccount,
   usePublicClient,
