@@ -162,12 +162,14 @@ export const useMintZkImagine = () => {
     ],
   )
 
+  // Function to perform partner free minting
   const partnerFreeMint = useCallback(
     async (modelId: string, imageId: string) => {
       if (!currentMarket || !walletClient || !publicClient || !address) {
         throw new Error('Wallet not connected or unsupported chain')
       }
 
+      // Find a usable partner NFT for free minting
       const usablePartnerNFT = await findUsablePartnerNFT()
       if (!usablePartnerNFT) {
         throw new Error('No usable partner NFT found for free minting')
@@ -178,7 +180,13 @@ export const useMintZkImagine = () => {
         address: currentMarket.addresses.ZkImagine,
         abi: ZkImagineABI,
         functionName: 'partnerFreeMint',
-        args: [address, usablePartnerNFT as Address, modelId, imageId],
+        args: [
+          address,
+          usablePartnerNFT.address as Address,
+          BigInt(usablePartnerNFT.tokenId),
+          modelId,
+          imageId,
+        ],
         account: address,
       })
 

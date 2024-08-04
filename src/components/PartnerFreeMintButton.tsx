@@ -1,8 +1,7 @@
-import { Loader2 } from 'lucide-react' // Assuming you're using Lucide icons
-import React, { useState } from 'react'
+import { Loader2 } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 
-import { Button } from '@/components/ui/button' // Adjust this import based on your UI library
-
+import { Button } from '@/components/ui/button'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 
@@ -19,19 +18,28 @@ export const PartnerFreeMintButton: React.FC<PartnerFreeMintButtonProps> = ({
   onSuccess,
   onError,
 }) => {
-  const { partnerNFTs, findUsablePartnerNFT, canPartnerFreeMint } =
+  // Custom hooks for partner free minting
+  const { findUsablePartnerNFT, availableNFT, canPartnerFreeMint } =
     usePartnerFreeMint()
-
   const { partnerFreeMint } = useMintZkImagine()
+
+  // State to manage loading state
   const [isLoading, setIsLoading] = useState(false)
 
+  // Effect to find a usable partner NFT when component mounts or canPartnerFreeMint changes
+  useEffect(() => {
+    if (canPartnerFreeMint) {
+      findUsablePartnerNFT()
+    }
+  }, [canPartnerFreeMint, findUsablePartnerNFT])
+
+  // Handler for partner free minting
   const handlePartnerFreeMint = async () => {
-    if (!canPartnerFreeMint) return
+    if (!canPartnerFreeMint || !availableNFT) return
 
     setIsLoading(true)
     try {
       const hash = await partnerFreeMint(modelId, imageId)
-      // console.log('Partner free minting successful, transaction hash:', hash)
       onSuccess?.(hash)
     } catch (error) {
       console.error('Partner free minting failed:', error)
@@ -43,15 +51,15 @@ export const PartnerFreeMintButton: React.FC<PartnerFreeMintButtonProps> = ({
     }
   }
 
-  if (!canPartnerFreeMint) {
-    return null // Don't render the button if partner free minting is not available
+  // Don't render the button if partner free minting is not available
+  if (!canPartnerFreeMint || !availableNFT) {
+    return null
   }
 
   return (
-    <div>
-      {canPartnerFreeMint && (
-        <Button onClick={handlePartnerFreeMint}>Partner Free Mint</Button>
-      )}
-    </div>
+    <Button onClick={handlePartnerFreeMint} disabled={isLoading}>
+      {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+      Partner Free Mint
+    </Button>
   )
 }
