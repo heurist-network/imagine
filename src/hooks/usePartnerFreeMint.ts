@@ -4,20 +4,15 @@ import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
 import ZkImagineABI from '@/abis/ZkImagine.json'
 import { MarketConfig } from '@/constants/MarketConfig'
-
-// API endpoints
-const PARTNER_NFTS_API = '/api/partner-nfts'
-
-const partnerNftList = ['0x5e0652d510d6823e0A6480b062179658645CBa81']
+import { partnerNftList } from '@/constants/partnerNftList'
 
 export const usePartnerFreeMint = () => {
-  const { address, chain } = useAccount()
+  const { address } = useAccount()
   const { data: walletClient } = useWalletClient()
   const publicClient = usePublicClient({
     chainId: walletClient?.chain.id,
   })
 
-  // State variables
   const [availableNFT, setAvailableNFT] = useState<{
     address: Address
     tokenId: string
@@ -26,7 +21,7 @@ export const usePartnerFreeMint = () => {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Fetch NFTs owned by the user using Alchemy API
+  // @note Alchemy API Call: Fetch NFTs owned by the user
   const fetchNFTsForOwner = useCallback(async () => {
     if (!address) return
 
@@ -49,7 +44,7 @@ export const usePartnerFreeMint = () => {
     }
   }, [address])
 
-  // Find a usable partner NFT for free minting
+  // @note Read contract:  Find a usable partner NFT for free minting
   const findUsablePartnerNFT = useCallback(async () => {
     if (!publicClient || !address || ownedNFTs.length === 0) return null
 
