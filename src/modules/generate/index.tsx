@@ -1,19 +1,19 @@
 'use client'
 
-import { Info, Loader2, MoreVertical } from 'lucide-react'
+import { Info, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useLocalStorage } from 'usehooks-ts'
 import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
-import PulsatingButton from '@/components/magicui/pulsating-button'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,12 +27,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
   Form,
   FormControl,
   FormDescription,
@@ -44,7 +38,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
-import { MintToNFT, useMintToNFT } from '@/modules/mintToNFT'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
@@ -84,7 +77,7 @@ function Tooltip({ content, children }: TooltipProps) {
 export default function Generate({ model, models, isXl }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
-  const [loadingGenerate, setLoadingGenerate] = useState(false)
+  const searchParams = useSearchParams()
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
@@ -98,7 +91,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   })
   const [info, setInfo] = useState<any>(null)
   const [transactionId, setTransactionId] = useState('')
-  const { loading: loadingMintNFT } = useMintToNFT()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -196,6 +188,8 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   }
 
   const getModelData = async () => {
+    const search = searchParams.get('prompt')
+
     const res: any[] = await fetch(
       'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
       {
@@ -204,9 +198,15 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
     ).then((res) => res.json())
     const nowModel = res.find((item) => item.name.includes(model))
     if (nowModel.type.includes('composite')) {
-      form.setValue('prompt', nowModel.autofill)
+      if (search) {
+        form.setValue('prompt', search)
+      } else {
+        form.setValue('prompt', nowModel.autofill)
+      }
       setModelInfo(nowModel)
       setShowRecommend(true)
+    } else {
+      if (search) form.setValue('prompt', search)
     }
   }
 
@@ -453,23 +453,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             />
           </div>
           <div className="space-y-4">
-            {/* <PulsatingButton
-              className={cn(
-                'h-14 w-full text-2xl font-semibold',
-                isGenerating ? 'bg-blue-500/50' : 'bg-blue-500',
-                isGenerating ? 'cursor-not-allowed' : 'cursor-pointer',
-              )}
-              onClick={onSubmit}
-              disabled={isGenerating}
-              pulseColor={isGenerating ? 'transparent' : '#0096ff'}
-            >
-              <div className="flex flex-row items-center">
-                {isGenerating && (
-                  <Loader2 className="h-6 mr-2 animate-spin w-6" />
-                )}
-                {isGenerating ? 'Generating...' : 'Generate'}
-              </div>
-            </PulsatingButton> */}
             <motion.button
               className="h-14 w-full overflow-hidden rounded-lg text-2xl font-semibold text-white shadow-lg"
               style={{
