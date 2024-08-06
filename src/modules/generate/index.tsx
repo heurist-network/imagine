@@ -486,7 +486,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             {!!result.url && (
               <div className="flex flex-wrap justify-center gap-2">
                 <Button
-                  className={cn({ 'gap-2': !loadingUpload })}
+                  className={cn({ 'gap-1.5': !loadingUpload })}
                   variant="outline"
                   disabled={loadingUpload}
                   onClick={onUpload}

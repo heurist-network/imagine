@@ -27,13 +27,12 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
 import {
   Table,
@@ -340,9 +339,75 @@ export default function Mint() {
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="w-[804px]">
-                      <div className="flex">
-                        <div className="flex-1">Left</div>
-                        <div className="flex-1">Right</div>
+                      <DialogTitle className="hidden" />
+                      <DialogDescription className="hidden" />
+                      <div className="flex flex-col items-center gap-6 md:flex-row">
+                        <div className="w-full flex-1 rounded-[10px] bg-[#877DFF]/50">
+                          <div className="flex h-[500px] items-center justify-center md:h-[616px]">
+                            Generating...
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <div className="rounded-xl border p-[25px]">
+                            <div className="flex flex-wrap gap-2">
+                              <Button
+                                className="rounded-full"
+                                variant="outline"
+                              >
+                                Download
+                              </Button>
+                              <Button
+                                className="gap-1.5 rounded-full"
+                                variant="outline"
+                                // onClick={() => {
+                                //   const link = `https://d1dagtixswu0qn.cloudfront.net/${
+                                //     result.url.split('/').slice(-1)[0].split('?')[0]
+                                //   }`
+
+                                //   const path = link.split('/')
+                                //   const name = path[path.length - 1].split('.')[0]
+                                //   const intentUrl =
+                                //     'https://twitter.com/intent/tweet?text=' +
+                                //     encodeURIComponent(
+                                //       'My latest #AIart creation with Imagine #Heurist 🎨',
+                                //     ) +
+                                //     '&url=' +
+                                //     encodeURIComponent(
+                                //       `https://imagine.heurist.ai/share/${name}`,
+                                //     )
+                                //   window.open(intentUrl, '_blank', 'width=550,height=420')
+                                // }}
+                              >
+                                <span>Share on</span>
+                                <span className="i-ri-twitter-x-fill h-4 w-4" />
+                              </Button>
+                              <Button
+                                className="gap-1.5 rounded-full"
+                                variant="outline"
+                              >
+                                <Image
+                                  src="/gateway.svg"
+                                  alt="gateway"
+                                  width={26}
+                                  height={26}
+                                />
+                                Upload to Gateway
+                              </Button>
+                            </div>
+                            <Separator className="my-4" />
+                            <Button className="w-full rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90">
+                              Mint to NFT
+                            </Button>
+                            <div className="mt-4 flex flex-col space-y-2">
+                              <Label htmlFor="address">Referral Address</Label>
+                              <Input
+                                id="address"
+                                placeholder="Referral Address"
+                                autoComplete="off"
+                              />
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </DialogContent>
                   </Dialog>
