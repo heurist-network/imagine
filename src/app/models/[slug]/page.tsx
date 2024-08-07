@@ -53,8 +53,8 @@ export default async function Models({ params }: { params: { slug: string } }) {
 
     return (
       <main className="flex-1">
-        <div className="container pt-8 pb-20">
-          <h2 className="font-semibold tracking-tight pb-2 text-3xl scroll-m-20 first:mt-0">
+        <div className="container pb-20 pt-8">
+          <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
             {model}
           </h2>
           <Author model={model} />
@@ -62,7 +62,7 @@ export default async function Models({ params }: { params: { slug: string } }) {
           <Tabs defaultValue="generate">
             <TabsList>
               <TabsTrigger value="generate">Generate</TabsTrigger>
-              <TabsTrigger value="history" className="gap-1 items-end">
+              <TabsTrigger value="history" className="items-end gap-1">
                 History
                 <span className="text-muted-foreground">(Latest 50)</span>
               </TabsTrigger>
@@ -90,8 +90,8 @@ export default async function Models({ params }: { params: { slug: string } }) {
   } catch (error) {
     return (
       <main className="flex-1">
-        <div className="container pt-8 pb-20">
-          <h2 className="font-semibold tracking-tight pb-2 text-3xl scroll-m-20 first:mt-0">
+        <div className="container pb-20 pt-8">
+          <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
             {model}
           </h2>
           <Author model={model} />
@@ -99,7 +99,7 @@ export default async function Models({ params }: { params: { slug: string } }) {
           <Tabs defaultValue="generate">
             <TabsList>
               <TabsTrigger value="generate">Generate</TabsTrigger>
-              <TabsTrigger value="history" className="gap-1 items-end">
+              <TabsTrigger value="history" className="items-end gap-1">
                 History
                 <span className="text-muted-foreground">(Latest 50)</span>
               </TabsTrigger>
