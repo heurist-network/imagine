@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Address, formatEther, Hash, isAddress } from 'viem'
+import { Address, Hash, isAddress } from 'viem'
 import { useAccount, useClient } from 'wagmi'
 import { z } from 'zod'
 
@@ -381,25 +381,32 @@ export function FeatureModels({ lists }: { lists: any[] }) {
             <div className="flex justify-center lg:hidden">
               <Carousel className="w-[259px]">
                 <CarouselContent>
-                  {Array.from({ length: 3 }).map((_, index) => (
+                  {models.map((item, index) => (
                     <CarouselItem key={index} className="flex justify-center">
                       <div className="flex h-[408px] w-[259px] p-1">
                         <Card className="flex flex-1">
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <CardContent className="flex flex-1 cursor-pointer items-center justify-center p-6">
-                                <span className="text-4xl font-semibold">
-                                  {index + 1}
-                                </span>
+                              <CardContent className="relative flex-1 cursor-pointer items-center justify-center p-6">
+                                <Image
+                                  className="absolute inset-0 rounded-lg"
+                                  unoptimized
+                                  priority
+                                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
+                                  alt="model"
+                                  objectFit="cover"
+                                  layout="fill"
+                                />
+                                <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
                               </CardContent>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
                                 <AlertDialogTitle>Prompt</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  This action cannot be undone. This will
-                                  permanently delete your account and remove
-                                  your data from our servers.
+                                  <div className="whitespace-pre-wrap text-left">
+                                    {JSON.stringify(item.data, null, 2)}
+                                  </div>
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
@@ -753,15 +760,15 @@ export function FeatureModels({ lists }: { lists: any[] }) {
           <DialogTitle className="hidden" />
           <DialogDescription className="hidden" />
           <div className="flex flex-col items-center gap-6 md:flex-row">
-            <div className="w-full flex-1 overflow-hidden rounded-[10px] bg-[#877DFF]/50">
+            <div className="flex w-full flex-1 overflow-hidden rounded-[10px] bg-[#877DFF]/50">
               {(loadingGenerate || !mintUrl) && (
-                <div className="flex h-[500px] items-center justify-center md:h-[616px]">
+                <div className="flex min-h-[300px] flex-1 items-center justify-center text-white md:h-[616px]">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Generating...
                 </div>
               )}
               {!!mintUrl && (
-                <div className="relative flex h-[500px] md:h-[616px]">
+                <div className="relative flex min-h-[300px] flex-1 md:h-[616px]">
                   <Image
                     className="absolute inset-0"
                     src={mintUrl}
