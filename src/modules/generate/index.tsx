@@ -282,7 +282,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
 
   const getModelData = async () => {
     const res: any[] = await fetch(
-      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models-new.json',
+      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
       {
         next: { revalidate: 3600 },
       },
@@ -364,15 +364,25 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                   </Tooltip>
                 </FormLabel>
                 <FormControl>
-                  <>
+                  <div>
                     <Input placeholder="Prompt" autoComplete="off" {...field} />
-                    {showRecommend && (
-                      <FormDescription>
-                        Recommended key words: {modelInfo.recommend}
-                      </FormDescription>
-                    )}
-                  </>
+                    <div className="mt-2 text-right">
+                      <a 
+                        href="https://ai-image-prompt-creator.vercel.app/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-500 hover:text-blue-700"
+                      >
+                        Need inspiration? Use this prompt generator
+                      </a>
+                    </div>
+                  </div>
                 </FormControl>
+                {showRecommend && (
+                  <FormDescription>
+                    Recommended key words: {modelInfo.recommend}
+                  </FormDescription>
+                )}
                 <FormMessage />
               </FormItem>
             )}
