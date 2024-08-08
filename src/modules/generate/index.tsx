@@ -1,13 +1,14 @@
 'use client'
 
-import { Info, Loader2, MoreVertical } from 'lucide-react'
+import { Info, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useLocalStorage } from 'usehooks-ts'
 import { useAccount } from 'wagmi'
 import { z } from 'zod'
@@ -26,12 +27,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
   Form,
   FormControl,
   FormDescription,
@@ -43,7 +38,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
-import { MintToNFT, useMintToNFT } from '@/modules/mintToNFT'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
@@ -80,84 +74,10 @@ function Tooltip({ content, children }: TooltipProps) {
   )
 }
 
-interface PixelatedImageProps {
-  src: string;
-  pixelSize?: number;
-}
-
-interface PixelatedImageProps {
-  src: string;
-  pixelSize?: number;
-}
-
-const PixelatedImage: React.FC<PixelatedImageProps> = ({ src, pixelSize = 16 }) => {
-  const [pixelatedSrc, setPixelatedSrc] = useState<string>('');
-
-  useEffect(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = pixelSize;
-    canvas.height = pixelSize;
-    const ctx = canvas.getContext('2d');
-    
-    if (ctx) {
-      const img = document.createElement('img');
-      img.crossOrigin = 'Anonymous';
-      img.onload = () => {
-        // Calculate aspect ratio
-        const aspectRatio = img.width / img.height;
-        let drawWidth = pixelSize;
-        let drawHeight = pixelSize;
-        
-        if (aspectRatio > 1) {
-          drawHeight = pixelSize / aspectRatio;
-        } else {
-          drawWidth = pixelSize * aspectRatio;
-        }
-        
-        // Draw small
-        ctx.drawImage(img, 0, 0, drawWidth, drawHeight);
-        
-        // Get the pixel data
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        ctx.putImageData(imageData, 0, 0);
-        
-        // Create a new canvas for the final image
-        const finalCanvas = document.createElement('canvas');
-        finalCanvas.width = 512;
-        finalCanvas.height = 512;
-        const finalCtx = finalCanvas.getContext('2d');
-        
-        if (finalCtx) {
-          // Disable image smoothing
-          finalCtx.imageSmoothingEnabled = false;
-          
-          // Scale up the pixelated image
-          finalCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 512, 512);
-          
-          setPixelatedSrc(finalCanvas.toDataURL());
-        }
-      };
-      img.src = src;
-    }
-  }, [src, pixelSize]);
-
-  return (
-    <Image
-      className="rounded-lg shadow-xl"
-      unoptimized
-      width={512}
-      height={512}
-      priority
-      src={pixelatedSrc || src}
-      alt="pixelated image result"
-    />
-  );
-};
-
 export default function Generate({ model, models, isXl }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
-  const [loadingGenerate, setLoadingGenerate] = useState(false)
+  const searchParams = useSearchParams()
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
@@ -171,14 +91,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   })
   const [info, setInfo] = useState<any>(null)
   const [transactionId, setTransactionId] = useState('')
-  const { loading: loadingMintNFT } = useMintToNFT()
-
-  // Philand results need pixelation
-  const [isPhiland, setIsPhiland] = useState(false)
-  useEffect(() => {
-    setIsPhiland(model === 'Philand')
-    console.log('model name', model)
-  }, [model])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -187,16 +99,11 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       neg_prompt: '(worst quality: 1.4), bad quality, nsfw',
       num_iterations: 25,
       guidance_scale: 7,
-      width: 512,
-      height: 768,
+      width: isXl ? 680 : 512,
+      height: isXl ? 1024 : 768,
       seed: '-1',
     },
   })
-
-  useEffect(() => {
-    form.setValue('width', isPhiland ? 1024 : isXl ? 680 : 512)
-    form.setValue('height', isPhiland ? 1024 : isXl ? 1024 : 768)
-  }, [isPhiland, isXl, form])
 
   const onSubmit = async () => {
     setResult({ url: '', width: 0, height: 0 })
@@ -281,17 +188,25 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   }
 
   const getModelData = async () => {
+    const search = searchParams.get('prompt')
+
     const res: any[] = await fetch(
-      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models-new.json',
+      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
       {
         next: { revalidate: 3600 },
       },
     ).then((res) => res.json())
     const nowModel = res.find((item) => item.name.includes(model))
     if (nowModel.type.includes('composite')) {
-      form.setValue('prompt', nowModel.autofill)
+      if (search) {
+        form.setValue('prompt', search)
+      } else {
+        form.setValue('prompt', nowModel.autofill)
+      }
       setModelInfo(nowModel)
       setShowRecommend(true)
+    } else {
+      if (search) form.setValue('prompt', search)
     }
   }
 
@@ -476,7 +391,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                     <Input
                       placeholder="Width"
                       type="number"
-                      disabled={isPhiland}
                       {...field}
                       onBlur={(e) => {
                         if (Number(e.target.value) < 512) {
@@ -504,7 +418,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                       placeholder="Height"
                       type="number"
                       {...field}
-                      disabled={isPhiland}
                       onBlur={(e) => {
                         if (Number(e.target.value) < 512) {
                           field.onChange(512)
@@ -540,23 +453,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             />
           </div>
           <div className="space-y-4">
-            {/* <PulsatingButton
-              className={cn(
-                'h-14 w-full text-2xl font-semibold',
-                isGenerating ? 'bg-blue-500/50' : 'bg-blue-500',
-                isGenerating ? 'cursor-not-allowed' : 'cursor-pointer',
-              )}
-              onClick={onSubmit}
-              disabled={isGenerating}
-              pulseColor={isGenerating ? 'transparent' : '#0096ff'}
-            >
-              <div className="flex flex-row items-center">
-                {isGenerating && (
-                  <Loader2 className="h-6 mr-2 animate-spin w-6" />
-                )}
-                {isGenerating ? 'Generating...' : 'Generate'}
-              </div>
-            </PulsatingButton> */}
             <motion.button
               className="h-14 w-full overflow-hidden rounded-lg text-2xl font-semibold text-white shadow-lg"
               style={{
@@ -588,69 +484,55 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             </motion.button>
 
             {!!result.url && (
-              <>
-                <div className="flex flex-wrap justify-center gap-2">
-                  <MintToNFT url={info.url} model={model}>
-                    <Button
-                      variant="outline"
-                      disabled={loadingMintNFT}
-                      className="bg-gradient-to-r from-[#9ffd8d] to-[#eaff61] hover:bg-gradient-to-l"
-                    >
-                      {loadingMintNFT && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      ✨ Mint zkImagine NFT
-                    </Button>
-                  </MintToNFT>
-                  <Button
-                    className={cn({ 'gap-2': !loadingUpload })}
-                    variant="outline"
-                    disabled={loadingUpload}
-                    onClick={onUpload}
-                  >
-                    {loadingUpload ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Image
-                        src="/gateway.svg"
-                        alt="gateway"
-                        width={26}
-                        height={26}
-                      />
-                    )}
-                    Upload to Gateway
-                  </Button>
-                  <Link href={result.url}>
-                    <Button variant="outline">Download</Button>
-                  </Link>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="gap-1.5"
-                    onClick={() => {
-                      const link = `https://d1dagtixswu0qn.cloudfront.net/${
-                        result.url.split('/').slice(-1)[0].split('?')[0]
-                      }`
+              <div className="flex flex-wrap justify-center gap-2">
+                <Button
+                  className={cn({ 'gap-1.5': !loadingUpload })}
+                  variant="outline"
+                  disabled={loadingUpload}
+                  onClick={onUpload}
+                >
+                  {loadingUpload ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Image
+                      src="/gateway.svg"
+                      alt="gateway"
+                      width={26}
+                      height={26}
+                    />
+                  )}
+                  Upload to Gateway
+                </Button>
+                <Link href={result.url}>
+                  <Button variant="outline">Download</Button>
+                </Link>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="gap-1.5"
+                  onClick={() => {
+                    const link = `https://d1dagtixswu0qn.cloudfront.net/${
+                      result.url.split('/').slice(-1)[0].split('?')[0]
+                    }`
 
-                      const path = link.split('/')
-                      const name = path[path.length - 1].split('.')[0]
-                      const intentUrl =
-                        'https://twitter.com/intent/tweet?text=' +
-                        encodeURIComponent(
-                          'My latest #AIart creation with Imagine #Heurist 🎨',
-                        ) +
-                        '&url=' +
-                        encodeURIComponent(
-                          `https://imagine.heurist.ai/share/${name}`,
-                        )
-                      window.open(intentUrl, '_blank', 'width=550,height=420')
-                    }}
-                  >
-                    <span>Share on</span>
-                    <span className="i-ri-twitter-x-fill h-4 w-4" />
-                  </Button>
-                </div>
-              </>
+                    const path = link.split('/')
+                    const name = path[path.length - 1].split('.')[0]
+                    const intentUrl =
+                      'https://twitter.com/intent/tweet?text=' +
+                      encodeURIComponent(
+                        'My latest #AIart creation with Imagine #Heurist 🎨',
+                      ) +
+                      '&url=' +
+                      encodeURIComponent(
+                        `https://imagine.heurist.ai/share/${name}`,
+                      )
+                    window.open(intentUrl, '_blank', 'width=550,height=420')
+                  }}
+                >
+                  <span>Share on</span>
+                  <span className="i-ri-twitter-x-fill h-4 w-4" />
+                </Button>
+              </div>
             )}
           </div>
           {loadingUpload && (
@@ -677,29 +559,20 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       </Form>
       {result.url && (
         <motion.div
-          className="mt-8 flex flex-col items-center space-y-8"
+          className="mt-8 flex justify-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {isPhiland && (
-            <div className="flex justify-center w-full">
-              <PixelatedImage
-                src={result.url}
-              />
-            </div>
-          )}
-          <div className="flex justify-center w-full">
-            <Image
-              className="rounded-lg shadow-xl"
-              unoptimized
-              width={result.width}
-              height={result.height}
-              priority
-              src={result.url}
-              alt="image result"
-            />
-          </div>
+          <Image
+            className="rounded-lg shadow-xl"
+            unoptimized
+            width={result.width}
+            height={result.height}
+            priority
+            src={result.url}
+            alt="image result"
+          />
         </motion.div>
       )}
     </div>
