@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useLocalStorage } from 'usehooks-ts'
 import { useAccount } from 'wagmi'
 import { z } from 'zod'
@@ -81,65 +82,78 @@ function Tooltip({ content, children }: TooltipProps) {
 }
 
 interface PixelatedImageProps {
-  src: string;
-  pixelSize?: number;
+  src: string
+  pixelSize?: number
 }
 
 interface PixelatedImageProps {
-  src: string;
-  pixelSize?: number;
+  src: string
+  pixelSize?: number
 }
 
-const PixelatedImage: React.FC<PixelatedImageProps> = ({ src, pixelSize = 16 }) => {
-  const [pixelatedSrc, setPixelatedSrc] = useState<string>('');
+const PixelatedImage: React.FC<PixelatedImageProps> = ({
+  src,
+  pixelSize = 16,
+}) => {
+  const [pixelatedSrc, setPixelatedSrc] = useState<string>('')
 
   useEffect(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = pixelSize;
-    canvas.height = pixelSize;
-    const ctx = canvas.getContext('2d');
-    
+    const canvas = document.createElement('canvas')
+    canvas.width = pixelSize
+    canvas.height = pixelSize
+    const ctx = canvas.getContext('2d')
+
     if (ctx) {
-      const img = document.createElement('img');
-      img.crossOrigin = 'Anonymous';
+      const img = document.createElement('img')
+      img.crossOrigin = 'Anonymous'
       img.onload = () => {
         // Calculate aspect ratio
-        const aspectRatio = img.width / img.height;
-        let drawWidth = pixelSize;
-        let drawHeight = pixelSize;
-        
+        const aspectRatio = img.width / img.height
+        let drawWidth = pixelSize
+        let drawHeight = pixelSize
+
         if (aspectRatio > 1) {
-          drawHeight = pixelSize / aspectRatio;
+          drawHeight = pixelSize / aspectRatio
         } else {
-          drawWidth = pixelSize * aspectRatio;
+          drawWidth = pixelSize * aspectRatio
         }
-        
+
         // Draw small
-        ctx.drawImage(img, 0, 0, drawWidth, drawHeight);
-        
+        ctx.drawImage(img, 0, 0, drawWidth, drawHeight)
+
         // Get the pixel data
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        ctx.putImageData(imageData, 0, 0);
-        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        ctx.putImageData(imageData, 0, 0)
+
         // Create a new canvas for the final image
-        const finalCanvas = document.createElement('canvas');
-        finalCanvas.width = 512;
-        finalCanvas.height = 512;
-        const finalCtx = finalCanvas.getContext('2d');
-        
+        const finalCanvas = document.createElement('canvas')
+        finalCanvas.width = 512
+        finalCanvas.height = 512
+        const finalCtx = finalCanvas.getContext('2d')
+
         if (finalCtx) {
           // Disable image smoothing
-          finalCtx.imageSmoothingEnabled = false;
-          
+          finalCtx.imageSmoothingEnabled = false
+
           // Scale up the pixelated image
-          finalCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 512, 512);
-          
-          setPixelatedSrc(finalCanvas.toDataURL());
+          finalCtx.drawImage(
+            canvas,
+            0,
+            0,
+            canvas.width,
+            canvas.height,
+            0,
+            0,
+            512,
+            512,
+          )
+
+          setPixelatedSrc(finalCanvas.toDataURL())
         }
-      };
-      img.src = src;
+      }
+      img.src = src
     }
-  }, [src, pixelSize]);
+  }, [src, pixelSize])
 
   return (
     <Image
@@ -151,12 +165,13 @@ const PixelatedImage: React.FC<PixelatedImageProps> = ({ src, pixelSize = 16 }) 
       src={pixelatedSrc || src}
       alt="pixelated image result"
     />
-  );
-};
+  )
+}
 
 export default function Generate({ model, models, isXl }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
+  const searchParams = useSearchParams()
   const [loadingGenerate, setLoadingGenerate] = useState(false)
 
   const [isGenerating, setIsGenerating] = useState(false)
@@ -192,11 +207,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       seed: '-1',
     },
   })
-
-  useEffect(() => {
-    form.setValue('width', isPhiland ? 1024 : isXl ? 680 : 512)
-    form.setValue('height', isPhiland ? 1024 : isXl ? 1024 : 768)
-  }, [isPhiland, isXl, form])
 
   const onSubmit = async () => {
     setResult({ url: '', width: 0, height: 0 })
@@ -281,6 +291,8 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   }
 
   const getModelData = async () => {
+    const search = searchParams.get('prompt')
+
     const res: any[] = await fetch(
       'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
       {
@@ -288,12 +300,24 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       },
     ).then((res) => res.json())
     const nowModel = res.find((item) => item.name.includes(model))
+
     if (nowModel.type.includes('composite')) {
-      form.setValue('prompt', nowModel.autofill)
+      if (search) {
+        form.setValue('prompt', search)
+      } else {
+        form.setValue('prompt', nowModel.autofill)
+      }
       setModelInfo(nowModel)
       setShowRecommend(true)
+    } else {
+      if (search) form.setValue('prompt', search)
     }
   }
+
+  useEffect(() => {
+    form.setValue('width', isPhiland ? 1024 : isXl ? 680 : 512)
+    form.setValue('height', isPhiland ? 1024 : isXl ? 1024 : 768)
+  }, [isPhiland, isXl, form])
 
   useEffect(() => {
     getModelData()
@@ -367,9 +391,9 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                   <div>
                     <Input placeholder="Prompt" autoComplete="off" {...field} />
                     <div className="mt-2 text-right">
-                      <a 
-                        href="https://ai-image-prompt-creator.vercel.app/" 
-                        target="_blank" 
+                      <a
+                        href="https://ai-image-prompt-creator.vercel.app/"
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-blue-500 hover:text-blue-700"
                       >
@@ -693,13 +717,11 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
           transition={{ duration: 0.5 }}
         >
           {isPhiland && (
-            <div className="flex justify-center w-full">
-              <PixelatedImage
-                src={result.url}
-              />
+            <div className="flex w-full justify-center">
+              <PixelatedImage src={result.url} />
             </div>
           )}
-          <div className="flex justify-center w-full">
+          <div className="flex w-full justify-center">
             <Image
               className="rounded-lg shadow-xl"
               unoptimized
