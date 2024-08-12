@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Address, keccak256 } from 'viem'
-import { useAccount } from 'wagmi'
+import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
+
+import ZkImagineABI from '@/abis/ZkImagine.json'
+import { MarketConfig } from '@/constants/MarketConfig'
 
 interface SignatureData {
   walletAddress: string
@@ -13,6 +16,10 @@ const SIGNATURE_DATA_URL =
 
 export const useSignatureFreeMint = () => {
   const { address } = useAccount()
+  const { data: walletClient } = useWalletClient()
+  const publicClient = usePublicClient({
+    chainId: walletClient?.chain.id,
+  })
   const [signatureData, setSignatureData] = useState<SignatureData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -58,9 +65,26 @@ export const useSignatureFreeMint = () => {
     return () => clearInterval(refreshInterval)
   }, [fetchSignatureData])
 
-  const canSignatureFreeMint = useCallback(() => {
-    return signatureData !== null
-  }, [signatureData])
+  const canSignatureFreeMint = useCallback(async () => {
+    if (signatureData !== null && publicClient) {
+      const currentMarket = Object.values(MarketConfig).find(
+        (m) => m.chain.id === publicClient.chain.id,
+      )
+      const contractAddress = currentMarket?.addresses.ZkImagine
+      if (!contractAddress) {
+        throw new Error('Contract address not found for the current chain')
+      }
+      // read contract: canMintForSignature
+      const result = (await publicClient.readContract({
+        address: contractAddress,
+        abi: ZkImagineABI,
+        functionName: 'canMintForSignature',
+        args: [signatureData.hash, signatureData.signature],
+      })) as { canMint: boolean; reason: string }
+
+      return result.canMint
+    }
+  }, [signatureData, publicClient])
 
   return {
     signatureData,
