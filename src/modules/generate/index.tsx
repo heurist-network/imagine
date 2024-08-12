@@ -14,6 +14,7 @@ import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
 import { PartnerFreeMintButton } from '@/components/PartnerFreeMintButton'
+import { SignatureFreeMintButton } from '@/components/SignatureFreeMintButton'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -617,7 +618,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                     </Button>
                   </MintToNFT>
 
-                  {/* @dev debug modal */}
+                  {/* @dev patnerFreeMint debug modal */}
                   <PartnerFreeMintButton
                     modelId={model}
                     imageId={info.id}
@@ -628,6 +629,19 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                       console.error('Partner free minting:', error)
                     }
                   />
+
+                  {/* @dev signatureFreeMint debug modal */}
+                  <SignatureFreeMintButton
+                    modelId={model}
+                    imageId={info.id}
+                    onSuccess={(hash) =>
+                      console.log('Signature free minting:', hash)
+                    }
+                    onError={(error) =>
+                      console.error('Signature free minting:', error)
+                    }
+                  />
+
                   <Button
                     className={cn({ 'gap-2': !loadingUpload })}
                     variant="outline"

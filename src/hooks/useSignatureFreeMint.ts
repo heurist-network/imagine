@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Address, keccak256 } from 'viem'
 import { useAccount } from 'wagmi'
 
 interface SignatureData {
-  address: string
+  walletAddress: string
   hash: string
   signature: string
 }
@@ -25,10 +25,11 @@ export const useSignatureFreeMint = () => {
 
     try {
       const response = await fetch(SIGNATURE_DATA_URL)
+
       const data: SignatureData[] = await response.json()
 
       const userSignatureData = data.find(
-        (item) => item.address.toLowerCase() === address.toLowerCase(),
+        (item) => item.walletAddress.toLowerCase() === address.toLowerCase(),
       )
 
       if (userSignatureData) {
@@ -46,6 +47,15 @@ export const useSignatureFreeMint = () => {
 
   useEffect(() => {
     fetchSignatureData()
+  }, [fetchSignatureData])
+
+  // Auto refresh signature data when webpage loads
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      fetchSignatureData()
+    }, 60000) // Refresh every minute
+
+    return () => clearInterval(refreshInterval)
   }, [fetchSignatureData])
 
   const canSignatureFreeMint = useCallback(() => {

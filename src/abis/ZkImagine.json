@@ -651,6 +651,11 @@
     "name": "signatureFreeMint",
     "inputs": [
       {
+        "name": "to",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
         "name": "hash",
         "type": "bytes32",
         "internalType": "bytes32"
