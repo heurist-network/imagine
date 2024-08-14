@@ -237,7 +237,7 @@ export const useMintZkImagine = () => {
         throw new Error('Wallet not connected or unsupported chain')
       }
 
-      if (!canSignatureFreeMint()) {
+      if (!canSignatureFreeMint) {
         throw new Error('User is not eligible for signature free mint')
       }
 

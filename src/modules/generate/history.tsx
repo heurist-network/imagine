@@ -1,22 +1,28 @@
 'use client'
 
+import { useEffect } from 'react'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import { formatDistance } from 'date-fns'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useLocalStorage } from 'usehooks-ts'
 
-import { MintToNFT, useMintToNFT } from '@/modules/mintToNFT'
+import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
+import { MintToNFT } from '@/modules/mintToNFT'
 
 import 'react-photo-view/dist/react-photo-view.css'
-
-import { Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 
 export default function History({ model }: { model: string }) {
+  const { refreshPartnerNFTs } = usePartnerFreeMint()
+
   const [history] = useLocalStorage<any[]>('IMAGINE_HISTORY', [])
-  const { loading: loadingMintNFT } = useMintToNFT()
+
+  // Run refreshPartnerNFTs once on mount
+  useEffect(() => {
+    refreshPartnerNFTs()
+  }, [refreshPartnerNFTs])
 
   const findModelHistory: any[] = (
     history.find((item) => item.model === model)?.lists ?? []
@@ -52,7 +58,12 @@ export default function History({ model }: { model: string }) {
             </div>
             <div className="mt-4 flex flex-col gap-4">
               <div className="flex gap-2">
-                <MintToNFT url={item.url} model={model} size="sm" />
+                <MintToNFT
+                  url={item.url}
+                  model={model}
+                  imageId={item.id}
+                  size="sm"
+                />
                 <Link href={item.url} download>
                   <Button size="sm" variant="outline">
                     Download
