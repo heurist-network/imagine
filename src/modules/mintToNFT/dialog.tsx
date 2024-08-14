@@ -218,28 +218,28 @@ export function MintToNFT({
   }
 
   // Show toast when the user can signature free mint
-  // useEffect(() => {
-  //   if (canSignatureFreeMint != null && !isSignatureNotified.current) {
-  //     toast.success('You can do the signature free mint!')
-  //     isSignatureNotified.current = true
-  //   } else if (canSignatureFreeMint == null && !isSignatureNotified.current) {
-  //     isSignatureNotified.current = true
-  //     console.log('Signature free mint: Not available')
-  //   }
-  // }, [canSignatureFreeMint])
+  useEffect(() => {
+    if (canSignatureFreeMint != null && !isSignatureNotified.current) {
+      toast.success('You can do the signature free mint!')
+      isSignatureNotified.current = true
+    } else if (canSignatureFreeMint == null && !isSignatureNotified.current) {
+      isSignatureNotified.current = true
+      console.log('Signature free mint: Not available')
+    }
+  }, [canSignatureFreeMint])
 
   // Show success toast if an available NFT is found
-  // useEffect(() => {
-  //   if (availableNFT != null && !isPartnerNotified.current) {
-  //     toast.success('Partner NFT available for free minting!')
-  //     isPartnerNotified.current = true
-  //   } else if (availableNFT == null && !isPartnerNotified.current) {
-  //     isPartnerNotified.current = true
-  //     console.log(
-  //       'Partner Free Mint: No partner NFT available for free minting.',
-  //     )
-  //   }
-  // }, [availableNFT])
+  useEffect(() => {
+    if (availableNFT != null && !isPartnerNotified.current) {
+      toast.success('Partner NFT available for free minting!')
+      isPartnerNotified.current = true
+    } else if (availableNFT == null && !isPartnerNotified.current) {
+      isPartnerNotified.current = true
+      console.log(
+        'Partner Free Mint: No partner NFT available for free minting.',
+      )
+    }
+  }, [availableNFT])
 
   useEffect(() => {
     if (signatureFreeMintError) {
