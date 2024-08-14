@@ -45,8 +45,6 @@ export default async function Models({ params }: { params: { slug: string } }) {
 
     const findModel = res.find((item) => item.name === model)
 
-    console.log(findModel, 'findModel')
-
     const models = [
       { label: model, data: model1 },
       { label: `${model}-2`, data: model2 },
@@ -68,7 +66,7 @@ export default async function Models({ params }: { params: { slug: string } }) {
                 History
                 <span className="text-muted-foreground">(Latest 50)</span>
               </TabsTrigger>
-              {/* <TabsTrigger value="pdas" className="items-end gap-1">
+              {/* <TabsTrigger value="pdas" className="gap-1 items-end">
                 PDAs
               </TabsTrigger> */}
             </TabsList>
@@ -105,7 +103,7 @@ export default async function Models({ params }: { params: { slug: string } }) {
                 History
                 <span className="text-muted-foreground">(Latest 50)</span>
               </TabsTrigger>
-              {/* <TabsTrigger value="pdas" className="items-end gap-1">
+              {/* <TabsTrigger value="pdas" className="gap-1 items-end">
                 PDAs
               </TabsTrigger> */}
             </TabsList>

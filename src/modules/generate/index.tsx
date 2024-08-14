@@ -1,13 +1,14 @@
 'use client'
 
-import { Info, Loader2, MoreVertical } from 'lucide-react'
+import { Info, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useLocalStorage } from 'usehooks-ts'
 import { useAccount } from 'wagmi'
 import { z } from 'zod'
@@ -27,12 +28,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import {
   Form,
   FormControl,
@@ -173,6 +168,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
   const [loadingGenerate, setLoadingGenerate] = useState(false)
+  const searchParams = useSearchParams()
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
@@ -296,6 +292,8 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   }
 
   const getModelData = async () => {
+    const search = searchParams.get('prompt')
+
     const res: any[] = await fetch(
       'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models-new.json',
       {
@@ -304,9 +302,15 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
     ).then((res) => res.json())
     const nowModel = res.find((item) => item.name.includes(model))
     if (nowModel.type.includes('composite')) {
-      form.setValue('prompt', nowModel.autofill)
+      if (search) {
+        form.setValue('prompt', search)
+      } else {
+        form.setValue('prompt', nowModel.autofill)
+      }
       setModelInfo(nowModel)
       setShowRecommend(true)
+    } else {
+      if (search) form.setValue('prompt', search)
     }
   }
 
