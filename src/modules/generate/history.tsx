@@ -52,19 +52,7 @@ export default function History({ model }: { model: string }) {
             </div>
             <div className="mt-4 flex flex-col gap-4">
               <div className="flex gap-2">
-                <MintToNFT url={item.url} model={model}>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={loadingMintNFT}
-                    className="bg-gradient-to-r from-[#9ffd8d] to-[#eaff61]"
-                  >
-                    {loadingMintNFT && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    ✨ Mint zkImagine NFT
-                  </Button>
-                </MintToNFT>
+                <MintToNFT url={item.url} model={model} size="sm" />
                 <Link href={item.url} download>
                   <Button size="sm" variant="outline">
                     Download

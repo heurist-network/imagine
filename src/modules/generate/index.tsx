@@ -182,7 +182,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   })
   const [info, setInfo] = useState<any>(null)
   const [transactionId, setTransactionId] = useState('')
-  const { loading: loadingMintNFT } = useMintToNFT()
 
   // Philand results need pixelation
   const [isPhiland, setIsPhiland] = useState(false)
@@ -609,21 +608,10 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             {!!result.url && (
               <>
                 <div className="flex flex-wrap justify-center gap-2">
-                  <MintToNFT url={info.url} model={model}>
-                    <Button
-                      variant="outline"
-                      disabled={loadingMintNFT}
-                      className="bg-gradient-to-r from-[#9ffd8d] to-[#eaff61] hover:bg-gradient-to-l"
-                    >
-                      {loadingMintNFT && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      ✨ Mint zkImagine NFT
-                    </Button>
-                  </MintToNFT>
+                  <MintToNFT url={info.url} model={model} imageId={info.id} />
 
                   {/* @dev patnerFreeMint debug modal */}
-                  <PartnerFreeMintButton
+                  {/* <PartnerFreeMintButton
                     modelId={model}
                     imageId={info.id}
                     onSuccess={(hash) =>
@@ -632,10 +620,10 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                     onError={(error) =>
                       console.error('Partner free minting:', error)
                     }
-                  />
+                  /> */}
 
                   {/* @dev signatureFreeMint debug modal */}
-                  <SignatureFreeMintButton
+                  {/* <SignatureFreeMintButton
                     modelId={model}
                     imageId={info.id}
                     onSuccess={(hash) =>
@@ -644,7 +632,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                     onError={(error) =>
                       console.error('Signature free minting:', error)
                     }
-                  />
+                  /> */}
 
                   <Button
                     className={cn({ 'gap-2': !loadingUpload })}

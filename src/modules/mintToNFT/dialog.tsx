@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { Loader2 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Address, formatEther, Hash, isAddress } from 'viem'
 import { useAccount, useBalance, useClient } from 'wagmi'
 
-import { Button } from '@/components/ui/button'
+import { Button, ButtonProps } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -15,33 +16,115 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
+import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
+import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
 import { useMintToNFT } from './hooks'
 
 export function MintToNFT({
-  children,
   url,
   model,
+  imageId,
+  size,
 }: {
-  children: React.ReactNode
   url: string
   model: string
+  imageId: string
+  size?: ButtonProps['size']
 }) {
   const account = useAccount()
   const client = useClient()
 
   const { openConnectModal } = useConnectModal()
-  const { setLoading, referralAddress, setReferralAddress } = useMintToNFT()
-  const { mint, mintFee, discountedFee } = useMintZkImagine()
+  const {
+    setLoading,
+    referralAddress,
+    setReferralAddress,
+    loading: loadingMintNFT,
+  } = useMintToNFT()
+
+  const {
+    canSignatureFreeMint,
+    isLoading: loadingSignatureFreeMint,
+    error: signatureFreeMintError,
+  } = useSignatureFreeMint()
+  const [isSignatureFreeMinting, setIsSignatureFreeMinting] = useState(false)
+
+  const {
+    availableNFT,
+    isLoading: loadingPartnerFreeMint,
+    error: partnerFreeMintError,
+    refreshPartnerNFTs,
+  } = usePartnerFreeMint()
+  const [isPartnerFreeMinting, setIsPartnerFreeMinting] = useState(false)
+
+  const { mint, mintFee, discountedFee, signatureFreeMint, partnerFreeMint } =
+    useMintZkImagine()
 
   const [open, setOpen] = useState(false)
   const [isValidReferral, setIsValidReferral] = useState(false)
+  // const [isSignatureNotified, setIsSignatureNotified] = useState(false)
+  const isSignatureNotified = useRef(false)
+  const isPartnerNotified = useRef(false)
 
   const balance =
     (useBalance({
       address: account.address,
     }).data?.value as bigint) || BigInt(0)
+
+  const onSignatureFreeMint = async () => {
+    if (!canSignatureFreeMint) {
+      toast.error('You cannot signature free mint')
+      return
+    }
+    setIsSignatureFreeMinting(true)
+
+    try {
+      const hash = await signatureFreeMint(model, imageId)
+      // onSuccess?.(hash)
+      toast.success('Signature free mint successful')
+    } catch (error) {
+      console.error('Signature free mint failed', error)
+      // onError?.(
+      //   error instanceof Error ? error : new Error('Unknown error occurred'),
+      // )
+      toast.error(
+        'Signature free minting failed. Please make sure you are in the list',
+      )
+    } finally {
+      setIsSignatureFreeMinting(false)
+    }
+  }
+
+  const onPartnerFreeMint = async () => {
+    if (!availableNFT) {
+      toast.error('No partner NFT available for free minting.')
+      return
+    }
+
+    setIsPartnerFreeMinting(true)
+    try {
+      const hash = await partnerFreeMint(
+        model,
+        imageId,
+        availableNFT.address,
+        BigInt(availableNFT.tokenId),
+      )
+      // onSuccess?.(hash)
+      toast.success('Partner free minting successful!')
+    } catch (error) {
+      console.error('Partner free minting failed:', error)
+      // onError?.(
+      //   error instanceof Error ? error : new Error('Unknown error occurred'),
+      // )
+      toast.error(
+        'Partner free minting failed. Please make sure you have a partner NFT available.',
+      )
+    } finally {
+      setIsPartnerFreeMinting(false)
+    }
+  }
 
   const onMintToNFT = async () => {
     if (!account.address) return openConnectModal?.()
@@ -134,6 +217,44 @@ export function MintToNFT({
     }
   }
 
+  // Show toast when the user can signature free mint
+  // useEffect(() => {
+  //   if (canSignatureFreeMint != null && !isSignatureNotified.current) {
+  //     toast.success('You can do the signature free mint!')
+  //     isSignatureNotified.current = true
+  //   } else if (canSignatureFreeMint == null && !isSignatureNotified.current) {
+  //     isSignatureNotified.current = true
+  //     console.log('Signature free mint: Not available')
+  //   }
+  // }, [canSignatureFreeMint])
+
+  // Show success toast if an available NFT is found
+  // useEffect(() => {
+  //   if (availableNFT != null && !isPartnerNotified.current) {
+  //     toast.success('Partner NFT available for free minting!')
+  //     isPartnerNotified.current = true
+  //   } else if (availableNFT == null && !isPartnerNotified.current) {
+  //     isPartnerNotified.current = true
+  //     console.log(
+  //       'Partner Free Mint: No partner NFT available for free minting.',
+  //     )
+  //   }
+  // }, [availableNFT])
+
+  useEffect(() => {
+    if (signatureFreeMintError) {
+      toast.error(`Error: ${signatureFreeMintError}`)
+    }
+    if (signatureFreeMintError) {
+      toast.error(`Error: ${signatureFreeMintError}`)
+    }
+  }, [signatureFreeMintError, signatureFreeMintError])
+
+  // Run refreshPartnerNFTs once on mount
+  useEffect(() => {
+    refreshPartnerNFTs()
+  }, [refreshPartnerNFTs])
+
   useEffect(() => {
     if (
       isAddress(referralAddress) &&
@@ -147,8 +268,45 @@ export function MintToNFT({
   }, [referralAddress])
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        if (open) return
+        setOpen(open)
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button
+          size={size}
+          variant="outline"
+          disabled={
+            loadingMintNFT ||
+            isSignatureFreeMinting ||
+            loadingSignatureFreeMint ||
+            isPartnerFreeMinting ||
+            loadingPartnerFreeMint
+          }
+          className="bg-gradient-to-r from-[#9ffd8d] to-[#eaff61] hover:bg-gradient-to-l"
+          onClick={async () => {
+            if (canSignatureFreeMint) {
+              onSignatureFreeMint()
+            } else if (availableNFT) {
+              onPartnerFreeMint()
+            } else {
+              setOpen(true)
+            }
+          }}
+        >
+          {(loadingMintNFT ||
+            isSignatureFreeMinting ||
+            loadingSignatureFreeMint ||
+            isPartnerFreeMinting ||
+            loadingPartnerFreeMint) && (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          )}
+          ✨ Mint zkImagine NFT
+        </Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Mint Imagine NFT</DialogTitle>
