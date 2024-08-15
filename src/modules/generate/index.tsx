@@ -169,7 +169,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   const { openConnectModal } = useConnectModal()
   const searchParams = useSearchParams()
   const [loadingGenerate, setLoadingGenerate] = useState(false)
-  const searchParams = useSearchParams()
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
