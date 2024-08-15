@@ -1,8 +1,8 @@
-import { Loader2 } from 'lucide-react' // Assuming you're using Lucide icons
-import React, { useState } from 'react'
+import { Loader2 } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
-import { Button } from '@/components/ui/button' // Adjust this import based on your UI library
-
+import { Button } from '@/components/ui/button'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 
@@ -19,39 +19,77 @@ export const PartnerFreeMintButton: React.FC<PartnerFreeMintButtonProps> = ({
   onSuccess,
   onError,
 }) => {
-  const { partnerNFTs, findUsablePartnerNFT, canPartnerFreeMint } =
+  const { availableNFT, isLoading, error, refreshPartnerNFTs } =
     usePartnerFreeMint()
-
   const { partnerFreeMint } = useMintZkImagine()
-  const [isLoading, setIsLoading] = useState(false)
+  const [isMinting, setIsMinting] = useState(false)
+  const [isNotified, setIsNotified] = useState(false)
+
+  // Run refreshPartnerNFTs once on mount
+  useEffect(() => {
+    refreshPartnerNFTs()
+  }, [refreshPartnerNFTs])
+
+  // Show error toast if there's an error
+  useEffect(() => {
+    if (error) {
+      toast.error(`Error: ${error}`)
+    }
+  }, [error])
+
+  // Show success toast if an available NFT is found
+  useEffect(() => {
+    if (availableNFT != null && !isNotified) {
+      toast.success('Partner NFT available for free minting!')
+      setIsNotified(true)
+    } else if (availableNFT == null && !isNotified) {
+      setIsNotified(true)
+      console.log(
+        'Partner Free Mint: No partner NFT available for free minting.',
+      )
+    }
+  }, [availableNFT])
 
   const handlePartnerFreeMint = async () => {
-    if (!canPartnerFreeMint) return
+    if (!availableNFT) {
+      toast.error('No partner NFT available for free minting.')
+      return
+    }
 
-    setIsLoading(true)
+    setIsMinting(true)
     try {
-      const hash = await partnerFreeMint(modelId, imageId)
-      // console.log('Partner free minting successful, transaction hash:', hash)
+      const hash = await partnerFreeMint(
+        modelId,
+        imageId,
+        availableNFT.address,
+        BigInt(availableNFT.tokenId),
+      )
       onSuccess?.(hash)
+      toast.success('Partner free minting successful!')
     } catch (error) {
       console.error('Partner free minting failed:', error)
       onError?.(
         error instanceof Error ? error : new Error('Unknown error occurred'),
       )
+      toast.error(
+        'Partner free minting failed. Please make sure you have a partner NFT available.',
+      )
     } finally {
-      setIsLoading(false)
+      setIsMinting(false)
     }
   }
 
-  if (!canPartnerFreeMint) {
-    return null // Don't render the button if partner free minting is not available
-  }
-
   return (
-    <div>
-      {canPartnerFreeMint && (
-        <Button onClick={handlePartnerFreeMint}>Partner Free Mint</Button>
-      )}
+    <div className="flex space-x-2">
+      <Button
+        onClick={handlePartnerFreeMint}
+        disabled={isMinting || isLoading || !availableNFT}
+      >
+        {isMinting || isLoading ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        ) : null}
+        Partner Free Mint
+      </Button>
     </div>
   )
 }

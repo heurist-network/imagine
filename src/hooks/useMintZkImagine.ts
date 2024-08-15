@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Address } from 'viem'
-import { zkSync, zkSyncSepoliaTestnet } from 'viem/zksync'
+import { Abi, Address, encodeFunctionData, keccak256 } from 'viem'
+import { eip712WalletActions, zkSync } from 'viem/zksync'
 import {
   useAccount,
   usePublicClient,
@@ -11,48 +11,31 @@ import {
 import ZkImagineABI from '@/abis/ZkImagine.json'
 import { MarketConfig } from '@/constants/MarketConfig'
 
-import { usePartnerFreeMint } from './usePartnerFreeMint'
+import { useSignatureFreeMint } from './useSignatureFreeMint'
 
-/**
- * Custom hook for minting ZkImagine NFTs.
- * This hook handles the minting process, including reading mint fees,
- * calculating discounts, and executing the mint transaction.
- *
- * @returns An object containing minting functions and related data.
- */
 export const useMintZkImagine = () => {
-  // Get account details and wallet client
   const { address, chain } = useAccount()
   const { data: walletClient } = useWalletClient()
   const { switchChain } = useSwitchChain()
+  const publicClient = usePublicClient({
+    chainId: walletClient?.chain.id,
+  })
 
-  const { findUsablePartnerNFT, canPartnerFreeMint } = usePartnerFreeMint()
+  const { signatureData, canSignatureFreeMint } = useSignatureFreeMint()
 
-  // State for storing mint fees
   const [mintFee, setMintFee] = useState<bigint | null>(null)
   const [discountedFee, setDiscountedFee] = useState<{
     fee: bigint
     discount: bigint
   } | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  // Get public client for reading contract data
-  const publicClient = usePublicClient({
-    chainId: walletClient?.chain.id,
-  })
-
-  // Determine the current market based on the connected chain
   const currentMarket = chain
     ? Object.values(MarketConfig).find((m) => m.chain.id === chain.id)
     : undefined
 
-  /**
-   * Reads the current mint fee from the contract.
-   */
   const readMintFee = useCallback(async () => {
-    if (!publicClient || !currentMarket) {
-      console.error('Public client or current market not available')
-      return
-    }
+    if (!publicClient || !currentMarket) return
 
     try {
       const fee = await publicClient.readContract({
@@ -68,14 +51,8 @@ export const useMintZkImagine = () => {
     }
   }, [publicClient, currentMarket])
 
-  /**
-   * Reads the discounted mint fee from the contract.
-   */
   const readDiscountedMintFee = useCallback(async () => {
-    if (!publicClient || !currentMarket) {
-      console.error('Public client or current market not available')
-      return
-    }
+    if (!publicClient || !currentMarket) return
 
     try {
       const [discountedFee, discount] = (await publicClient.readContract({
@@ -91,14 +68,12 @@ export const useMintZkImagine = () => {
     }
   }, [publicClient, currentMarket])
 
-  // Switch to zkSync Sepolia testnet if not already connected
   useEffect(() => {
     if (chain && chain.id !== zkSync.id) {
       switchChain({ chainId: zkSync.id })
     }
   }, [chain, switchChain])
 
-  // Read mint fees when public client and market are available
   useEffect(() => {
     if (publicClient && currentMarket) {
       readMintFee().catch(console.error)
@@ -106,14 +81,29 @@ export const useMintZkImagine = () => {
     }
   }, [publicClient, currentMarket, readMintFee, readDiscountedMintFee])
 
-  /**
-   * Mints a new ZkImagine NFT.
-   *
-   * @param referralAddress - The address of the referrer (for discount)
-   * @param modelId - The ID of the model used for the NFT
-   * @param imageId - The ID of the image used for the NFT
-   * @returns The transaction hash of the mint transaction
-   */
+  // @dev getSponsoredPaymasterParams is used for partnerFreeMint with zyfi paymaster.
+  const getSponsoredPaymasterParams = useCallback(async (txRequest: any) => {
+    try {
+      const response = await fetch('/api/sponsored-paymaster', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ txRequest }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error during sponsored paymaster API call:', error)
+      throw error
+    }
+  }, [])
+
+  // @dev call to zkImagine contract to mint.
   const mint = useCallback(
     async (referralAddress: string, modelId: string, imageId: string) => {
       if (!currentMarket || !walletClient || !publicClient || !address) {
@@ -124,33 +114,34 @@ export const useMintZkImagine = () => {
         throw new Error('Mint fee not yet loaded')
       }
 
-      // Determine which fee to use based on referral address
-      let mintFeeToUse = mintFee
-      if (
-        referralAddress !== '0x0000000000000000000000000000000000000000' &&
-        referralAddress !== address
-      ) {
-        // Use discounted fee if a valid referral address is provided
-        mintFeeToUse = discountedFee.fee
-      } else {
-        referralAddress = '0x0000000000000000000000000000000000000000'
+      setIsLoading(true)
+      try {
+        let mintFeeToUse = mintFee
+        if (
+          referralAddress !== '0x0000000000000000000000000000000000000000' &&
+          referralAddress !== address
+        ) {
+          mintFeeToUse = discountedFee.fee
+        } else {
+          referralAddress = '0x0000000000000000000000000000000000000000'
+        }
+
+        const { request } = await publicClient.simulateContract({
+          address: currentMarket.addresses.ZkImagine,
+          abi: ZkImagineABI,
+          functionName: 'mint',
+          args: [address, referralAddress as Address, modelId, imageId],
+          account: address,
+          value: mintFeeToUse,
+        })
+
+        const hash = await walletClient.writeContract(request)
+        await publicClient.waitForTransactionReceipt({ hash })
+
+        return hash
+      } finally {
+        setIsLoading(false)
       }
-
-      // Simulate the contract interaction
-      const { request } = await publicClient.simulateContract({
-        address: currentMarket.addresses.ZkImagine,
-        abi: ZkImagineABI,
-        functionName: 'mint',
-        args: [address, referralAddress as Address, modelId, imageId],
-        account: address,
-        value: mintFeeToUse,
-      })
-
-      // Execute the actual transaction
-      const hash = await walletClient.writeContract(request)
-      await publicClient.waitForTransactionReceipt({ hash })
-
-      return hash
     },
     [
       address,
@@ -162,63 +153,202 @@ export const useMintZkImagine = () => {
     ],
   )
 
+  //@dev: call to zkImagine contract to partnerFreeMint with zyfi paymaster sponsored featue, no gas cost from user.
   const partnerFreeMint = useCallback(
+    async (
+      modelId: string,
+      imageId: string,
+      nftAddress: Address,
+      tokenId: bigint,
+    ) => {
+      if (!currentMarket || !walletClient || !publicClient || !address) {
+        throw new Error(
+          'Wallet not connected, unsupported chain, or no available partner NFT',
+        )
+      }
+
+      setIsLoading(true)
+      try {
+        const { request } = await publicClient.simulateContract({
+          address: currentMarket.addresses.ZkImagine,
+          abi: ZkImagineABI,
+          functionName: 'partnerFreeMint',
+          args: [address, nftAddress as Address, tokenId, modelId, imageId],
+          account: address,
+        })
+
+        // paymasterResponse is used for partnerFreeMint with zyfi paymaster.
+        const paymasterResponse = await getSponsoredPaymasterParams({
+          from: address,
+          to: request.address,
+          data: encodeFunctionData({
+            abi: request.abi as Abi,
+            functionName: request.functionName as string,
+            args: request.args,
+          }),
+        })
+
+        const nonce = await publicClient.getTransactionCount({
+          address: address,
+        })
+
+        const rawTx = paymasterResponse.txData
+
+        console.log('rawTx: ', rawTx)
+
+        // generate txPayload
+        const txPayload = {
+          account: address,
+          to: rawTx.to,
+          value: BigInt(rawTx.value!),
+          chain: walletClient.chain,
+          gas: BigInt(rawTx.gasLimit),
+          gasPerPubdata: BigInt(rawTx.customData.gasPerPubdata),
+          maxFeePerGas: BigInt(rawTx.maxFeePerGas),
+          maxPriorityFeePerGas: BigInt(0),
+          data: rawTx.data,
+          paymaster: rawTx.customData.paymasterParams.paymaster,
+          paymasterInput: rawTx.customData.paymasterParams.paymasterInput,
+          nonce,
+        }
+
+        // const eip712WalletClient = walletClient.extend(eip712WalletActions())
+        const hash = await walletClient.sendTransaction(txPayload)
+        await publicClient.waitForTransactionReceipt({ hash })
+
+        return hash
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [
+      address,
+      currentMarket,
+      walletClient,
+      publicClient,
+      getSponsoredPaymasterParams,
+    ],
+  )
+
+  //@dev call to zkImagine contract to signatureFreeMint with zyfi paymaster sponsored featue, no gas cost from user.
+  const signatureFreeMint = useCallback(
     async (modelId: string, imageId: string) => {
       if (!currentMarket || !walletClient || !publicClient || !address) {
         throw new Error('Wallet not connected or unsupported chain')
       }
 
-      const usablePartnerNFT = await findUsablePartnerNFT()
-      if (!usablePartnerNFT) {
-        throw new Error('No usable partner NFT found for free minting')
+      if (!canSignatureFreeMint) {
+        throw new Error('User is not eligible for signature free mint')
       }
 
-      // Simulate the contract interaction
-      const { request } = await publicClient.simulateContract({
-        address: currentMarket.addresses.ZkImagine,
-        abi: ZkImagineABI,
-        functionName: 'partnerFreeMint',
-        args: [address, usablePartnerNFT as Address, modelId, imageId],
-        account: address,
-      })
+      setIsLoading(true)
+      try {
+        const { request } = await publicClient.simulateContract({
+          address: currentMarket.addresses.ZkImagine,
+          abi: ZkImagineABI,
+          functionName: 'signatureFreeMint',
+          args: [
+            address,
+            keccak256(address as `0x${string}`),
+            signatureData!.signature as `0x${string}`,
+            modelId,
+            imageId,
+          ],
+          account: address,
+        })
 
-      // Execute the actual transaction
-      const hash = await walletClient.writeContract(request)
-      await publicClient.waitForTransactionReceipt({ hash })
+        // getSponsoredPaymasterParams is used for signatureFreeMint with zyfi paymaster.
+        const paymasterResponse = await getSponsoredPaymasterParams({
+          from: address,
+          to: request.address,
+          data: encodeFunctionData({
+            abi: request.abi as Abi,
+            functionName: request.functionName as string,
+            args: request.args,
+          }),
+        })
 
-      return hash
+        const nonce = await publicClient.getTransactionCount({
+          address: address,
+        })
+
+        const rawTx = paymasterResponse.txData
+
+        // generate txPayload
+        const txPayload = {
+          account: address,
+          to: rawTx.to,
+          value: BigInt(rawTx.value!),
+          chain: walletClient.chain,
+          gas: BigInt(rawTx.gasLimit),
+          gasPerPubdata: BigInt(rawTx.customData.gasPerPubdata),
+          maxFeePerGas: BigInt(rawTx.maxFeePerGas),
+          maxPriorityFeePerGas: BigInt(0),
+          data: rawTx.data,
+          paymaster: rawTx.customData.paymasterParams.paymaster,
+          paymasterInput: rawTx.customData.paymasterParams.paymasterInput,
+          nonce,
+        }
+
+        // const eip712WalletClient = walletClient.extend(eip712WalletActions())
+        const hash = await walletClient.sendTransaction(txPayload)
+        await publicClient.waitForTransactionReceipt({ hash })
+
+        return hash
+      } finally {
+        setIsLoading(false)
+      }
     },
-    [address, currentMarket, walletClient, publicClient, findUsablePartnerNFT],
+    [
+      address,
+      currentMarket,
+      walletClient,
+      publicClient,
+      canSignatureFreeMint,
+      signatureData,
+      getSponsoredPaymasterParams,
+    ],
   )
-  // Return placeholder functions if wallet is not connected or chain is not supported
+
   if (!chain || !address || !publicClient) {
     return {
       mint: async () => {
-        throw new Error('Wallet not connected or unsupported chain')
+        throw new Error(
+          'Wallet not connected, no address, or unsupported chain',
+        )
       },
       partnerFreeMint: async () => {
-        throw new Error('Wallet not connected or unsupported chain')
+        throw new Error(
+          'Wallet not connected, no address, or unsupported chain',
+        )
+      },
+      signatureFreeMint: async () => {
+        throw new Error(
+          'Wallet not connected, no address, or unsupported chain',
+        )
       },
       mintFee: null,
       discountedFee: null,
       readMintFee: async () => {
-        throw new Error('Wallet not connected or unsupported chain')
+        throw new Error('Public client not available')
       },
       readDiscountedMintFee: async () => {
-        throw new Error('Wallet not connected or unsupported chain')
+        throw new Error('Public client not available')
       },
-      canPartnerFreeMint: false,
+      isLoading: false,
+      canSignatureFreeMint: () => false,
     }
   }
 
-  // Return the hook's functions and data
   return {
     mint,
     partnerFreeMint,
+    signatureFreeMint,
     mintFee,
     discountedFee,
     readMintFee,
     readDiscountedMintFee,
-    canPartnerFreeMint,
+    isLoading,
+    canSignatureFreeMint,
   }
 }

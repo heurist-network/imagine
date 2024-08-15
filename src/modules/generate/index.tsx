@@ -1,10 +1,10 @@
 'use client'
 
-import { Info, Loader2, MoreVertical } from 'lucide-react'
+import { Info, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -14,6 +14,8 @@ import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
+import { PartnerFreeMintButton } from '@/components/PartnerFreeMintButton'
+import { SignatureFreeMintButton } from '@/components/SignatureFreeMintButton'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,12 +28,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import {
   Form,
   FormControl,
@@ -186,7 +182,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   })
   const [info, setInfo] = useState<any>(null)
   const [transactionId, setTransactionId] = useState('')
-  const { loading: loadingMintNFT } = useMintToNFT()
 
   // Philand results need pixelation
   const [isPhiland, setIsPhiland] = useState(false)
@@ -624,18 +619,32 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             {!!result.url && (
               <>
                 <div className="flex flex-wrap justify-center gap-2">
-                  <MintToNFT url={info.url} model={model}>
-                    <Button
-                      variant="outline"
-                      disabled={loadingMintNFT}
-                      className="bg-gradient-to-r from-[#9ffd8d] to-[#eaff61] hover:bg-gradient-to-l"
-                    >
-                      {loadingMintNFT && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      ✨ Mint zkImagine NFT
-                    </Button>
-                  </MintToNFT>
+                  <MintToNFT url={info.url} model={model} imageId={info.id} />
+
+                  {/* @dev patnerFreeMint debug modal */}
+                  {/* <PartnerFreeMintButton
+                    modelId={model}
+                    imageId={info.id}
+                    onSuccess={(hash) =>
+                      console.log('Partner free minting:', hash)
+                    }
+                    onError={(error) =>
+                      console.error('Partner free minting:', error)
+                    }
+                  /> */}
+
+                  {/* @dev signatureFreeMint debug modal */}
+                  {/* <SignatureFreeMintButton
+                    modelId={model}
+                    imageId={info.id}
+                    onSuccess={(hash) =>
+                      console.log('Signature free minting:', hash)
+                    }
+                    onError={(error) =>
+                      console.error('Signature free minting:', error)
+                    }
+                  /> */}
+
                   <Button
                     className={cn({ 'gap-2': !loadingUpload })}
                     variant="outline"

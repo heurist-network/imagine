@@ -1,0 +1,4 @@
+export const partnerNftList = [
+  '0x5e0652d510d6823e0A6480b062179658645CBa81',
+  '0x1925AB9F9bcdB9E2D2861cc7C4c157645126D9d9',
+]

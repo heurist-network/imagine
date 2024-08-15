@@ -4,92 +4,96 @@ import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
 import ZkImagineABI from '@/abis/ZkImagine.json'
 import { MarketConfig } from '@/constants/MarketConfig'
-
-const PARTNER_NFTS_API = '/api/partner-nfts'
+import { partnerNftList } from '@/constants/partnerNftList'
 
 export const usePartnerFreeMint = () => {
-  const { address, chain } = useAccount()
+  const { address } = useAccount()
   const { data: walletClient } = useWalletClient()
   const publicClient = usePublicClient({
     chainId: walletClient?.chain.id,
   })
-  const [partnerNFTs, setPartnerNFTs] = useState<string[]>([])
-  const [error, setError] = useState<string | null>(null)
 
-  const fetchPartnerNFTs = useCallback(async () => {
+  const [availableNFT, setAvailableNFT] = useState<{
+    address: Address
+    tokenId: string
+  } | null>(null)
+  const [ownedNFTs, setOwnedNFTs] = useState<any[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  // @note Alchemy API Call: Fetch NFTs owned by the user
+  const fetchNFTsForOwner = useCallback(async () => {
     if (!address) return
 
+    setIsLoading(true)
     try {
-      const response = await fetch(
-        `${PARTNER_NFTS_API}?minterAddress=${address}`,
-      )
-      const textData = await response.text()
+      const contractAddresses = partnerNftList
+        .map((nft) => `contractAddresses[]=${nft}`)
+        .join('&')
+      const url = `/api/getNFTsForOwner?address=${address}&${contractAddresses}&withMetadata=false`
 
-      let data
-      try {
-        data = JSON.parse(textData)
-      } catch (e) {
-        console.error('Failed to parse JSON:', textData)
-        throw new Error('Invalid response format')
-      }
+      const response = await fetch(url)
+      const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch partner NFTs')
-      }
-
-      setPartnerNFTs(data.canMintForPartnerNFTs || [])
-      setError(null)
+      setOwnedNFTs(data.ownedNfts || [])
     } catch (error) {
-      console.error('Error fetching partner NFTs:', error)
-      setError(
-        error instanceof Error ? error.message : 'Unknown error occurred',
-      )
-      setPartnerNFTs([])
+      console.error('Error fetching NFTs for owner', error)
+      setOwnedNFTs([])
+    } finally {
+      setIsLoading(false)
     }
   }, [address])
 
-  const checkCanMintForPartnerNFT = useCallback(
-    async (partnerNFTAddress: string) => {
-      if (!publicClient || !address) return false
+  // @note Read contract:  Find a usable partner NFT for free minting
+  const findUsablePartnerNFT = useCallback(async () => {
+    if (!publicClient || !address || ownedNFTs.length === 0) return null
 
-      const currentMarket = Object.values(MarketConfig).find(
-        (m) => m.chain.id === publicClient.chain.id,
-      )
-      if (!currentMarket) return false
-
+    for (const nft of ownedNFTs) {
       try {
-        const result = await publicClient.readContract({
+        const currentMarket = Object.values(MarketConfig).find(
+          (m) => m.chain.id === publicClient.chain.id,
+        )
+        if (!currentMarket) continue
+
+        const result = (await publicClient.readContract({
           address: currentMarket.addresses.ZkImagine,
           abi: ZkImagineABI,
           functionName: 'canMintForPartnerNFT',
-          args: [address, partnerNFTAddress as Address],
-        })
+          args: [address, nft.contractAddress as Address, BigInt(nft.tokenId)],
+        })) as { canMint: boolean; reason: string }
 
-        return (result as any).canMint
+        if (result.canMint === true) {
+          const usableNFT = {
+            address: nft.contractAddress,
+            tokenId: nft.tokenId,
+          }
+
+          setAvailableNFT(usableNFT)
+          return usableNFT
+        }
       } catch (error) {
         console.error('Error checking canMintForPartnerNFT:', error)
-        return false
-      }
-    },
-    [publicClient, address],
-  )
-
-  const findUsablePartnerNFT = useCallback(async () => {
-    for (const nftAddress of partnerNFTs) {
-      if (await checkCanMintForPartnerNFT(nftAddress)) {
-        return nftAddress
       }
     }
-    return null
-  }, [partnerNFTs, checkCanMintForPartnerNFT])
 
+    setAvailableNFT(null)
+    return null
+  }, [publicClient, address, ownedNFTs])
+
+  // Effect to find usable NFT when ownedNFTs changes
   useEffect(() => {
-    fetchPartnerNFTs()
-  }, [fetchPartnerNFTs])
+    findUsablePartnerNFT()
+  }, [findUsablePartnerNFT])
+
+  // Function to manually trigger NFT fetch and usable NFT check
+  const refreshPartnerNFTs = useCallback(async () => {
+    await fetchNFTsForOwner()
+  }, [fetchNFTsForOwner])
 
   return {
-    partnerNFTs,
-    findUsablePartnerNFT,
-    canPartnerFreeMint: partnerNFTs.length > 0,
+    availableNFT,
+    isLoading,
+    error,
+    refreshPartnerNFTs,
   }
 }

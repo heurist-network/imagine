@@ -1,1249 +1,1316 @@
 [
   {
-    "type": "constructor",
     "inputs": [],
-    "stateMutability": "nonpayable"
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   },
   {
-    "type": "receive",
-    "stateMutability": "payable"
-  },
-  {
-    "type": "function",
-    "name": "addWhitelistedNFT",
+    "anonymous": false,
     "inputs": [
       {
-        "name": "nftAddress",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "approve",
-    "inputs": [
-      {
-        "name": "to",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "tokenId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "balanceOf",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "canMintForPartnerNFT",
-    "inputs": [
-      {
-        "name": "to",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "partnerNFTAddress",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "tokenId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple",
-        "internalType": "struct ZkImagine.MintStatus",
-        "components": [
-          {
-            "name": "canMint",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "reason",
-            "type": "string",
-            "internalType": "string"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "canMintForSignature",
-    "inputs": [
-      {
-        "name": "hash",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "signature",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple",
-        "internalType": "struct ZkImagine.MintStatus",
-        "components": [
-          {
-            "name": "canMint",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "reason",
-            "type": "string",
-            "internalType": "string"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "claimFee",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "claimReferralFee",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "freeMintCooldownWindow",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getApproved",
-    "inputs": [
-      {
-        "name": "tokenId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getDiscountedMintFee",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "globalTimeThreshold",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "initialize",
-    "inputs": [
-      {
-        "name": "name",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "symbol",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "baseTokenURI",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "mint_fee",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "referralDiscount",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "cooldownWindow",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "startTimestamp",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "isApprovedForAll",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "operator",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "isWhitelistedNFT",
-    "inputs": [
-      {
-        "name": "nftAddress",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "mint",
-    "inputs": [
-      {
-        "name": "to",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "referral",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "modelId",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "imageId",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "payable"
-  },
-  {
-    "type": "function",
-    "name": "mintFee",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "name",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "nextMint",
-    "inputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "nextSignatureMint",
-    "inputs": [
-      {
-        "name": "",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "owner",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "ownerOf",
-    "inputs": [
-      {
-        "name": "tokenId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "partnerFreeMint",
-    "inputs": [
-      {
-        "name": "to",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "partnerNFTAddress",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "partnerNFTtokenId",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "modelId",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "imageId",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "proxiableUUID",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "referralDiscountPct",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "referralFeesEarned",
-    "inputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "removeWhitelistedNFT",
-    "inputs": [
-      {
-        "name": "nftAddress",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "renounceOwnership",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "safeTransferFrom",
-    "inputs": [
-      {
-        "name": "from",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "to",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "tokenId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "safeTransferFrom",
-    "inputs": [
-      {
-        "name": "from",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "to",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "tokenId",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "data",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setApprovalForAll",
-    "inputs": [
-      {
-        "name": "operator",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "approved",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setBaseURI",
-    "inputs": [
-      {
-        "name": "baseURI",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setFreeMintCooldownWindow",
-    "inputs": [
-      {
-        "name": "cooldownWindow",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setMintFee",
-    "inputs": [
-      {
-        "name": "fee",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setReferralDiscountPct",
-    "inputs": [
-      {
-        "name": "discount",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "signatureFreeMint",
-    "inputs": [
-      {
-        "name": "hash",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "signature",
-        "type": "bytes",
-        "internalType": "bytes"
-      },
-      {
-        "name": "modelId",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "imageId",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "supportsInterface",
-    "inputs": [
-      {
-        "name": "interfaceId",
-        "type": "bytes4",
-        "internalType": "bytes4"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "symbol",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "tokenByIndex",
-    "inputs": [
-      {
-        "name": "index",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "tokenOfOwnerByIndex",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "index",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "tokenURI",
-    "inputs": [
-      {
-        "name": "tokenId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "totalReferralFees",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "totalSupply",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "transferFrom",
-    "inputs": [
-      {
-        "name": "from",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "to",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "tokenId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "transferOwnership",
-    "inputs": [
-      {
-        "name": "newOwner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "upgradeTo",
-    "inputs": [
-      {
-        "name": "newImplementation",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "upgradeToAndCall",
-    "inputs": [
-      {
-        "name": "newImplementation",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "data",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "payable"
-  },
-  {
-    "type": "function",
-    "name": "whitelistedNFTs",
-    "inputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "event",
-    "name": "AdminChanged",
-    "inputs": [
-      {
+        "indexed": false,
+        "internalType": "address",
         "name": "previousAdmin",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
+        "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "address",
         "name": "newAdmin",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
+        "type": "address"
       }
     ],
-    "anonymous": false
+    "name": "AdminChanged",
+    "type": "event"
   },
   {
-    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "approved",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
     "name": "Approval",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "approved",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "tokenId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "ApprovalForAll",
+    "anonymous": false,
     "inputs": [
       {
-        "name": "owner",
-        "type": "address",
         "indexed": true,
-        "internalType": "address"
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
       },
       {
+        "indexed": true,
+        "internalType": "address",
         "name": "operator",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "bool",
         "name": "approved",
-        "type": "bool",
-        "indexed": false,
-        "internalType": "bool"
+        "type": "bool"
       }
     ],
-    "anonymous": false
+    "name": "ApprovalForAll",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "BeaconUpgraded",
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "string",
+        "name": "baseURI",
+        "type": "string"
+      }
+    ],
+    "name": "BaseURIChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "beacon",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        "type": "address"
       }
     ],
-    "anonymous": false
+    "name": "BeaconUpgraded",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "FeeClaimed",
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
         "name": "owner",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
+        "type": "address"
       },
       {
-        "name": "amount",
-        "type": "uint256",
         "indexed": false,
-        "internalType": "uint256"
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
       }
     ],
-    "anonymous": false
+    "name": "FeeClaimed",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "FreeMintCooldownWindowChanged",
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "cooldownWindow",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
+        "type": "uint256"
       }
     ],
-    "anonymous": false
+    "name": "FreeMintCooldownWindowChanged",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "Initialized",
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint8",
         "name": "version",
-        "type": "uint8",
-        "indexed": false,
-        "internalType": "uint8"
+        "type": "uint8"
       }
     ],
-    "anonymous": false
+    "name": "Initialized",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "MintFeeChanged",
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "fee",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
+        "type": "uint256"
       }
     ],
-    "anonymous": false
+    "name": "MintFeeChanged",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "Minted",
+    "anonymous": false,
     "inputs": [
       {
-        "name": "to",
-        "type": "address",
         "indexed": false,
-        "internalType": "address"
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "address",
         "name": "referral",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
+        "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "tokenId",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
+        "type": "uint256"
       },
       {
+        "indexed": false,
+        "internalType": "string",
         "name": "modelId",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
+        "type": "string"
       },
       {
-        "name": "imageId",
-        "type": "string",
         "indexed": false,
-        "internalType": "string"
+        "internalType": "string",
+        "name": "imageId",
+        "type": "string"
       }
     ],
-    "anonymous": false
+    "name": "Minted",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "OwnershipTransferred",
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "address",
         "name": "previousOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        "type": "address"
       },
       {
+        "indexed": true,
+        "internalType": "address",
         "name": "newOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        "type": "address"
       }
     ],
-    "anonymous": false
+    "name": "OwnershipTransferred",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "PartnerFreeMint",
+    "anonymous": false,
     "inputs": [
       {
-        "name": "to",
-        "type": "address",
         "indexed": false,
-        "internalType": "address"
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "address",
         "name": "partnerNFTAddress",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
+        "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "partnerNFTtokenId",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
+        "type": "uint256"
       },
       {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "tokenId",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
+        "type": "uint256"
       },
       {
+        "indexed": false,
+        "internalType": "string",
         "name": "modelId",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
+        "type": "string"
       },
       {
-        "name": "imageId",
-        "type": "string",
         "indexed": false,
-        "internalType": "string"
+        "internalType": "string",
+        "name": "imageId",
+        "type": "string"
       }
     ],
-    "anonymous": false
+    "name": "PartnerFreeMint",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "ReferralDiscountChanged",
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "discount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
+        "type": "uint256"
       }
     ],
-    "anonymous": false
+    "name": "ReferralDiscountChanged",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "ReferralFeeClaimed",
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
         "name": "referer",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
+        "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "amount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
+        "type": "uint256"
       }
     ],
-    "anonymous": false
+    "name": "ReferralFeeClaimed",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "SignatureFreeMint",
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
         "name": "to",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
+        "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "tokenId",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
+        "type": "uint256"
       },
       {
+        "indexed": false,
+        "internalType": "string",
         "name": "modelId",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
+        "type": "string"
       },
       {
+        "indexed": false,
+        "internalType": "string",
         "name": "imageId",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
+        "type": "string"
       }
     ],
-    "anonymous": false
+    "name": "SignatureFreeMint",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "Transfer",
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "signer",
+        "type": "address"
+      }
+    ],
+    "name": "SignerChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "from",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        "type": "address"
       },
       {
+        "indexed": true,
+        "internalType": "address",
         "name": "to",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        "type": "address"
       },
       {
+        "indexed": true,
+        "internalType": "uint256",
         "name": "tokenId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
+        "type": "uint256"
       }
     ],
-    "anonymous": false
+    "name": "Transfer",
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "Upgraded",
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "address",
         "name": "implementation",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        "type": "address"
       }
     ],
-    "anonymous": false
+    "name": "Upgraded",
+    "type": "event"
   },
   {
-    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "nftAddress",
+        "type": "address"
+      }
+    ],
     "name": "WhitelistedNFTAdded",
-    "inputs": [
-      {
-        "name": "nftAddress",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
+    "type": "event"
   },
   {
-    "type": "event",
-    "name": "WhitelistedNFTRemoved",
+    "anonymous": false,
     "inputs": [
       {
-        "name": "nftAddress",
-        "type": "address",
         "indexed": false,
-        "internalType": "address"
+        "internalType": "address",
+        "name": "nftAddress",
+        "type": "address"
       }
     ],
-    "anonymous": false
+    "name": "WhitelistedNFTRemoved",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nftAddress",
+        "type": "address"
+      }
+    ],
+    "name": "addWhitelistedNFT",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "approve",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "partnerNFTAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "canMintForPartnerNFT",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "canMint",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "reason",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct zkImagine.MintStatus",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "hash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      },
+      {
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      }
+    ],
+    "name": "canMintForSignature",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "canMint",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "reason",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct zkImagine.MintStatus",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimReferralFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "freeMintCooldownWindow",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getApproved",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getDiscountedMintFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "globalTimeThreshold",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "symbol",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "baseTokenURI",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "mint_fee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "referralDiscount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "cooldownWindow",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startTimestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_signer",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      }
+    ],
+    "name": "isApprovedForAll",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nftAddress",
+        "type": "address"
+      }
+    ],
+    "name": "isWhitelistedNFT",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "referral",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "modelId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "imageId",
+        "type": "string"
+      }
+    ],
+    "name": "mint",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "mintFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "name",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "nextMint",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "name": "nextSignatureMint",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ownerOf",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "partnerNFTAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "partnerNFTtokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "modelId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "imageId",
+        "type": "string"
+      }
+    ],
+    "name": "partnerFreeMint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "referralDiscountPct",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "referralFeesEarned",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nftAddress",
+        "type": "address"
+      }
+    ],
+    "name": "removeWhitelistedNFT",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "safeTransferFrom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "safeTransferFrom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "approved",
+        "type": "bool"
+      }
+    ],
+    "name": "setApprovalForAll",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "baseURI",
+        "type": "string"
+      }
+    ],
+    "name": "setBaseURI",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "cooldownWindow",
+        "type": "uint256"
+      }
+    ],
+    "name": "setFreeMintCooldownWindow",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "fee",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMintFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "discount",
+        "type": "uint256"
+      }
+    ],
+    "name": "setReferralDiscountPct",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_signer",
+        "type": "address"
+      }
+    ],
+    "name": "setSigner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "hash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      },
+      {
+        "internalType": "string",
+        "name": "modelId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "imageId",
+        "type": "string"
+      }
+    ],
+    "name": "signatureFreeMint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "signer",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
+    ],
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "tokenByIndex",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "tokenOfOwnerByIndex",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "tokenURI",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalReferralFees",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "transferFrom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      }
+    ],
+    "name": "upgradeTo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "upgradeToAndCall",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "whitelistedNFTs",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
   }
 ]
