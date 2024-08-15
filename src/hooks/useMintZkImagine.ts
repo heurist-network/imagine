@@ -192,28 +192,28 @@ export const useMintZkImagine = () => {
           address: address,
         })
 
+        const rawTx = paymasterResponse.txData
+
+        console.log('rawTx: ', rawTx)
+
         // generate txPayload
         const txPayload = {
           account: address,
-          to: paymasterResponse.txData.to,
-          value: BigInt(paymasterResponse.txData.value || '0'),
+          to: rawTx.to,
+          value: BigInt(rawTx.value!),
           chain: walletClient.chain,
-          gas: BigInt(paymasterResponse.txData.gasLimit),
-          gasPerPubdata: BigInt(
-            paymasterResponse.txData.customData.gasPerPubdata,
-          ),
-          maxFeePerGas: BigInt(paymasterResponse.txData.maxFeePerGas),
+          gas: BigInt(rawTx.gasLimit),
+          gasPerPubdata: BigInt(rawTx.customData.gasPerPubdata),
+          maxFeePerGas: BigInt(rawTx.maxFeePerGas),
           maxPriorityFeePerGas: BigInt(0),
-          data: paymasterResponse.txData.data,
-          paymaster:
-            paymasterResponse.txData.customData.paymasterParams.paymaster,
-          paymasterInput:
-            paymasterResponse.txData.customData.paymasterParams.paymasterInput,
+          data: rawTx.data,
+          paymaster: rawTx.customData.paymasterParams.paymaster,
+          paymasterInput: rawTx.customData.paymasterParams.paymasterInput,
           nonce,
         }
 
-        const eip712WalletClient = walletClient.extend(eip712WalletActions())
-        const hash = await eip712WalletClient.sendTransaction(txPayload)
+        // const eip712WalletClient = walletClient.extend(eip712WalletActions())
+        const hash = await walletClient.sendTransaction(txPayload)
         await publicClient.waitForTransactionReceipt({ hash })
 
         return hash
@@ -272,28 +272,26 @@ export const useMintZkImagine = () => {
           address: address,
         })
 
+        const rawTx = paymasterResponse.txData
+
         // generate txPayload
         const txPayload = {
           account: address,
-          to: paymasterResponse.txData.to,
-          value: BigInt(paymasterResponse.txData.value || '0'),
+          to: rawTx.to,
+          value: BigInt(rawTx.value!),
           chain: walletClient.chain,
-          gas: BigInt(paymasterResponse.txData.gasLimit),
-          gasPerPubdata: BigInt(
-            paymasterResponse.txData.customData.gasPerPubdata,
-          ),
-          maxFeePerGas: BigInt(paymasterResponse.txData.maxFeePerGas),
+          gas: BigInt(rawTx.gasLimit),
+          gasPerPubdata: BigInt(rawTx.customData.gasPerPubdata),
+          maxFeePerGas: BigInt(rawTx.maxFeePerGas),
           maxPriorityFeePerGas: BigInt(0),
-          data: paymasterResponse.txData.data,
-          paymaster:
-            paymasterResponse.txData.customData.paymasterParams.paymaster,
-          paymasterInput:
-            paymasterResponse.txData.customData.paymasterParams.paymasterInput,
+          data: rawTx.data,
+          paymaster: rawTx.customData.paymasterParams.paymaster,
+          paymasterInput: rawTx.customData.paymasterParams.paymasterInput,
           nonce,
         }
 
-        const eip712WalletClient = walletClient.extend(eip712WalletActions())
-        const hash = await eip712WalletClient.sendTransaction(txPayload)
+        // const eip712WalletClient = walletClient.extend(eip712WalletActions())
+        const hash = await walletClient.sendTransaction(txPayload)
         await publicClient.waitForTransactionReceipt({ hash })
 
         return hash
