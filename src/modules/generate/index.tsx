@@ -167,6 +167,7 @@ const PixelatedImage: React.FC<PixelatedImageProps> = ({
 export default function Generate({ model, models, isXl }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
+  const searchParams = useSearchParams()
   const [loadingGenerate, setLoadingGenerate] = useState(false)
   const searchParams = useSearchParams()
 
@@ -202,11 +203,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       seed: '-1',
     },
   })
-
-  useEffect(() => {
-    form.setValue('width', isPhiland ? 1024 : isXl ? 680 : 512)
-    form.setValue('height', isPhiland ? 1024 : isXl ? 1024 : 768)
-  }, [isPhiland, isXl, form])
 
   const onSubmit = async () => {
     setResult({ url: '', width: 0, height: 0 })
@@ -294,12 +290,13 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
     const search = searchParams.get('prompt')
 
     const res: any[] = await fetch(
-      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models-new.json',
+      'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
       {
         next: { revalidate: 3600 },
       },
     ).then((res) => res.json())
     const nowModel = res.find((item) => item.name.includes(model))
+
     if (nowModel.type.includes('composite')) {
       if (search) {
         form.setValue('prompt', search)
@@ -312,6 +309,11 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       if (search) form.setValue('prompt', search)
     }
   }
+
+  useEffect(() => {
+    form.setValue('width', isPhiland ? 1024 : isXl ? 680 : 512)
+    form.setValue('height', isPhiland ? 1024 : isXl ? 1024 : 768)
+  }, [isPhiland, isXl, form])
 
   useEffect(() => {
     getModelData()
@@ -382,15 +384,25 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                   </Tooltip>
                 </FormLabel>
                 <FormControl>
-                  <>
+                  <div>
                     <Input placeholder="Prompt" autoComplete="off" {...field} />
-                    {showRecommend && (
-                      <FormDescription>
-                        Recommended key words: {modelInfo.recommend}
-                      </FormDescription>
-                    )}
-                  </>
+                    <div className="mt-2 text-right">
+                      <a
+                        href="https://ai-image-prompt-creator.vercel.app/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-500 hover:text-blue-700"
+                      >
+                        Need inspiration? Use this prompt generator
+                      </a>
+                    </div>
+                  </div>
                 </FormControl>
+                {showRecommend && (
+                  <FormDescription>
+                    Recommended key words: {modelInfo.recommend}
+                  </FormDescription>
+                )}
                 <FormMessage />
               </FormItem>
             )}
