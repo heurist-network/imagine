@@ -91,7 +91,7 @@ export const useSignatureFreeMint = () => {
             address: contractAddress,
             abi: ZkImagineABI,
             functionName: 'canMintForSignature',
-            args: [signatureData.hash, signatureData.signature],
+            args: [signatureData.hash, signatureData.signature, address],
           })) as { canMint: boolean; reason: string }
 
           setCanSignatureFreeMint(!!result.canMint)
