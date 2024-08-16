@@ -194,8 +194,6 @@ export const useMintZkImagine = () => {
 
         const rawTx = paymasterResponse.txData
 
-        console.log('rawTx: ', rawTx)
-
         // generate txPayload
         const txPayload = {
           account: address,
@@ -212,8 +210,8 @@ export const useMintZkImagine = () => {
           nonce,
         }
 
-        // const eip712WalletClient = walletClient.extend(eip712WalletActions())
-        const hash = await walletClient.sendTransaction(txPayload)
+        const eip712WalletClient = walletClient.extend(eip712WalletActions())
+        const hash = await eip712WalletClient.sendTransaction(txPayload)
         await publicClient.waitForTransactionReceipt({ hash })
 
         return hash
@@ -290,8 +288,8 @@ export const useMintZkImagine = () => {
           nonce,
         }
 
-        // const eip712WalletClient = walletClient.extend(eip712WalletActions())
-        const hash = await walletClient.sendTransaction(txPayload)
+        const eip712WalletClient = walletClient.extend(eip712WalletActions())
+        const hash = await eip712WalletClient.sendTransaction(txPayload)
         await publicClient.waitForTransactionReceipt({ hash })
 
         return hash
