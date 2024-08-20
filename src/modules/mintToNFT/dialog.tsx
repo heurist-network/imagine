@@ -181,7 +181,8 @@ export function MintToNFT({
    * @param signal - The AbortController signal
    */
   const postMintingData = async (txHash: Hash, signal: AbortSignal) => {
-    const response = await fetch('/api/mint-proxy', {
+    // TODO: Post the image right after the mint button is clicked. don't wait for the txn
+    const response = await fetch('/api/notify-image-gen', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -214,11 +215,11 @@ export function MintToNFT({
    */
   const handleApiResponse = (response: Response | null) => {
     if (!response) {
-      console.log('Mint-Proxy API: Proceeding to next step due to timeout')
+      console.log('notify-image-gen API: Proceeding to next step due to timeout')
     } else if (!response.ok) {
       response
         .json()
-        .then((data) => console.error('Mint-Proxy API: Error:', data))
+        .then((data) => console.error('notify-image-gen API: Error:', data))
     }
   }
 
