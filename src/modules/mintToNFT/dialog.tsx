@@ -1,122 +1,416 @@
-'use client'
+import { Loader2 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
+import { Address, formatEther, Hash, isAddress } from 'viem'
+import { useAccount, useBalance, useClient } from 'wagmi'
 
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { X } from 'lucide-react'
-import * as React from 'react'
-
-import { cn } from '@/lib/utils'
-
-const Dialog = DialogPrimitive.Root
-
-const DialogTrigger = DialogPrimitive.Trigger
-
-const DialogPortal = DialogPrimitive.Portal
-
-const DialogClose = DialogPrimitive.Close
-
-const DialogOverlay = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Overlay
-    ref={ref}
-    className={cn(
-      'fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-      className,
-    )}
-    {...props}
-  />
-))
-DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
-
-const DialogContent = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        'fixed left-[50%] top-[50%] z-50 grid w-[520px] max-w-[calc(100vw-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
-        className,
-      )}
-      {...props}
-    >
-      {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
-    </DialogPrimitive.Content>
-  </DialogPortal>
-))
-DialogContent.displayName = DialogPrimitive.Content.displayName
-
-const DialogHeader = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      'flex flex-col space-y-1.5 text-center sm:text-left',
-      className,
-    )}
-    {...props}
-  />
-)
-DialogHeader.displayName = 'DialogHeader'
-
-const DialogFooter = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2',
-      className,
-    )}
-    {...props}
-  />
-)
-DialogFooter.displayName = 'DialogFooter'
-
-const DialogTitle = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Title>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Title
-    ref={ref}
-    className={cn(
-      'text-lg font-semibold leading-none tracking-tight',
-      className,
-    )}
-    {...props}
-  />
-))
-DialogTitle.displayName = DialogPrimitive.Title.displayName
-
-const DialogDescription = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Description>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Description
-    ref={ref}
-    className={cn('text-sm text-muted-foreground', className)}
-    {...props}
-  />
-))
-DialogDescription.displayName = DialogPrimitive.Description.displayName
-
-export {
+import { Button, ButtonProps } from '@/components/ui/button'
+import {
   Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogClose,
-  DialogTrigger,
   DialogContent,
-  DialogHeader,
   DialogFooter,
+  DialogHeader,
   DialogTitle,
-  DialogDescription,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useMintZkImagine } from '@/hooks/useMintZkImagine'
+import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
+import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
+import { useConnectModal } from '@rainbow-me/rainbowkit'
+
+import { useMintToNFT } from './hooks'
+
+export function MintToNFT({
+  url,
+  model,
+  imageId,
+  size,
+}: {
+  url: string
+  model: string
+  imageId: string
+  size?: ButtonProps['size']
+}) {
+  const account = useAccount()
+  const client = useClient()
+
+  const { openConnectModal } = useConnectModal()
+  const {
+    setLoading,
+    referralAddress,
+    setReferralAddress,
+    loading: loadingMintNFT,
+  } = useMintToNFT()
+
+  const {
+    canSignatureFreeMint,
+    isLoading: loadingSignatureFreeMint,
+    error: signatureFreeMintError,
+  } = useSignatureFreeMint()
+  const [isSignatureFreeMinting, setIsSignatureFreeMinting] = useState(false)
+
+  const {
+    availableNFT,
+    isLoading: loadingPartnerFreeMint,
+    error: partnerFreeMintError,
+    refreshPartnerNFTs,
+  } = usePartnerFreeMint()
+  const [isPartnerFreeMinting, setIsPartnerFreeMinting] = useState(false)
+
+  const { mint, mintFee, discountedFee, signatureFreeMint, partnerFreeMint } =
+    useMintZkImagine()
+
+  const [open, setOpen] = useState(false)
+  const [isValidReferral, setIsValidReferral] = useState(false)
+  const isSignatureNotified = useRef(false)
+  const isPartnerNotified = useRef(false)
+
+  const balance =
+    (useBalance({
+      address: account.address,
+    }).data?.value as bigint) || BigInt(0)
+
+  /**
+   * Handles the minting process for signature free mint.
+   */
+  const onSignatureFreeMint = async () => {
+    if (!canSignatureFreeMint) {
+      toast.error('You cannot signature free mint')
+      return
+    }
+    setIsSignatureFreeMinting(true)
+
+    try {
+      const txHash = await signatureFreeMint(model, imageId)
+      await handleMintingProcess(txHash)
+      showSuccessToast('Signature free mint successful.')
+    } catch (error) {
+      console.error('Signature free mint failed', error)
+      toast.error(
+        'Signature free minting failed. Please make sure you are in the list',
+      )
+    } finally {
+      setIsSignatureFreeMinting(false)
+    }
+  }
+
+  /**
+   * Handles the minting process for partner free mint.
+   */
+  const onPartnerFreeMint = async () => {
+    if (!availableNFT) {
+      toast.error('No partner NFT available for free minting.')
+      return
+    }
+
+    setIsPartnerFreeMinting(true)
+    try {
+      const txHash = await partnerFreeMint(
+        model,
+        imageId,
+        availableNFT.address,
+        BigInt(availableNFT.tokenId),
+      )
+      await handleMintingProcess(txHash)
+      showSuccessToast('Partner free minting successful!')
+    } catch (error) {
+      console.error('Partner free minting failed:', error)
+      toast.error(
+        'Partner free minting failed. Please make sure you have a partner NFT available.',
+      )
+    } finally {
+      setIsPartnerFreeMinting(false)
+    }
+  }
+
+  /**
+   * Handles the regular minting process.
+   */
+  const onMintToNFT = async () => {
+    if (!account.address) return openConnectModal?.()
+
+    const extractedImageId = extractImageId(url)
+    const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
+
+    setLoading(true)
+
+    try {
+      if (mintFee && balance < mintFee) {
+        toast.error('Insufficient ETH balance to mint NFT.')
+        return
+      }
+
+      const txHash = await mint(
+        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
+        model,
+        extractedImageId,
+      )
+      await handleMintingProcess(txHash)
+      showSuccessToast('Mint zkImagine NFT successfully.')
+    } catch (error: unknown) {
+      handleMintError(error)
+    } finally {
+      setLoading(false)
+      setReferralAddress('')
+    }
+  }
+
+  /**
+   * Handles the common minting process after a transaction is initiated.
+   * @param txHash - The transaction hash
+   */
+  const handleMintingProcess = async (txHash: Hash) => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 20000)
+
+    try {
+      await postMintingData(txHash, controller.signal)
+    } catch (error) {
+      console.error('Error in minting process:', error)
+    } finally {
+      clearTimeout(timeoutId)
+    }
+  }
+
+  /**
+   * Posts minting data to the API.
+   * @param txHash - The transaction hash
+   * @param signal - The AbortController signal
+   */
+  const postMintingData = async (txHash: Hash, signal: AbortSignal) => {
+    const response = await fetch('/api/mint-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        imageId,
+        modelId: model,
+        url,
+        transactionHash: txHash,
+      }),
+      signal,
+    }).catch(handleFetchError)
+
+    handleApiResponse(response)
+  }
+
+  /**
+   * Handles fetch errors.
+   * @param err - The error object
+   */
+  const handleFetchError = (err: Error) => {
+    if (err.name === 'AbortError') {
+      console.log('Request timed out')
+      return null
+    }
+    throw err
+  }
+
+  /**
+   * Handles API response.
+   * @param response - The fetch response object
+   */
+  const handleApiResponse = (response: Response | null) => {
+    if (!response) {
+      console.log('Mint-Proxy API: Proceeding to next step due to timeout')
+    } else if (!response.ok) {
+      response
+        .json()
+        .then((data) => console.error('Mint-Proxy API: Error:', data))
+    }
+  }
+
+  /**
+   * Shows a success toast with a transaction link.
+   * @param message - The success message
+   * @param txHash - The transaction hash
+   */
+  const showSuccessToast = (message: string, txHash?: Hash) => {
+    const txUrl = txHash
+      ? `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
+      : ''
+    toast.success(
+      <div>
+        <div>{message}</div>
+        {txUrl && (
+          <a
+            href={txUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-800 underline"
+          >
+            View in explorer.
+          </a>
+        )}
+      </div>,
+    )
+  }
+
+  /**
+   * Handles minting errors.
+   * @param error - The error object
+   */
+  const handleMintError = (error: unknown) => {
+    if (error instanceof Error) {
+      console.error('Failed to Mint zkImagine NFT:', error)
+      if (error.message.includes('User rejected the request.')) {
+        toast.error('User rejected transaction signature.')
+      } else {
+        toast.error(
+          `Failed to Mint zkImagine NFT: ${error.message}. Please try again later.`,
+        )
+      }
+    }
+  }
+
+  /**
+   * Extracts the image ID from the URL.
+   * @param url - The image URL
+   * @returns The extracted image ID
+   */
+  const extractImageId = (url: string) => {
+    const arr = url.split('/').slice(-1)[0].split('-').slice(-3)
+    return `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
+  }
+
+  // Show toast when the user can signature free mint
+  useEffect(() => {
+    if (canSignatureFreeMint == true && !isSignatureNotified.current) {
+      toast.success('🎉 Congratulations! You are in the free mint list!')
+      isSignatureNotified.current = true
+    } else if (canSignatureFreeMint == null && !isSignatureNotified.current) {
+      isSignatureNotified.current = true
+      console.log('Signature free mint: Not available')
+    }
+  }, [canSignatureFreeMint])
+
+  // Show success toast if an available NFT is found
+  useEffect(() => {
+    if (availableNFT != null && !isPartnerNotified.current) {
+      toast.success(
+        '🎉Congratulations! You are holding an NFT that can be used for free mint!',
+      )
+      isPartnerNotified.current = true
+    } else if (availableNFT == null && !isPartnerNotified.current) {
+      isPartnerNotified.current = true
+      console.log(
+        'Partner Free Mint: No partner NFT available for free minting.',
+      )
+    }
+  }, [availableNFT])
+
+  // Refresh partner NFTs when the component mounts
+  useEffect(() => {
+    refreshPartnerNFTs()
+  }, [refreshPartnerNFTs])
+
+  useEffect(() => {
+    if (signatureFreeMintError) {
+      toast.error(`Error: ${signatureFreeMintError}`)
+    }
+    if (signatureFreeMintError) {
+      toast.error(`Error: ${signatureFreeMintError}`)
+    }
+  }, [signatureFreeMintError, signatureFreeMintError])
+
+  useEffect(() => {
+    if (
+      isAddress(referralAddress) &&
+      referralAddress !== account.address &&
+      referralAddress !== '0x0000000000000000000000000000000000000000'
+    ) {
+      setIsValidReferral(true)
+    } else {
+      setIsValidReferral(false)
+    }
+  }, [referralAddress])
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        if (open) return
+        setOpen(open)
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button
+          size={size}
+          variant="outline"
+          disabled={
+            loadingMintNFT ||
+            isSignatureFreeMinting ||
+            loadingSignatureFreeMint ||
+            isPartnerFreeMinting ||
+            loadingPartnerFreeMint
+          }
+          className="bg-gradient-to-r from-[#9ffd8d] to-[#eaff61] hover:bg-gradient-to-l"
+          onClick={async () => {
+            if (canSignatureFreeMint) {
+              console.log('Signature free mint, proceed')
+              onSignatureFreeMint()
+            } else if (availableNFT) {
+              console.log('Partner free mint, proceed')
+              onPartnerFreeMint()
+            } else {
+              console.log('Mint, proceed')
+              setOpen(true)
+            }
+          }}
+        >
+          {(loadingMintNFT ||
+            isSignatureFreeMinting ||
+            loadingSignatureFreeMint ||
+            isPartnerFreeMinting ||
+            loadingPartnerFreeMint) && (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          )}
+          ✨ Mint zkImagine NFT{' '}
+          {canSignatureFreeMint || availableNFT ? ' (Free & Zero Gas)' : ''}
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Mint Imagine NFT</DialogTitle>
+        </DialogHeader>
+
+        <div className="flex flex-col space-y-2">
+          <Label htmlFor="address">{'Referral Address (Optional)'}</Label>
+          <Input
+            id="address"
+            placeholder="Referral Address"
+            autoComplete="off"
+            value={referralAddress}
+            onChange={(e) => setReferralAddress(e.target.value as Address)}
+          />
+          <span className="text-xs font-normal leading-snug text-muted-foreground">
+            Use referral address to receive 10% mint discount
+          </span>
+        </div>
+        <div className="text-sm">
+          Mint fee:{' '}
+          {mintFee && discountedFee
+            ? isValidReferral
+              ? formatEther(discountedFee.fee)
+              : formatEther(mintFee)
+            : '-'}{' '}
+          ETH
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              setOpen(false)
+              onMintToNFT()
+            }}
+          >
+            Mint
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
 }
