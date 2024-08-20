@@ -417,78 +417,18 @@ export function FeatureModels({ lists }: { lists: any[] }) {
         </div>
         <div className="flex flex-col items-center gap-4 lg:flex-row lg:gap-16">
           <div className="flex h-[552px] w-full flex-1 flex-col gap-4 lg:gap-8">
-            <Tabs
-              value={selectedModel}
-              onValueChange={(value) => {
+            <ModelTabs
+              featureModels={featureModels}
+              selectedModel={selectedModel}
+              loadingGetModels={loadingGetModels}
+              onSelectModel={(value) => {
                 if (!!loadingGetModels) return
                 setSelectedModel(value)
                 getModels(value)
               }}
-              className="flex"
-            >
-              <TabsList className="flex-1 border border-slate-300 bg-white">
-                {featureModels.map((model, index) => (
-                  <TabsTrigger
-                    className="flex-1 gap-2 data-[state=active]:bg-black data-[state=active]:text-white"
-                    key={model.name}
-                    value={model.name}
-                  >
-                    <span>Model {index + 1}</span>
-                    {loadingGetModels === index + 1 && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-            <div className="flex justify-center lg:hidden">
-              <Carousel className="w-[259px]">
-                <CarouselContent>
-                  {models.map((item, index) => (
-                    <CarouselItem key={index} className="flex justify-center">
-                      <div className="flex h-[408px] w-[259px] p-1">
-                        <Card className="flex flex-1">
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <CardContent className="relative flex-1 cursor-pointer items-center justify-center p-6">
-                                <Image
-                                  className="absolute inset-0 rounded-lg"
-                                  unoptimized
-                                  priority
-                                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
-                                  alt="model"
-                                  objectFit="cover"
-                                  layout="fill"
-                                />
-                                <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
-                              </CardContent>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Prompt</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  <div className="whitespace-pre-wrap text-left">
-                                    {JSON.stringify(item.data, null, 2)}
-                                  </div>
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction>
-                                  Use this prompt
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </Card>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
-            </div>
+            />
+            <ModelCarousel models={models} />
+
             <div className="hidden lg:block">
               {!!loadingGetModels ? (
                 <div>Loading...</div>
@@ -937,3 +877,88 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     </div>
   )
 }
+
+/**
+ * ModelTabs component for displaying model selection tabs
+ */
+interface ModelTabsProps {
+  featureModels: { name: string }[]
+  selectedModel: string
+  loadingGetModels: number | null
+  onSelectModel: (value: string) => void
+}
+
+const ModelTabs: React.FC<ModelTabsProps> = ({
+  featureModels,
+  selectedModel,
+  loadingGetModels,
+  onSelectModel,
+}) => (
+  <Tabs value={selectedModel} onValueChange={onSelectModel} className="flex">
+    <TabsList className="flex-1 border border-slate-300 bg-white">
+      {featureModels.map((model, index) => (
+        <TabsTrigger
+          key={model.name}
+          className="flex-1 gap-2 data-[state=active]:bg-black data-[state=active]:text-white"
+          value={model.name}
+        >
+          <span>Model {index + 1}</span>
+          {loadingGetModels === index + 1 && (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          )}
+        </TabsTrigger>
+      ))}
+    </TabsList>
+  </Tabs>
+)
+
+/**
+ * ModelCarousel component for displaying model carousel on mobile
+ */
+interface ModelCarouselProps {
+  models: Array<{
+    label: string
+    // Add other properties of the model object as needed
+  }>
+}
+
+const ModelCarousel: React.FC<ModelCarouselProps> = ({ models }) => (
+  <div className="flex justify-center lg:hidden">
+    <Carousel className="w-[259px]">
+      <CarouselContent>
+        {models.map((item, index) => (
+          <CarouselItem key={index} className="flex justify-center">
+            <ModelCard item={item} />
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+    </Carousel>
+  </div>
+)
+
+/**
+ * ModelCard component for displaying individual model cards
+ */
+interface ModelCardProps {
+  item: {
+    label: string
+    // Add other properties of the item object as needed
+  }
+}
+
+const ModelCard: React.FC<ModelCardProps> = ({ item }) => (
+  <Card className="flex flex-1">
+    <CardContent className="relative flex-1 cursor-pointer items-center justify-center p-6">
+      <Image
+        className="absolute inset-0 rounded-lg"
+        unoptimized
+        priority
+        src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
+        alt="model"
+        objectFit="cover"
+        layout="fill"
+      />
+      <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
+    </CardContent>
+  </Card>
+)
