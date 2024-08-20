@@ -81,78 +81,13 @@ export function MintToNFT({
     setIsSignatureFreeMinting(true)
 
     try {
-      const hash = await signatureFreeMint(model, imageId)
-      // onSuccess?.(hash)
-      toast.success('Signature free mint successful')
-    } catch (error) {
-      console.error('Signature free mint failed', error)
-      // onError?.(
-      //   error instanceof Error ? error : new Error('Unknown error occurred'),
-      // )
-      toast.error(
-        'Signature free minting failed. Please make sure you are in the list',
-      )
-    } finally {
-      setIsSignatureFreeMinting(false)
-    }
-  }
-
-  const onPartnerFreeMint = async () => {
-    if (!availableNFT) {
-      toast.error('No partner NFT available for free minting.')
-      return
-    }
-
-    setIsPartnerFreeMinting(true)
-    try {
-      const hash = await partnerFreeMint(
-        model,
-        imageId,
-        availableNFT.address,
-        BigInt(availableNFT.tokenId),
-      )
-      // onSuccess?.(hash)
-      toast.success('Partner free minting successful!')
-    } catch (error) {
-      console.error('Partner free minting failed:', error)
-      // onError?.(
-      //   error instanceof Error ? error : new Error('Unknown error occurred'),
-      // )
-      toast.error(
-        'Partner free minting failed. Please make sure you have a partner NFT available.',
-      )
-    } finally {
-      setIsPartnerFreeMinting(false)
-    }
-  }
-
-  const onMintToNFT = async () => {
-    if (!account.address) return openConnectModal?.()
-
-    const arr = url.split('/').slice(-1)[0].split('-').slice(-3)
-    const imageId = `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
-
-    const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
-
-    setLoading(true)
-    try {
+      // Set up abort controller for timeout
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
 
-      // check wallet balance, balance should > mintFee
-      if (mintFee && balance < mintFee) {
-        toast.error('Insufficient ETH balance to mint NFT.')
-        return
-      }
+      const txHash = await signatureFreeMint(model, imageId)
 
-      const txHash = await mint(
-        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
-        model,
-        imageId,
-      )
-
-      // TODO: Post the image after mint tx sent
-      //@dev post image to mint-proxy
+      // Post minting data to API
       const response = await fetch('/api/mint-proxy', {
         method: 'POST',
         headers: {
@@ -173,8 +108,10 @@ export function MintToNFT({
         throw err
       })
 
+      // Clear timeout
       clearTimeout(timeoutId)
 
+      // Handle API response
       if (!response) {
         console.log('Mint-Proxy API: Proceeding to next step due to timeout')
       } else if (!response.ok) {
@@ -182,7 +119,178 @@ export function MintToNFT({
         console.error('Mint-Proxy API: Error:', data)
       }
 
-      // View in Etherscan
+      // Show success message with transaction link
+      const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
+      toast.success(
+        <div>
+          <div>Signature free mint successful.</div>
+          {client?.chain?.blockExplorers?.default.url && (
+            <a
+              href={txUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-800 underline"
+            >
+              View in explorer.
+            </a>
+          )}
+        </div>,
+      )
+    } catch (error) {
+      console.error('Signature free mint failed', error)
+      toast.error(
+        'Signature free minting failed. Please make sure you are in the list',
+      )
+    } finally {
+      setIsSignatureFreeMinting(false)
+    }
+  }
+
+  const onPartnerFreeMint = async () => {
+    if (!availableNFT) {
+      toast.error('No partner NFT available for free minting.')
+      return
+    }
+
+    setIsPartnerFreeMinting(true)
+    try {
+      // Set up abort controller for timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
+
+      const txHash = await partnerFreeMint(
+        model,
+        imageId,
+        availableNFT.address,
+        BigInt(availableNFT.tokenId),
+      )
+
+      // Post minting data to API
+      const response = await fetch('/api/mint-proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageId: imageId,
+          modelId: model,
+          url: url,
+          transactionHash: txHash as Hash,
+        }),
+        signal: controller.signal,
+      }).catch((err) => {
+        if (err.name === 'AbortError') {
+          console.log('Request timed out')
+          return null
+        }
+        throw err
+      })
+
+      // Clear timeout
+      clearTimeout(timeoutId)
+
+      // Handle API response
+      if (!response) {
+        console.log('Mint-Proxy API: Proceeding to next step due to timeout')
+      } else if (!response.ok) {
+        const data = await response.json()
+        console.error('Mint-Proxy API: Error:', data)
+      }
+
+      // Show success message with transaction link
+      const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
+      toast.success(
+        <div>
+          <div>Partner free minting successful!</div>
+          {client?.chain?.blockExplorers?.default.url && (
+            <a
+              href={txUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-800 underline"
+            >
+              View in explorer.
+            </a>
+          )}
+        </div>,
+      )
+    } catch (error) {
+      console.error('Partner free minting failed:', error)
+      toast.error(
+        'Partner free minting failed. Please make sure you have a partner NFT available.',
+      )
+    } finally {
+      setIsPartnerFreeMinting(false)
+    }
+  }
+
+  const onMintToNFT = async () => {
+    // Function to handle minting an NFT
+
+    // 1. Check if user is connected, if not open connect modal
+    if (!account.address) return openConnectModal?.()
+
+    // 2. Extract imageId from URL
+    const arr = url.split('/').slice(-1)[0].split('-').slice(-3)
+    const imageId = `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
+
+    // Define zero address for referral
+    const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
+
+    // Set loading state
+    setLoading(true)
+
+    try {
+      // Set up abort controller for timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
+
+      // Check if user has sufficient balance
+      if (mintFee && balance < mintFee) {
+        toast.error('Insufficient ETH balance to mint NFT.')
+        return
+      }
+
+      // 3. Call mint function
+      const txHash = await mint(
+        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
+        model,
+        imageId,
+      )
+
+      // 4. Post minting data to API
+      const response = await fetch('/api/mint-proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageId: imageId,
+          modelId: model,
+          url: url,
+          transactionHash: txHash as Hash,
+        }),
+        signal: controller.signal,
+      }).catch((err) => {
+        if (err.name === 'AbortError') {
+          console.log('Request timed out')
+          return null
+        }
+        throw err
+      })
+
+      // Clear timeout
+      clearTimeout(timeoutId)
+
+      // 5. Handle API response
+      if (!response) {
+        console.log('Mint-Proxy API: Proceeding to next step due to timeout')
+      } else if (!response.ok) {
+        const data = await response.json()
+        console.error('Mint-Proxy API: Error:', data)
+      }
+
+      // 6. Show success message with transaction link
       const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
       toast.success(
         <div>
@@ -200,9 +308,9 @@ export function MintToNFT({
         </div>,
       )
     } catch (error: unknown) {
+      // Error handling
       if (error instanceof Error) {
         console.error('Failed to Mint zkImagine NFT:', error)
-        // error handler - user rejected transaction
         if (error.message.includes('User rejected the request.')) {
           toast.error('User rejected transaction signature.')
         } else {
@@ -212,6 +320,7 @@ export function MintToNFT({
         }
       }
     } finally {
+      // Reset states
       setLoading(false)
       setReferralAddress('')
     }
