@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
+import { extractImageId } from '@/lib/utils'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
 import { useMintToNFT } from './hooks'
@@ -262,16 +263,6 @@ export function MintToNFT({
         )
       }
     }
-  }
-
-  /**
-   * Extracts the image ID from the URL.
-   * @param url - The image URL
-   * @returns The extracted image ID
-   */
-  const extractImageId = (url: string) => {
-    const arr = url.split('/').slice(-1)[0].split('-').slice(-3)
-    return `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
   }
 
   // Show toast when the user can signature free mint
