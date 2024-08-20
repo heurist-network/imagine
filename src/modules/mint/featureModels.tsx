@@ -69,6 +69,12 @@ const formSchema = z.object({
   model: z.string().optional(),
 })
 
+/**
+ * FeatureModels component for displaying and interacting with featured AI models
+ * @param {Object} props - Component props
+ * @param {any[]} props.lists - List of available models
+ */
+
 export function FeatureModels({ lists }: { lists: any[] }) {
   const account = useAccount()
   const client = useClient()
@@ -115,6 +121,10 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     },
   })
 
+  /**
+   * Fetches model data from GitHub
+   * @param {string} [params] - Optional model parameter
+   */
   const getModels = async (params?: string) => {
     const model = params || selectedModel
 
@@ -156,6 +166,9 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     }
   }
 
+  /**
+   * Generates an image based on the current form values
+   */
   const onGenerate = async () => {
     try {
       setResult({ url: '', width: 0, height: 0 })
@@ -205,84 +218,119 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     }
   }
 
+  /**
+   * Uploads the generated image to the Gateway
+   */
   const onUpload = async () => {
-    if (!account.address) {
-      setOpen(false)
-      openConnectModal?.()
-      return
-    }
+    if (!ensureUserConnected()) return
 
     setTransactionId('')
+    setLoadingUpload(true)
 
     try {
-      setLoadingUpload(true)
       const res = await issueToGateway(
         { ...info, model: selectedModel },
-        account.address,
+        account.address!,
       )
 
-      if (res.status !== 200) {
-        return toast.error(
-          res.message || 'Issue to Gateway failed, please try again.',
-        )
-      }
-
-      setTransactionId(res.data?.transactionId!)
-
-      toast.success('Issue to Gateway successfully.')
+      handleApiResponse(res, 'Issue to Gateway')
     } finally {
       setLoadingUpload(false)
     }
   }
 
+  /**
+   * Mints the generated image as an NFT
+   */
   const onMintToNFT = async () => {
-    if (!account.address) {
-      setOpen(false)
-      openConnectModal?.()
-      return
-    }
+    if (!ensureUserConnected()) return
 
-    const arr = mintUrl.split('/').slice(-1)[0].split('-').slice(-3)
-    const imageId = `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
-
-    const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
+    const imageId = extractImageId(mintUrl)
+    const referralAddr = isAddress(referralAddress)
+      ? referralAddress
+      : '0x0000000000000000000000000000000000000000'
 
     setLoadingMint(true)
     setLoading(true)
 
     try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
+      const txHash = await mint(referralAddr, selectedModel, imageId)
+      await postImageToMintProxy(imageId, selectedModel, mintUrl, txHash)
+      displaySuccessMessage(txHash)
+    } catch (error) {
+      handleMintError(error)
+    } finally {
+      setLoading(false)
+      setLoadingMint(false)
+      setReferralAddress('')
+    }
+  }
 
-      const txHash = await mint(
-        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
-        selectedModel,
-        imageId,
-      )
+  /**
+   * Ensures the user is connected to their wallet
+   * @returns {boolean} True if connected, false otherwise
+   */
+  const ensureUserConnected = (): boolean => {
+    if (!account.address) {
+      setOpen(false)
+      openConnectModal?.()
+      return false
+    }
+    return true
+  }
 
-      // TODO: Post the image after mint tx sent
-      //@dev post image to mint-proxy
+  /**
+   * Handles API responses and displays appropriate messages
+   * @param {any} res - API response
+   * @param {string} action - Description of the action performed
+   */
+  const handleApiResponse = (res: any, action: string) => {
+    if (res.status !== 200) {
+      toast.error(res.message || `${action} failed, please try again.`)
+      return
+    }
+    setTransactionId(res.data?.transactionId!)
+    toast.success(`${action} successfully.`)
+  }
+
+  /**
+   * Extracts the image ID from the mint URL
+   * @param {string} url - Mint URL
+   * @returns {string} Extracted image ID
+   */
+  const extractImageId = (url: string): string => {
+    const arr = url.split('/').slice(-1)[0].split('-').slice(-3)
+    return `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
+  }
+
+  /**
+   * Posts the image data to the mint-proxy API
+   * @param {string} imageId - ID of the image
+   * @param {string} modelId - ID of the model used
+   * @param {string} url - URL of the minted image
+   * @param {Hash} txHash - Transaction hash
+   */
+  const postImageToMintProxy = async (
+    imageId: string,
+    modelId: string,
+    url: string,
+    txHash: Hash,
+  ) => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
+
+    try {
       const response = await fetch('/api/mint-proxy', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          imageId: imageId,
-          modelId: selectedModel,
-          url: mintUrl,
-          transactionHash: txHash as Hash,
+          imageId,
+          modelId,
+          url,
+          transactionHash: txHash,
         }),
         signal: controller.signal,
-      }).catch((err) => {
-        if (err.name === 'AbortError') {
-          console.log('Request timed out')
-          return null
-        }
-        throw err
       })
-
-      clearTimeout(timeoutId)
 
       if (!response) {
         console.log('Mint-Proxy API: Proceeding to next step due to timeout')
@@ -290,40 +338,55 @@ export function FeatureModels({ lists }: { lists: any[] }) {
         const data = await response.json()
         console.error('Mint-Proxy API: Error:', data)
       }
-
-      // View in Etherscan
-      const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
-      toast.success(
-        <div>
-          <div>Mint zkImagine NFT successfully.</div>
-          {client?.chain?.blockExplorers?.default.url && (
-            <a
-              href={txUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-800 underline"
-            >
-              View in explorer.
-            </a>
-          )}
-        </div>,
-      )
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('Failed to Mint zkImagine NFT:', error)
-        // error handler - user rejected transaction
-        if (error.message.includes('User rejected the request.')) {
-          toast.error('User rejected transaction signature.')
-        } else {
-          toast.error(
-            `Failed to Mint zkImagine NFT: ${error.message}. Please try again later.`,
-          )
-        }
+    } catch (err) {
+      // @ts-ignore
+      if (err.name === 'AbortError') {
+        console.log('Request timed out')
+      } else {
+        throw err
       }
     } finally {
-      setLoading(false)
-      setLoadingMint(false)
-      setReferralAddress('')
+      clearTimeout(timeoutId)
+    }
+  }
+
+  /**
+   * Displays a success message after minting
+   * @param {Hash} txHash - Transaction hash
+   */
+  const displaySuccessMessage = (txHash: Hash) => {
+    const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
+    toast.success(
+      <div>
+        <div>Mint zkImagine NFT successfully.</div>
+        {client?.chain?.blockExplorers?.default.url && (
+          <a
+            href={txUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-800 underline"
+          >
+            View in explorer.
+          </a>
+        )}
+      </div>,
+    )
+  }
+
+  /**
+   * Handles errors that occur during minting
+   * @param {unknown} error - The error that occurred
+   */
+  const handleMintError = (error: unknown) => {
+    if (error instanceof Error) {
+      console.error('Failed to Mint zkImagine NFT:', error)
+      if (error.message.includes('User rejected the request.')) {
+        toast.error('User rejected transaction signature.')
+      } else {
+        toast.error(
+          `Failed to Mint zkImagine NFT: ${error.message}. Please try again later.`,
+        )
+      }
     }
   }
 
