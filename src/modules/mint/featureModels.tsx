@@ -260,9 +260,8 @@ export function FeatureModels({ lists }: { lists: any[] }) {
         imageId,
       )
 
-      // TODO: Post the image after mint tx sent
-      //@dev post image to mint-proxy
-      const response = await fetch('/api/mint-proxy', {
+      // TODO: Post the image right after the mint button is clicked. don't wait for the txn
+      const response = await fetch('/api/notify-image-gen', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -285,10 +284,10 @@ export function FeatureModels({ lists }: { lists: any[] }) {
       clearTimeout(timeoutId)
 
       if (!response) {
-        console.log('Mint-Proxy API: Proceeding to next step due to timeout')
+        console.log('notify-image-gen API: Proceeding to next step due to timeout')
       } else if (!response.ok) {
         const data = await response.json()
-        console.error('Mint-Proxy API: Error:', data)
+        console.error('notify-image-gen API: Error:', data)
       }
 
       // View in Etherscan

@@ -9,14 +9,13 @@ type Payload = {
 }
 
 export async function POST(request: Request) {
-  const API_ENDPOINT = 'https://imagine-seven.vercel.app/api/mint-proxy'
-  const X_API_KEY = 'rUvdjh39jx7xLhXRdUCxV4jy3XNctgvTos6xSpl4'
+  const API_ENDPOINT = 'https://uoub6ss185.execute-api.us-east-1.amazonaws.com/prod/notify-image-gen'
 
   try {
     const body: Payload = await request.json()
 
     // Input validation
-    if (!body.imageId || !body.modelId || !body.url || !body.transactionHash) {
+    if (!body.imageId || !body.modelId || !body.url) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 },
@@ -28,7 +27,6 @@ export async function POST(request: Request) {
       headers: {
         Accept: '*/*',
         'Content-Type': 'application/json',
-        'x-api-key': X_API_KEY,
       },
       body: JSON.stringify(body),
     })

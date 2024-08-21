@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
+import { API_NOTIFY_IMAGE_GEN } from '@/lib/endpoints'
 import { extractImageId } from '@/lib/utils'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
@@ -181,9 +182,12 @@ export function MintToNFT({
    * @param signal - The AbortController signal
    */
   const postMintingData = async (txHash: Hash, signal: AbortSignal) => {
-    const response = await fetch('/api/mint-proxy', {
+    const response = await fetch(API_NOTIFY_IMAGE_GEN, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: window.location.origin,
+      },
       body: JSON.stringify({
         imageId,
         modelId: model,
@@ -214,11 +218,13 @@ export function MintToNFT({
    */
   const handleApiResponse = (response: Response | null) => {
     if (!response) {
-      console.log('Mint-Proxy API: Proceeding to next step due to timeout')
+      console.log(
+        'notify-image-gen API: Proceeding to next step due to timeout',
+      )
     } else if (!response.ok) {
       response
         .json()
-        .then((data) => console.error('Mint-Proxy API: Error:', data))
+        .then((data) => console.error('notify-image-gen API: Error:', data))
     }
   }
 
