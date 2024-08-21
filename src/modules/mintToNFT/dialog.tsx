@@ -192,7 +192,6 @@ export function MintToNFT({
         imageId,
         modelId: model,
         url,
-        transactionHash: txHash,
       }),
       signal,
     }).catch(handleFetchError)
