@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
+import { API_NOTIFY_IMAGE_GEN } from '@/lib/endpoints'
 import { extractImageId } from '@/lib/utils'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
@@ -181,10 +182,12 @@ export function MintToNFT({
    * @param signal - The AbortController signal
    */
   const postMintingData = async (txHash: Hash, signal: AbortSignal) => {
-    // TODO: Post the image right after the mint button is clicked. don't wait for the txn
-    const response = await fetch('/api/notify-image-gen', {
+    const response = await fetch(API_NOTIFY_IMAGE_GEN, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: window.location.origin,
+      },
       body: JSON.stringify({
         imageId,
         modelId: model,
@@ -215,7 +218,9 @@ export function MintToNFT({
    */
   const handleApiResponse = (response: Response | null) => {
     if (!response) {
-      console.log('notify-image-gen API: Proceeding to next step due to timeout')
+      console.log(
+        'notify-image-gen API: Proceeding to next step due to timeout',
+      )
     } else if (!response.ok) {
       response
         .json()
