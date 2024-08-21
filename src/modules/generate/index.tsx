@@ -14,6 +14,8 @@ import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
+import EmergingImage from '@/components/emergingImage/EmergingImage'
+import Scene from '@/components/emergingImage/Scene'
 import { PartnerFreeMintButton } from '@/components/PartnerFreeMintButton'
 import { SignatureFreeMintButton } from '@/components/SignatureFreeMintButton'
 import {
@@ -180,6 +182,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
     width: 0,
     height: 0,
   })
+  const [resultLoaded, setResultLoaded] = useState(false)
   const [info, setInfo] = useState<any>(null)
   const [transactionId, setTransactionId] = useState('')
 
@@ -320,11 +323,20 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
 
   return (
     <div>
+      <Scene />
       <div className="md:3/4 grid w-full grid-cols-3 gap-4 py-4 md:grid-cols-4 lg:w-4/5">
         {models.map((item) => (
           <AlertDialog key={item.label}>
             <AlertDialogTrigger asChild>
               <div className="relative cursor-pointer">
+                {/* <EmergingImage
+                  type={1}
+                  url="https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/Zeek.png"
+                  style={{
+                    height: 200,
+                    width: 200,
+                  }}
+                /> */}
                 <Image
                   className="rounded-lg transition-opacity duration-image hover:opacity-80"
                   unoptimized
@@ -731,14 +743,35 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             </div>
           )}
           <div className="flex w-full justify-center">
+            <div
+              className="flex border"
+              style={{ width: result.width, height: result.height }}
+            >
+              {resultLoaded && (
+                <EmergingImage
+                  type={1}
+                  url={result.url}
+                  style={{
+                    flex: 1,
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                  }}
+                />
+              )}
+            </div>
+
             <Image
-              className="rounded-lg shadow-xl"
+              className="sr-only"
               unoptimized
-              width={result.width}
-              height={result.height}
               priority
               src={result.url}
               alt="image result"
+              width={result.width}
+              height={result.height}
+              onLoad={() => {
+                console.log('loaded')
+                setResultLoaded(true)
+              }}
             />
           </div>
         </motion.div>
