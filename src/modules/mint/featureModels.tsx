@@ -52,6 +52,8 @@ import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
+import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
+import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
 import { API_NOTIFY_IMAGE_GEN } from '@/lib/endpoints'
 import { cn, extractImageId } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -81,7 +83,8 @@ export function FeatureModels({ lists }: { lists: any[] }) {
   const client = useClient()
   const { openConnectModal } = useConnectModal()
   const { setLoading, referralAddress, setReferralAddress } = useMintToNFT()
-  const { mint, mintFee, discountedFee } = useMintZkImagine()
+  const { mint, mintFee, discountedFee, signatureFreeMint, partnerFreeMint } =
+    useMintZkImagine()
   const featureModels = lists.slice(0, 4)
 
   const [open, setOpen] = useState(false)
@@ -104,6 +107,19 @@ export function FeatureModels({ lists }: { lists: any[] }) {
   const [transactionId, setTransactionId] = useState('')
   const [isValidReferral, setIsValidReferral] = useState(false)
   const [loadingMint, setLoadingMint] = useState(false)
+
+  const {
+    canSignatureFreeMint,
+    isLoading: loadingSignatureFreeMint,
+    error: signatureFreeMintError,
+  } = useSignatureFreeMint()
+
+  const {
+    availableNFT,
+    isLoading: loadingPartnerFreeMint,
+    error: partnerFreeMintError,
+    refreshPartnerNFTs,
+  } = usePartnerFreeMint()
 
   const balance =
     (useBalance({
@@ -202,7 +218,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
       }`
 
       const item = {
-        id: nanoid(),
+        id: extractImageId(url),
         url,
         prompt: data.prompt,
         neg_prompt: data.neg_prompt,
@@ -212,6 +228,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
         num_inference_steps: data.num_iterations,
         guidance_scale: data.guidance_scale,
         create_at: new Date().toISOString(),
+        model: selectedModel,
       }
 
       setInfo(item)
@@ -257,6 +274,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
    * Handles the regular minting process.
    */
   const onMintToNFT = async () => {
+    // TODO: Update function, add signatureFreeMint and partnerFreeMint
     if (!account.address) return openConnectModal?.()
 
     const extractedImageId = extractImageId(info.url)
@@ -270,12 +288,28 @@ export function FeatureModels({ lists }: { lists: any[] }) {
         return
       }
 
-      const txHash = await mint(
-        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
-        info.model,
-        extractedImageId,
-      )
-      await handleMintingProcess(txHash)
+      // Signature Free Mint  - Partner Free Mint - Mint
+      let txHash: Hash
+      if (canSignatureFreeMint) {
+        console.log('calling signatureFreeMint...')
+        txHash = await signatureFreeMint(info.model, extractedImageId)
+      } else if (availableNFT) {
+        console.log('calling partnerFreeMint...')
+        txHash = await partnerFreeMint(
+          info.model,
+          extractedImageId,
+          availableNFT.address,
+          BigInt(availableNFT.tokenId),
+        )
+      } else {
+        txHash = await mint(
+          isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
+          info.model,
+          extractedImageId,
+        )
+      }
+
+      await handleMintingProcess()
       showSuccessToast('Mint zkImagine NFT successfully.')
     } catch (error: unknown) {
       handleMintError(error)
@@ -289,12 +323,12 @@ export function FeatureModels({ lists }: { lists: any[] }) {
    * Handles the common minting process after a transaction is initiated.
    * @param txHash - The transaction hash
    */
-  const handleMintingProcess = async (txHash: Hash) => {
+  const handleMintingProcess = async () => {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 20000)
 
     try {
-      await postMintingData(txHash, controller.signal)
+      await postMintingData(controller.signal)
     } catch (error) {
       console.error('Error in minting process:', error)
     } finally {
@@ -307,7 +341,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
    * @param txHash - The transaction hash
    * @param signal - The AbortController signal
    */
-  const postMintingData = async (txHash: Hash, signal: AbortSignal) => {
+  const postMintingData = async (signal: AbortSignal) => {
     const response = await fetch(API_NOTIFY_IMAGE_GEN, {
       method: 'POST',
       headers: {
@@ -412,6 +446,11 @@ export function FeatureModels({ lists }: { lists: any[] }) {
   useEffect(() => {
     getModels()
   }, [])
+
+  // Refresh partner NFTs when the component mounts
+  useEffect(() => {
+    refreshPartnerNFTs()
+  }, [refreshPartnerNFTs])
 
   useEffect(() => {
     if (
