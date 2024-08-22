@@ -82,7 +82,12 @@ export function FeatureModels({ lists }: { lists: any[] }) {
   const account = useAccount()
   const client = useClient()
   const { openConnectModal } = useConnectModal()
-  const { setLoading, referralAddress, setReferralAddress } = useMintToNFT()
+  const {
+    setLoading,
+    referralAddress,
+    setReferralAddress,
+    loading: loadingMintNFT,
+  } = useMintToNFT()
   const { mint, mintFee, discountedFee, signatureFreeMint, partnerFreeMint } =
     useMintZkImagine()
   const featureModels = lists.slice(0, 4)
@@ -910,10 +915,15 @@ export function FeatureModels({ lists }: { lists: any[] }) {
                   onClick={onMintToNFT}
                   disabled={loadingMint}
                 >
-                  {loadingMint && (
-                    <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                  {(loadingMintNFT ||
+                    loadingSignatureFreeMint ||
+                    loadingPartnerFreeMint) && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Mint to NFT
+                  ✨ Mint zkImagine NFT{' '}
+                  {canSignatureFreeMint || availableNFT
+                    ? ' (Free & Zero Gas)'
+                    : ''}
                 </Button>
                 <div className="mt-4 flex flex-col space-y-2">
                   <Label htmlFor="address">Referral Address</Label>
