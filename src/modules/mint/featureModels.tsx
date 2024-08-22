@@ -469,6 +469,21 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     }
   }, [referralAddress])
 
+  useEffect(() => {
+    if (models.length > 0) {
+      const defaultModel = models[0]
+      if (defaultModel && defaultModel.data) {
+        form.setValue('prompt', defaultModel.data.prompt || '')
+        form.setValue('neg_prompt', defaultModel.data.neg_prompt || '')
+        form.setValue('num_iterations', defaultModel.data.num_iterations || 25)
+        form.setValue('guidance_scale', defaultModel.data.guidance_scale || 7)
+        form.setValue('width', defaultModel.data.width || 512)
+        form.setValue('height', defaultModel.data.height || 768)
+        form.setValue('seed', defaultModel.data.seed || '-1')
+      }
+    }
+  }, [models, form])
+
   return (
     <div className="mt-16 lg:bg-slate-50">
       <div className="container py-8">
@@ -533,7 +548,23 @@ export function FeatureModels({ lists }: { lists: any[] }) {
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => {
-                              console.log(124124)
+                              // TODO: use the model prompt
+                              form.setValue('prompt', item.data.prompt)
+                              form.setValue(
+                                'neg_prompt',
+                                item.data.neg_prompt || '',
+                              )
+                              form.setValue(
+                                'num_iterations',
+                                item.data.num_iterations || 25,
+                              )
+                              form.setValue(
+                                'guidance_scale',
+                                item.data.guidance_scale || 7,
+                              )
+                              form.setValue('width', item.data.width || 512)
+                              form.setValue('height', item.data.height || 768)
+                              form.setValue('seed', item.data.seed || '-1')
                             }}
                           >
                             Use this prompt
@@ -925,18 +956,20 @@ export function FeatureModels({ lists }: { lists: any[] }) {
                     ? ' (Free & Zero Gas)'
                     : ''}
                 </Button>
-                <div className="mt-4 flex flex-col space-y-2">
-                  <Label htmlFor="address">Referral Address</Label>
-                  <Input
-                    id="address"
-                    placeholder="Referral Address"
-                    autoComplete="off"
-                    value={referralAddress}
-                    onChange={(e) =>
-                      setReferralAddress(e.target.value as Address)
-                    }
-                  />
-                </div>
+                {!canSignatureFreeMint && !availableNFT && (
+                  <div className="mt-4 flex flex-col space-y-2">
+                    <Label htmlFor="address">Referral Address</Label>
+                    <Input
+                      id="address"
+                      placeholder="Referral Address"
+                      autoComplete="off"
+                      value={referralAddress}
+                      onChange={(e) =>
+                        setReferralAddress(e.target.value as Address)
+                      }
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
