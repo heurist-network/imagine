@@ -296,10 +296,8 @@ export function FeatureModels({ lists }: { lists: any[] }) {
       // Signature Free Mint  - Partner Free Mint - Mint
       let txHash: Hash
       if (canSignatureFreeMint) {
-        console.log('calling signatureFreeMint...')
         txHash = await signatureFreeMint(info.model, extractedImageId)
       } else if (availableNFT) {
-        console.log('calling partnerFreeMint...')
         txHash = await partnerFreeMint(
           info.model,
           extractedImageId,
@@ -471,7 +469,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
 
   useEffect(() => {
     if (models.length > 0) {
-      const defaultModel = models[0]
+      const defaultModel = models[1]
       if (defaultModel && defaultModel.data) {
         form.setValue('prompt', defaultModel.data.prompt || '')
         form.setValue('neg_prompt', defaultModel.data.neg_prompt || '')
@@ -479,7 +477,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
         form.setValue('guidance_scale', defaultModel.data.guidance_scale || 7)
         form.setValue('width', defaultModel.data.width || 512)
         form.setValue('height', defaultModel.data.height || 768)
-        form.setValue('seed', defaultModel.data.seed || '-1')
+        form.setValue('seed', '-1')
       }
     }
   }, [models, form])
@@ -846,8 +844,14 @@ export function FeatureModels({ lists }: { lists: any[] }) {
       <Dialog
         open={open}
         onOpenChange={(isOpen) => {
-          if (loadingGenerate) {
-            return toast.error('Please wait for the generation to complete.')
+          // Reset state when dialog is closed
+          if (!isOpen) {
+            setLoadingGenerate(false)
+            setMintUrl('')
+            setInfo(null)
+            setTransactionId('')
+            setLoadingUpload(false)
+            setLoadingMint(false)
           }
 
           setOpen(isOpen)
