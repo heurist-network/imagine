@@ -8,7 +8,7 @@ import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Address, Hash, isAddress } from 'viem'
-import { useAccount, useClient } from 'wagmi'
+import { useAccount, useBalance, useClient } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
@@ -52,7 +52,8 @@ import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
-import { cn } from '@/lib/utils'
+import { API_NOTIFY_IMAGE_GEN } from '@/lib/endpoints'
+import { cn, extractImageId } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
@@ -103,6 +104,11 @@ export function FeatureModels({ lists }: { lists: any[] }) {
   const [transactionId, setTransactionId] = useState('')
   const [isValidReferral, setIsValidReferral] = useState(false)
   const [loadingMint, setLoadingMint] = useState(false)
+
+  const balance =
+    (useBalance({
+      address: account.address,
+    }).data?.value as bigint) || BigInt(0)
 
   const findActiveModel = featureModels.find(
     (model) => model.name === selectedModel,
@@ -222,48 +228,113 @@ export function FeatureModels({ lists }: { lists: any[] }) {
    * Uploads the generated image to the Gateway
    */
   const onUpload = async () => {
-    if (!ensureUserConnected()) return
+    if (!account.address) return openConnectModal?.()
 
     setTransactionId('')
-    setLoadingUpload(true)
 
     try {
+      setLoadingUpload(true)
       const res = await issueToGateway(
-        { ...info, model: selectedModel },
-        account.address!,
+        { ...info, model: info.model },
+        account.address,
       )
 
-      handleApiResponse(res, 'Issue to Gateway')
+      if (res.status !== 200) {
+        return toast.error(
+          res.message || 'Issue to Gateway failed, please try again.',
+        )
+      }
+
+      setTransactionId(res.data?.transactionId!)
+
+      toast.success('Issue to Gateway successfully.')
     } finally {
       setLoadingUpload(false)
     }
   }
 
   /**
-   * Mints the generated image as an NFT
+   * Handles the regular minting process.
    */
   const onMintToNFT = async () => {
-    if (!ensureUserConnected()) return
+    if (!account.address) return openConnectModal?.()
 
-    const imageId = extractImageId(mintUrl)
-    const referralAddr = isAddress(referralAddress)
-      ? referralAddress
-      : '0x0000000000000000000000000000000000000000'
+    const extractedImageId = extractImageId(info.url)
+    const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
 
-    setLoadingMint(true)
     setLoading(true)
 
     try {
-      const txHash = await mint(referralAddr, selectedModel, imageId)
-      await postImageToMintProxy(imageId, selectedModel, mintUrl, txHash)
-      displaySuccessMessage(txHash)
-    } catch (error) {
+      if (mintFee && balance < mintFee) {
+        toast.error('Insufficient ETH balance to mint NFT.')
+        return
+      }
+
+      const txHash = await mint(
+        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
+        info.model,
+        extractedImageId,
+      )
+      await handleMintingProcess(txHash)
+      showSuccessToast('Mint zkImagine NFT successfully.')
+    } catch (error: unknown) {
       handleMintError(error)
     } finally {
       setLoading(false)
-      setLoadingMint(false)
       setReferralAddress('')
     }
+  }
+
+  /**
+   * Handles the common minting process after a transaction is initiated.
+   * @param txHash - The transaction hash
+   */
+  const handleMintingProcess = async (txHash: Hash) => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 20000)
+
+    try {
+      await postMintingData(txHash, controller.signal)
+    } catch (error) {
+      console.error('Error in minting process:', error)
+    } finally {
+      clearTimeout(timeoutId)
+    }
+  }
+
+  /**
+   * Posts minting data to the API.
+   * @param txHash - The transaction hash
+   * @param signal - The AbortController signal
+   */
+  const postMintingData = async (txHash: Hash, signal: AbortSignal) => {
+    const response = await fetch(API_NOTIFY_IMAGE_GEN, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: window.location.origin,
+      },
+      body: JSON.stringify({
+        imageId: info.id,
+        modelId: info.model,
+        url: info.url,
+      }),
+      signal,
+    }).catch(handleFetchError)
+
+    handleApiResponse(response)
+  }
+
+  /**
+   * Handles fetch errors.
+   * @param err - The error object
+   */
+  const handleFetchError = (err: Error) => {
+    if (err.name === 'AbortError') {
+      console.log('Request timed out')
+      return null
+    }
+    throw err
   }
 
   /**
@@ -280,92 +351,34 @@ export function FeatureModels({ lists }: { lists: any[] }) {
   }
 
   /**
-   * Handles API responses and displays appropriate messages
-   * @param {any} res - API response
-   * @param {string} action - Description of the action performed
+   * Handles API response.
+   * @param response - The fetch response object
    */
-  const handleApiResponse = (res: any, action: string) => {
-    if (res.status !== 200) {
-      toast.error(res.message || `${action} failed, please try again.`)
-      return
-    }
-    setTransactionId(res.data?.transactionId!)
-    toast.success(`${action} successfully.`)
-  }
-
-  /**
-   * Extracts the image ID from the mint URL
-   * @param {string} url - Mint URL
-   * @returns {string} Extracted image ID
-   */
-  const extractImageId = (url: string): string => {
-    const arr = url.split('/').slice(-1)[0].split('-').slice(-3)
-    return `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
-  }
-
-  /**
-   * Posts the image data to the mint-proxy API
-   * @param {string} imageId - ID of the image
-   * @param {string} modelId - ID of the model used
-   * @param {string} url - URL of the minted image
-   * @param {Hash} txHash - Transaction hash
-   */
-  const postImageToMintProxy = async (
-    imageId: string,
-    modelId: string,
-    url: string,
-    txHash: Hash,
-  ) => {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
-
-      const txHash = await mint(
-        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
-        selectedModel,
-        imageId,
+  const handleApiResponse = (response: Response | null) => {
+    if (!response) {
+      console.log(
+        'notify-image-gen API: Proceeding to next step due to timeout',
       )
-
-      // TODO: Post the image right after the mint button is clicked. don't wait for the txn
-      const response = await fetch('/api/notify-image-gen', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageId,
-          modelId,
-          url,
-          transactionHash: txHash,
-        }),
-        signal: controller.signal,
-      })
-
-      if (!response) {
-        console.log('notify-image-gen API: Proceeding to next step due to timeout')
-      } else if (!response.ok) {
-        const data = await response.json()
-        console.error('notify-image-gen API: Error:', data)
-      }
-    } catch (err) {
-      // @ts-ignore
-      if (err.name === 'AbortError') {
-        console.log('Request timed out')
-      } else {
-        throw err
-      }
-    } finally {
-      clearTimeout(timeoutId)
+    } else if (!response.ok) {
+      response
+        .json()
+        .then((data) => console.error('notify-image-gen API: Error:', data))
     }
   }
 
   /**
-   * Displays a success message after minting
-   * @param {Hash} txHash - Transaction hash
+   * Shows a success toast with a transaction link.
+   * @param message - The success message
+   * @param txHash - The transaction hash
    */
-  const displaySuccessMessage = (txHash: Hash) => {
-    const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
+  const showSuccessToast = (message: string, txHash?: Hash) => {
+    const txUrl = txHash
+      ? `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
+      : ''
     toast.success(
       <div>
-        <div>Mint zkImagine NFT successfully.</div>
-        {client?.chain?.blockExplorers?.default.url && (
+        <div>{message}</div>
+        {txUrl && (
           <a
             href={txUrl}
             target="_blank"
