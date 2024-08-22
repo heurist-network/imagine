@@ -319,8 +319,14 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
 
-    try {
-      const response = await fetch('/api/mint-proxy', {
+      const txHash = await mint(
+        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
+        selectedModel,
+        imageId,
+      )
+
+      // TODO: Post the image right after the mint button is clicked. don't wait for the txn
+      const response = await fetch('/api/notify-image-gen', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -333,10 +339,10 @@ export function FeatureModels({ lists }: { lists: any[] }) {
       })
 
       if (!response) {
-        console.log('Mint-Proxy API: Proceeding to next step due to timeout')
+        console.log('notify-image-gen API: Proceeding to next step due to timeout')
       } else if (!response.ok) {
         const data = await response.json()
-        console.error('Mint-Proxy API: Error:', data)
+        console.error('notify-image-gen API: Error:', data)
       }
     } catch (err) {
       // @ts-ignore

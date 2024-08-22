@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
-import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -14,8 +13,6 @@ import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
-import { PartnerFreeMintButton } from '@/components/PartnerFreeMintButton'
-import { SignatureFreeMintButton } from '@/components/SignatureFreeMintButton'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,8 +36,8 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
-import { cn } from '@/lib/utils'
-import { MintToNFT, useMintToNFT } from '@/modules/mintToNFT'
+import { cn, extractImageId } from '@/lib/utils'
+import { MintToNFT } from '@/modules/mintToNFT'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
@@ -228,7 +225,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       }`
 
       const item = {
-        id: nanoid(),
+        id: extractImageId(data.url),
         url,
         prompt: data.prompt,
         neg_prompt: data.neg_prompt,
@@ -569,23 +566,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             />
           </div>
           <div className="space-y-4">
-            {/* <PulsatingButton
-              className={cn(
-                'h-14 w-full text-2xl font-semibold',
-                isGenerating ? 'bg-blue-500/50' : 'bg-blue-500',
-                isGenerating ? 'cursor-not-allowed' : 'cursor-pointer',
-              )}
-              onClick={onSubmit}
-              disabled={isGenerating}
-              pulseColor={isGenerating ? 'transparent' : '#0096ff'}
-            >
-              <div className="flex flex-row items-center">
-                {isGenerating && (
-                  <Loader2 className="h-6 mr-2 animate-spin w-6" />
-                )}
-                {isGenerating ? 'Generating...' : 'Generate'}
-              </div>
-            </PulsatingButton> */}
             <motion.button
               className="h-14 w-full overflow-hidden rounded-lg text-2xl font-semibold text-white shadow-lg"
               style={{
@@ -620,30 +600,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
               <>
                 <div className="flex flex-wrap justify-center gap-2">
                   <MintToNFT url={info.url} model={model} imageId={info.id} />
-
-                  {/* @dev patnerFreeMint debug modal */}
-                  {/* <PartnerFreeMintButton
-                    modelId={model}
-                    imageId={info.id}
-                    onSuccess={(hash) =>
-                      console.log('Partner free minting:', hash)
-                    }
-                    onError={(error) =>
-                      console.error('Partner free minting:', error)
-                    }
-                  /> */}
-
-                  {/* @dev signatureFreeMint debug modal */}
-                  {/* <SignatureFreeMintButton
-                    modelId={model}
-                    imageId={info.id}
-                    onSuccess={(hash) =>
-                      console.log('Signature free minting:', hash)
-                    }
-                    onError={(error) =>
-                      console.error('Signature free minting:', error)
-                    }
-                  /> */}
 
                   <Button
                     className={cn({ 'gap-2': !loadingUpload })}

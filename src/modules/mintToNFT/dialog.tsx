@@ -18,6 +18,8 @@ import { Label } from '@/components/ui/label'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
+import { API_NOTIFY_IMAGE_GEN } from '@/lib/endpoints'
+import { extractImageId } from '@/lib/utils'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
 import { useMintToNFT } from './hooks'
@@ -180,14 +182,16 @@ export function MintToNFT({
    * @param signal - The AbortController signal
    */
   const postMintingData = async (txHash: Hash, signal: AbortSignal) => {
-    const response = await fetch('/api/mint-proxy', {
+    const response = await fetch(API_NOTIFY_IMAGE_GEN, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: window.location.origin,
+      },
       body: JSON.stringify({
         imageId,
         modelId: model,
         url,
-        transactionHash: txHash,
       }),
       signal,
     }).catch(handleFetchError)
@@ -213,11 +217,13 @@ export function MintToNFT({
    */
   const handleApiResponse = (response: Response | null) => {
     if (!response) {
-      console.log('Mint-Proxy API: Proceeding to next step due to timeout')
+      console.log(
+        'notify-image-gen API: Proceeding to next step due to timeout',
+      )
     } else if (!response.ok) {
       response
         .json()
-        .then((data) => console.error('Mint-Proxy API: Error:', data))
+        .then((data) => console.error('notify-image-gen API: Error:', data))
     }
   }
 
@@ -262,16 +268,6 @@ export function MintToNFT({
         )
       }
     }
-  }
-
-  /**
-   * Extracts the image ID from the URL.
-   * @param url - The image URL
-   * @returns The extracted image ID
-   */
-  const extractImageId = (url: string) => {
-    const arr = url.split('/').slice(-1)[0].split('-').slice(-3)
-    return `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
   }
 
   // Show toast when the user can signature free mint
