@@ -313,7 +313,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
       }
 
       await handleMintingProcess()
-      showSuccessToast('Mint zkImagine NFT successfully.')
+      showSuccessToast('Mint zkImagine NFT successfully!', txHash)
     } catch (error: unknown) {
       handleMintError(error)
     } finally {
