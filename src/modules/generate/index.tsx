@@ -329,14 +329,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
           <AlertDialog key={item.label}>
             <AlertDialogTrigger asChild>
               <div className="relative cursor-pointer">
-                {/* <EmergingImage
-                  type={1}
-                  url="https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/Zeek.png"
-                  style={{
-                    height: 200,
-                    width: 200,
-                  }}
-                /> */}
                 <Image
                   className="rounded-lg transition-opacity duration-image hover:opacity-80"
                   unoptimized
@@ -701,6 +693,8 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                 <EmergingImage
                   type={1}
                   url={result.url}
+                  width={result.width}
+                  height={result.height}
                   style={{
                     flex: 1,
                     borderRadius: 16,
@@ -719,7 +713,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
               width={result.width}
               height={result.height}
               onLoad={() => {
-                console.log('loaded')
                 setResultLoaded(true)
               }}
             />

@@ -2,6 +2,7 @@ import { useGSAP } from '@gsap/react'
 import { View } from '@react-three/drei'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
+import Image from 'next/image'
 import * as THREE from 'three'
 
 import EmergeMaterial from './EmergeMaterial'
@@ -20,6 +21,7 @@ export default function EmergingImage({ ...props }) {
   const ref = useRef()
   const screenSize = useScreenSize()
   const [isIntersecting, setIsIntersecting] = useState(false)
+  const [loadError, setLoadError] = useState(false)
 
   useEffect(() => {
     const textureLoader = new THREE.TextureLoader()
@@ -27,12 +29,11 @@ export default function EmergingImage({ ...props }) {
     textureLoader
       .loadAsync(props.url)
       .then((data) => {
-        // data.colorSpace = THREE.LinearSRGBColorSpace;
         setTextureSize([data.source.data.width, data.source.data.height])
         setTexture(data)
       })
-      .catch((err) => {
-        console.log(err)
+      .catch(() => {
+        setLoadError(true)
       })
   }, [])
 
@@ -70,19 +71,36 @@ export default function EmergingImage({ ...props }) {
 
   // resize
   useEffect(() => {
+    if (loadError || !ref.current) return
     let bounds = ref.current.getBoundingClientRect()
     setElementSize([bounds.width, bounds.height])
     refMesh?.scale.set(bounds.width, bounds.height, 1)
-  }, [screenSize])
+  }, [screenSize, loadError])
+
+  if (loadError) {
+    return (
+      <div className="relative flex-1">
+        <Image
+          className="flex-1"
+          src={props.url}
+          unoptimized
+          priority
+          objectFit="cover"
+          layout="fill"
+          alt="image"
+        />
+      </div>
+    )
+  }
 
   return (
     <View {...props} ref={ref}>
       <mesh ref={setRefMesh}>
         <emergeMaterial
-          uFillColor={new THREE.Color('#403fb7')}
           transparent={true}
           uTexture={texture}
           uPixels={PIXELS}
+          uFillColor={new THREE.Color('#403fb7')}
           uTextureSize={new THREE.Vector2(textureSize[0], textureSize[1])}
           uElementSize={new THREE.Vector2(elementSize[0], elementSize[1])}
         />
