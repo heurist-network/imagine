@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
+import { shareOnX } from '@/lib/share'
 import { MintToNFT } from '@/modules/mintToNFT'
 
 import 'react-photo-view/dist/react-photo-view.css'
@@ -72,24 +73,7 @@ export default function History({ model }: { model: string }) {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => {
-                    const path = item.url.split('/')
-                    const name = path[path.length - 1].split('.')[0]
-                    const intentUrl =
-                      'https://twitter.com/intent/tweet?text=' +
-                      encodeURIComponent(
-                        'My latest #AIart creation with Imagine #Heurist 🎨',
-                      ) +
-                      '&url=' +
-                      encodeURIComponent(
-                        `https://imagine.heurist.ai/share/${name}`,
-                      )
-                    // "&via=" +
-                    // encodeURIComponent("asf") +
-                    // "&hashtags=" +
-                    // encodeURIComponent("Heurist");
-                    window.open(intentUrl, '_blank', 'width=550,height=420')
-                  }}
+                  onClick={() => shareOnX(item.id, item.prompt)}
                 >
                   <span className="i-ri-twitter-x-fill" />
                 </Button>

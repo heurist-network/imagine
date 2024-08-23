@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
+import { shareOnX } from '@/lib/share'
 import { cn, extractImageId } from '@/lib/utils'
 import { MintToNFT } from '@/modules/mintToNFT'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -627,22 +628,13 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                     variant="outline"
                     className="gap-1.5"
                     onClick={() => {
-                      const link = `https://d1dagtixswu0qn.cloudfront.net/${
-                        result.url.split('/').slice(-1)[0].split('?')[0]
-                      }`
+                      const name = result.url
+                        .split('/')
+                        .slice(-1)[0]
+                        .split('?')[0]
+                        .split('.')[0]
 
-                      const path = link.split('/')
-                      const name = path[path.length - 1].split('.')[0]
-                      const intentUrl =
-                        'https://twitter.com/intent/tweet?text=' +
-                        encodeURIComponent(
-                          'My latest #AIart creation with Imagine #Heurist 🎨',
-                        ) +
-                        '&url=' +
-                        encodeURIComponent(
-                          `https://imagine.heurist.ai/share/${name}`,
-                        )
-                      window.open(intentUrl, '_blank', 'width=550,height=420')
+                      shareOnX(name, form.getValues().prompt || '')
                     }}
                   >
                     <span>Share on</span>
