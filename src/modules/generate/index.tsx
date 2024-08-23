@@ -13,6 +13,7 @@ import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
+import FlipCard, { FlipCards } from '@/components/animate/flip-card'
 import EmergingImage from '@/components/emergingImage/EmergingImage'
 import Scene from '@/components/emergingImage/Scene'
 import { PartnerFreeMintButton } from '@/components/PartnerFreeMintButton'
@@ -329,16 +330,20 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
           <AlertDialog key={item.label}>
             <AlertDialogTrigger asChild>
               <div className="relative cursor-pointer">
-                <Image
-                  className="rounded-lg transition-opacity duration-image hover:opacity-80"
-                  unoptimized
-                  width={512}
-                  height={768}
-                  priority
-                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
-                  alt="model"
+                <FlipCards
+                  url={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
+                  back={
+                    <div className="flex flex-col gap-2">
+                      <div className="text-sm font-bold">Prompt</div>
+                      <div className="whitespace-pre-wrap text-left text-xs">
+                        {JSON.stringify(item.data, null, 2)}
+                      </div>
+                    </div>
+                  }
+                  extra={
+                    <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
+                  }
                 />
-                <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
               </div>
             </AlertDialogTrigger>
             <AlertDialogContent>
