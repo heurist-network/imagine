@@ -4,11 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import {
-  ImageWrapper,
-  ModelsTitle,
-  ModelsWrapper,
-} from '@/components/motion/modelsWrapper'
+import { ModelsTitle, ModelsWrapper } from '@/components/motion/modelsWrapper'
+import { DirectionAwareHover } from '@/components/ui/direction-aware-hover'
 
 export async function Models() {
   try {
@@ -32,23 +29,28 @@ export async function Models() {
       <div className="pb-20">
         <ModelsTitle>Deployed Models</ModelsTitle>
         <ModelsWrapper>
-          {lists.map((item, index) => (
+          {lists.map((item) => (
             <Link
               className="flex"
               key={item.name}
               href={`/models/${item.name}`}
             >
-              <ImageWrapper name={item.name} index={index}>
-                <Image
-                  unoptimized
-                  className="h-full w-full transition-transform hover:scale-105"
-                  width={280}
-                  height={400}
-                  priority
-                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.name}.png`}
-                  alt="models image"
-                />
-              </ImageWrapper>
+              <DirectionAwareHover
+                content={
+                  <Image
+                    unoptimized
+                    className="h-full w-full scale-[1.15] transition-transform"
+                    width={280}
+                    height={400}
+                    priority
+                    src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.name}.png`}
+                    alt="models image"
+                  />
+                }
+              >
+                <p className="text-xl font-bold">{item.name}</p>
+                <p className="text-sm font-normal">{item.author}</p>
+              </DirectionAwareHover>
             </Link>
           ))}
         </ModelsWrapper>
