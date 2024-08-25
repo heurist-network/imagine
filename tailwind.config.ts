@@ -2,13 +2,19 @@ import type { Config } from 'tailwindcss'
 
 import { getIconCollections, iconsPlugin } from '@egoist/tailwindcss-icons'
 
+// import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
+
+const {
+  default: flattenColorPalette,
+} = require('tailwindcss/lib/util/flattenColorPalette')
+
 const config = {
   darkMode: ['class'],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    './pages/**/*.{ts,tsx,jsx}',
+    './components/**/*.{ts,tsx,jsx}',
+    './app/**/*.{ts,tsx,jsx}',
+    './src/**/*.{ts,tsx,jsx}',
   ],
   prefix: '',
   theme: {
@@ -115,6 +121,14 @@ const config = {
           '0%, 100%': { boxShadow: '0 0 0 0 var(--pulse-color)' },
           '50%': { boxShadow: '0 0 0 8px var(--pulse-color)' },
         },
+        aurora: {
+          from: {
+            backgroundPosition: '50% 50%, 50% 50%',
+          },
+          to: {
+            backgroundPosition: '350% 50%, 350% 50%',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -124,6 +138,7 @@ const config = {
         shimmer: 'shimmer 8s infinite',
         gradient: 'gradient 8s linear infinite',
         pulse: 'pulse var(--duration) ease-out infinite',
+        aurora: 'aurora 60s linear infinite',
       },
     },
   },
@@ -132,7 +147,20 @@ const config = {
     iconsPlugin({
       collections: getIconCollections(['f7', 'ri', 'mingcute']),
     }),
+    addVariablesForColors,
   ],
 } satisfies Config
+
+// This plugin adds each Tailwind color as a global CSS variable, e.g. var(--gray-200).
+function addVariablesForColors({ addBase, theme }: any) {
+  let allColors = flattenColorPalette(theme('colors'))
+  let newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val]),
+  )
+
+  addBase({
+    ':root': newVars,
+  })
+}
 
 export default config

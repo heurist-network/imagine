@@ -13,6 +13,11 @@ import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
+import FlipCard, { FlipCards } from '@/components/animate/flip-card'
+import EmergingImage from '@/components/emergingImage/EmergingImage'
+import Scene from '@/components/emergingImage/Scene'
+import { PartnerFreeMintButton } from '@/components/PartnerFreeMintButton'
+import { SignatureFreeMintButton } from '@/components/SignatureFreeMintButton'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -178,6 +183,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
     width: 0,
     height: 0,
   })
+  const [resultLoaded, setResultLoaded] = useState(false)
   const [info, setInfo] = useState<any>(null)
   const [transactionId, setTransactionId] = useState('')
 
@@ -318,21 +324,26 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
 
   return (
     <div>
+      <Scene />
       <div className="md:3/4 grid w-full grid-cols-3 gap-4 py-4 md:grid-cols-4 lg:w-4/5">
         {models.map((item) => (
           <AlertDialog key={item.label}>
             <AlertDialogTrigger asChild>
               <div className="relative cursor-pointer">
-                <Image
-                  className="rounded-lg transition-opacity duration-image hover:opacity-80"
-                  unoptimized
-                  width={512}
-                  height={768}
-                  priority
-                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
-                  alt="model"
+                <FlipCards
+                  url={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
+                  back={
+                    <div className="flex flex-col gap-2">
+                      <div className="text-sm font-bold">Prompt</div>
+                      <div className="whitespace-pre-wrap text-left text-xs">
+                        {JSON.stringify(item.data, null, 2)}
+                      </div>
+                    </div>
+                  }
+                  extra={
+                    <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
+                  }
                 />
-                <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
               </div>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -679,14 +690,36 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             </div>
           )}
           <div className="flex w-full justify-center">
+            <div
+              className="flex border"
+              style={{ width: result.width, height: result.height }}
+            >
+              {resultLoaded && (
+                <EmergingImage
+                  type={1}
+                  url={result.url}
+                  width={result.width}
+                  height={result.height}
+                  style={{
+                    flex: 1,
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                  }}
+                />
+              )}
+            </div>
+
             <Image
-              className="rounded-lg shadow-xl"
+              className="sr-only"
               unoptimized
-              width={result.width}
-              height={result.height}
               priority
               src={result.url}
               alt="image result"
+              width={result.width}
+              height={result.height}
+              onLoad={() => {
+                setResultLoaded(true)
+              }}
             />
           </div>
         </motion.div>
