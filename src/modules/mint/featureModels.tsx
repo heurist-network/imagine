@@ -260,6 +260,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
    * Uploads the generated image to the Gateway
    */
   const onUpload = async () => {
+    if (!isMinted) return toast.error('You need to mint the image to NFT first')
     if (!account.address) return openConnectModal?.()
 
     setTransactionId('')
@@ -308,7 +309,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
    * Opens a new window with the Twitter intent URL.
    */
   const onShareTwitter = async () => {
-    //TODO: API CALL TO NOTIFY TWITTER SHARE
+    if (!isMinted) return toast.error('You need to mint the image to NFT first')
 
     const resOfNotifyAfterMintActions = await fetch(
       API_NOTIFY_AFTER_MINT_ACTIONS,
@@ -959,11 +960,11 @@ export function FeatureModels({ lists }: { lists: any[] }) {
                     className="gap-1.5 rounded-full"
                     variant="outline"
                     onClick={onShareTwitter}
-                    disabled={!isMinted}
                   >
                     <span>Share on</span>
                     <span className="i-ri-twitter-x-fill h-4 w-4" />
                   </Button>
+
                   <Button
                     className="gap-1.5 rounded-full"
                     variant="outline"
