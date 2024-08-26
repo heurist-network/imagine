@@ -336,7 +336,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                     <div className="flex flex-col gap-2">
                       <div className="text-sm font-bold">Prompt</div>
                       <div className="whitespace-pre-wrap text-left text-xs">
-                        {JSON.stringify(item.data, null, 2)}
+                        {item.data.prompt}
                       </div>
                     </div>
                   }
@@ -689,7 +689,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
               <PixelatedImage src={result.url} />
             </div>
           )}
-          <div className="flex w-full justify-center">
+          <div className="relative flex w-full justify-center">
             <div
               className="flex border"
               style={{ width: result.width, height: result.height }}
@@ -710,7 +710,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             </div>
 
             <Image
-              className="sr-only"
+              className="absolute opacity-0"
               unoptimized
               priority
               src={result.url}
