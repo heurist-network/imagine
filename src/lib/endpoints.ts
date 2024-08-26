@@ -55,6 +55,18 @@ export const getEpochRewards = async (epoch?: string) => {
   return response.json()
 }
 
+export interface LeaderboardData {
+  epoch: number
+  mint_count: number
+  epoch_address: string
+  ranking: number
+  gateway_upload_count?: number
+  score: number
+  zk_cashback: number
+  pay_in_eth: number
+  twitter_share_count?: number
+}
+
 /**
  * API endpoint for fetching leaderboard data.
  */
@@ -64,10 +76,12 @@ export const API_LEADERBOARD =
 /**
  * Fetches leaderboard data for a specific epoch or the current epoch if not specified.
  * @param {string} [epoch] - Optional epoch parameter (e.g., 'EPOCH_0').
- * @returns {Promise<LeaderboardData>} A promise that resolves to the leaderboard data.
+ * @returns {Promise<LeaderboardData[]>} A promise that resolves to an array of leaderboard data.
  * @throws {Error} If the fetch request fails or returns a non-OK status.
  */
-export const getLeaderboard = async (epoch?: string): Promise<any> => {
+export const getLeaderboard = async (
+  epoch?: string,
+): Promise<LeaderboardData[]> => {
   const params = new URLSearchParams()
   if (epoch) params.append('epoch', epoch)
 
@@ -78,8 +92,9 @@ export const getLeaderboard = async (epoch?: string): Promise<any> => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    console.log('debug leaderboard', await response.json())
-    return await response.json()
+    const data = await response.json()
+    console.log('debug leaderboard', data)
+    return data
   } catch (error) {
     console.error('Error fetching leaderboard data:', error)
     throw error
