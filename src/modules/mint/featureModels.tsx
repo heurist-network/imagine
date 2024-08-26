@@ -51,10 +51,19 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
-import { API_NOTIFY_IMAGE_GEN } from '@/lib/endpoints'
+import {
+  API_NOTIFY_AFTER_MINT_ACTIONS,
+  API_NOTIFY_IMAGE_GEN,
+} from '@/lib/endpoints'
 import { cn, extractImageId } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
@@ -64,8 +73,8 @@ import { useMintToNFT } from '../mintToNFT'
 const formSchema = z.object({
   prompt: z.string().optional(),
   neg_prompt: z.string().optional(),
-  num_iterations: z.number(),
-  guidance_scale: z.number(),
+  num_iterations: z.number().min(1).max(50),
+  guidance_scale: z.number().min(1).max(12),
   width: z.number().min(512).max(1024),
   height: z.number().min(512).max(1024),
   seed: z.string().optional(),
@@ -111,6 +120,8 @@ export function FeatureModels({ lists }: { lists: any[] }) {
   const [loadingUpload, setLoadingUpload] = useState(false)
   const [transactionId, setTransactionId] = useState('')
   const [isValidReferral, setIsValidReferral] = useState(false)
+  const [isMinted, setIsMinted] = useState(false)
+  const [isUploaded, setIsUploaded] = useState(false)
   const [loadingMint, setLoadingMint] = useState(false)
 
   const {
@@ -250,6 +261,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
    * Uploads the generated image to the Gateway
    */
   const onUpload = async () => {
+    if (!isMinted) return toast.error('You need to mint the image to NFT first')
     if (!account.address) return openConnectModal?.()
 
     setTransactionId('')
@@ -269,10 +281,61 @@ export function FeatureModels({ lists }: { lists: any[] }) {
 
       setTransactionId(res.data?.transactionId!)
 
-      toast.success('Issue to Gateway successfully.')
+      const resOfNotifyAfterMintActions = await fetch(
+        API_NOTIFY_AFTER_MINT_ACTIONS,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            modelId: info.model,
+            imageId: info.id,
+            actionType: 'GATEWAY_UPLOAD',
+          }),
+        },
+      ).catch(handleFetchError)
+      handleApiResponse(resOfNotifyAfterMintActions)
+
+      toast.success('Image uploaded to Gateway successfully!')
     } finally {
       setLoadingUpload(false)
+      setIsUploaded(true)
     }
+  }
+
+  /**
+   * Handles sharing the generated image on Twitter.
+   * Constructs a tweet with a predefined text and a link to the shared image.
+   * Opens a new window with the Twitter intent URL.
+   */
+  const onShareTwitter = async () => {
+    if (!isMinted) return toast.error('You need to mint the image to NFT first')
+
+    const resOfNotifyAfterMintActions = await fetch(
+      API_NOTIFY_AFTER_MINT_ACTIONS,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          modelId: info.model,
+          imageId: info.id,
+          actionType: 'TWITTER_SHARE',
+        }),
+      },
+    ).catch(handleFetchError)
+    handleApiResponse(resOfNotifyAfterMintActions)
+
+    const path = mintUrl.split('/')
+    const name = path[path.length - 1].split('.')[0]
+    const intentUrl =
+      'https://twitter.com/intent/tweet?text=' +
+      encodeURIComponent('My latest #AIart creation with Imagine #Heurist 🎨') +
+      '&url=' +
+      encodeURIComponent(`https://imagine.heurist.ai/share/${name}`)
+    window.open(intentUrl, '_blank', 'width=550,height=420')
   }
 
   /**
@@ -288,11 +351,6 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     setLoading(true)
 
     try {
-      if (mintFee && balance < mintFee) {
-        toast.error('Insufficient ETH balance to mint NFT.')
-        return
-      }
-
       // Signature Free Mint  - Partner Free Mint - Mint
       let txHash: Hash
       if (canSignatureFreeMint) {
@@ -305,6 +363,10 @@ export function FeatureModels({ lists }: { lists: any[] }) {
           BigInt(availableNFT.tokenId),
         )
       } else {
+        if (mintFee && balance < mintFee) {
+          toast.error('Insufficient ETH balance to mint NFT.')
+          return
+        }
         txHash = await mint(
           isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
           info.model,
@@ -319,6 +381,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     } finally {
       setLoading(false)
       setReferralAddress('')
+      setIsMinted(true)
     }
   }
 
@@ -896,52 +959,54 @@ export function FeatureModels({ lists }: { lists: any[] }) {
                   <Button
                     className="gap-1.5 rounded-full"
                     variant="outline"
-                    onClick={() => {
-                      const path = mintUrl.split('/')
-                      const name = path[path.length - 1].split('.')[0]
-                      const intentUrl =
-                        'https://twitter.com/intent/tweet?text=' +
-                        encodeURIComponent(
-                          'My latest #AIart creation with Imagine #Heurist 🎨',
-                        ) +
-                        '&url=' +
-                        encodeURIComponent(
-                          `https://imagine.heurist.ai/share/${name}`,
-                        )
-                      window.open(intentUrl, '_blank', 'width=550,height=420')
-                    }}
+                    onClick={onShareTwitter}
                   >
                     <span>Share on</span>
                     <span className="i-ri-twitter-x-fill h-4 w-4" />
                   </Button>
-                  <Button
-                    className="gap-1.5 rounded-full"
-                    variant="outline"
-                    disabled={loadingUpload}
-                    onClick={onUpload}
-                  >
-                    {loadingUpload ? (
-                      <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                    ) : (
+
+                  {!isUploaded && (
+                    <Button
+                      className="gap-1.5 rounded-full"
+                      variant="outline"
+                      disabled={loadingUpload}
+                      onClick={onUpload}
+                    >
+                      {loadingUpload ? (
+                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Image
+                          src="/gateway.svg"
+                          alt="gateway"
+                          width={26}
+                          height={26}
+                        />
+                      )}
+                      Upload to Gateway
+                    </Button>
+                  )}
+                </div>
+
+                {!!transactionId && (
+                  <div className="mt-2">
+                    <Button
+                      className="gap-1.5 rounded-full"
+                      variant="outline"
+                      onClick={() =>
+                        window.open(
+                          `https://mygateway.xyz/explorer/transactions/${transactionId}`,
+                          '_blank',
+                        )
+                      }
+                    >
                       <Image
                         src="/gateway.svg"
                         alt="gateway"
                         width={26}
                         height={26}
                       />
-                    )}
-                    Upload to Gateway
-                  </Button>
-                </div>
-                {!!transactionId && (
-                  <div className="mt-2">
-                    <Link
-                      className="text-sky-400 underline"
-                      href={`https://mygateway.xyz/explorer/transactions/${transactionId}`}
-                      target="_blank"
-                    >
                       Open in Gateway
-                    </Link>
+                    </Button>
                   </div>
                 )}
                 <Separator className="my-4" />
@@ -1023,7 +1088,7 @@ const ModelTabs: React.FC<ModelTabsProps> = ({
 interface ModelCarouselProps {
   models: Array<{
     label: string
-    // Add other properties of the model object as needed
+    // Add other properties of the model object as neede
   }>
 }
 
