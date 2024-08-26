@@ -18,7 +18,7 @@ export const API_NOTIFY_AFTER_MINT_ACTIONS =
  * API endpoint for fetching user rewards.
  */
 export const API_USER_REWARDS =
-  'https://xl53ziu42g.execute-api.us-east-1.amazonaws.com/dev/user-rewards'
+  'https://xl53ziu42g.execute-api.us-east-1.amazonaws.com/prod/user-rewards'
 
 /**
  * Fetches user rewards for a given address and optional epoch.
@@ -38,7 +38,7 @@ export const getUserRewards = async (address: string, epoch?: string) => {
  * API endpoint for fetching epoch rewards.
  */
 export const API_EPOCH_REWARDS =
-  'https://xl53ziu42g.execute-api.us-east-1.amazonaws.com/dev/epoch-rewards'
+  'https://xl53ziu42g.execute-api.us-east-1.amazonaws.com/prod/epoch-rewards'
 
 /**
  * Fetches rewards for a specific epoch or the current epoch if not specified.
@@ -59,7 +59,7 @@ export const getEpochRewards = async (epoch?: string) => {
  * API endpoint for fetching leaderboard data.
  */
 export const API_LEADERBOARD =
-  'https://gnjlmpxbsh.execute-api.us-east-1.amazonaws.com/dev/leaderboard'
+  'https://xl53ziu42g.execute-api.us-east-1.amazonaws.com/prod/leaderboard-stats'
 
 /**
  * Fetches leaderboard data for a specific epoch or the current epoch if not specified.
