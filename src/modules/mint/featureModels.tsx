@@ -121,6 +121,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
   const [transactionId, setTransactionId] = useState('')
   const [isValidReferral, setIsValidReferral] = useState(false)
   const [isMinted, setIsMinted] = useState(false)
+  const [isUploaded, setIsUploaded] = useState(false)
   const [loadingMint, setLoadingMint] = useState(false)
 
   const {
@@ -280,9 +281,6 @@ export function FeatureModels({ lists }: { lists: any[] }) {
 
       setTransactionId(res.data?.transactionId!)
 
-      toast.success('Issue to Gateway successfully.')
-
-      // TODO: POST DATA TO API AFTER UPLOADING TO GATEWAY
       const resOfNotifyAfterMintActions = await fetch(
         API_NOTIFY_AFTER_MINT_ACTIONS,
         {
@@ -298,8 +296,11 @@ export function FeatureModels({ lists }: { lists: any[] }) {
         },
       ).catch(handleFetchError)
       handleApiResponse(resOfNotifyAfterMintActions)
+
+      toast.success('Image uploaded to Gateway successfully!')
     } finally {
       setLoadingUpload(false)
+      setIsUploaded(true)
     }
   }
 
@@ -350,11 +351,6 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     setLoading(true)
 
     try {
-      if (mintFee && balance < mintFee) {
-        toast.error('Insufficient ETH balance to mint NFT.')
-        return
-      }
-
       // Signature Free Mint  - Partner Free Mint - Mint
       let txHash: Hash
       if (canSignatureFreeMint) {
@@ -367,6 +363,10 @@ export function FeatureModels({ lists }: { lists: any[] }) {
           BigInt(availableNFT.tokenId),
         )
       } else {
+        if (mintFee && balance < mintFee) {
+          toast.error('Insufficient ETH balance to mint NFT.')
+          return
+        }
         txHash = await mint(
           isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
           info.model,
@@ -965,24 +965,26 @@ export function FeatureModels({ lists }: { lists: any[] }) {
                     <span className="i-ri-twitter-x-fill h-4 w-4" />
                   </Button>
 
-                  <Button
-                    className="gap-1.5 rounded-full"
-                    variant="outline"
-                    disabled={loadingUpload}
-                    onClick={onUpload}
-                  >
-                    {loadingUpload ? (
-                      <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Image
-                        src="/gateway.svg"
-                        alt="gateway"
-                        width={26}
-                        height={26}
-                      />
-                    )}
-                    Upload to Gateway
-                  </Button>
+                  {!isUploaded && (
+                    <Button
+                      className="gap-1.5 rounded-full"
+                      variant="outline"
+                      disabled={loadingUpload}
+                      onClick={onUpload}
+                    >
+                      {loadingUpload ? (
+                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Image
+                          src="/gateway.svg"
+                          alt="gateway"
+                          width={26}
+                          height={26}
+                        />
+                      )}
+                      Upload to Gateway
+                    </Button>
+                  )}
                 </div>
 
                 {!!transactionId && (
