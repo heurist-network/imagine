@@ -145,10 +145,10 @@ export function CampaignReward() {
             </div>
             <div className="flex justify-between">
               <div className="rounded-[2px] bg-white px-2">
-                Claimable: <span className="font-bold">34.45 ZK</span>
+                Claimable: <span className="font-bold">contractRead ZK</span>
               </div>
               <div className="flex items-center gap-2 transition-colors group-hover:text-[#CDF138]">
-                <div className="font-semibold underline">Claim</div>
+                <div className="font-semibold underline">Claim Action</div>
                 <Arrow className="transition-transform group-hover:rotate-45" />
               </div>
             </div>
@@ -167,10 +167,10 @@ export function CampaignReward() {
             </div>
             <div className="flex justify-between">
               <div className="rounded-[2px] bg-white px-2">
-                Claimable: <span className="font-bold">34.45 ZK</span>
+                Claimable: <span className="font-bold">contractRead ZK</span>
               </div>
               <div className="flex items-center gap-2 transition-colors group-hover:text-[#CDF138]">
-                <div className="font-semibold underline">Claim</div>
+                <div className="font-semibold underline">Claim Action</div>
                 <Arrow className="transition-transform group-hover:rotate-45" />
               </div>
             </div>
