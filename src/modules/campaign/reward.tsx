@@ -102,7 +102,7 @@ export function CampaignReward() {
               My Pool 1 Rewards
             </div>
             <div className="font-sfMono text-[48px] font-bold leading-[62px] text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]">
-              45.34 ZK
+              45.3 ZK
             </div>
             <div className="flex justify-between">
               <div className="rounded-[2px] bg-white px-2">
@@ -124,7 +124,7 @@ export function CampaignReward() {
               My Pool 2 Rewards
             </div>
             <div className="font-sfMono text-[48px] font-bold leading-[62px] text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]">
-              45.34 ZK
+              45.3 ZK
             </div>
             <div className="flex justify-between">
               <div className="rounded-[2px] bg-white px-2">
@@ -138,7 +138,7 @@ export function CampaignReward() {
           </div>
         </div>
         <MagicCard
-          className="bg-campaign-reward-work flex h-auto w-auto flex-1 flex-col rounded-2xl bg-cover p-12 text-white"
+          className="flex h-auto w-auto flex-1 flex-col rounded-2xl bg-campaign-reward-work bg-cover p-12 text-white"
           containerClassName="flex-1 flex flex-col"
           gradientColor="#CDF138"
           gradientOpacity={0.25}
