@@ -11,13 +11,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
+import { getLeaderboard, LeaderboardData } from '@/lib/endpoints'
 import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export function Leaderboard() {
   const [page, setPage] = useState(1)
-  const [data, setData] = useState<any>([])
+  const [data, setData] = useState<LeaderboardData[]>([])
   const [loading, setLoading] = useState(false)
   const [hasNextPage, setHasNextPage] = useState(false)
 
@@ -25,18 +26,12 @@ export function Leaderboard() {
     setLoading(true)
 
     try {
-      const res = await fetch(
-        `https://xl53ziu42g.execute-api.us-east-1.amazonaws.com/prod/leaderboard-stats?pageSize=10&page=${currentPage ?? page}`,
-      )
-      const data = await res.json()
-      if (!data.items) {
-        setData([])
-        return
-      }
-      setData(data.items)
-      setHasNextPage(data.pageInfo.hasNextPage)
+      const response = await getLeaderboard(undefined, currentPage ?? page)
+      setData(response.items)
+      setHasNextPage(response.pageInfo.hasNextPage)
       if (currentPage) setPage(currentPage)
     } catch (error) {
+      console.error('Error fetching leaderboard data:', error)
       setData([])
     } finally {
       setLoading(false)
@@ -78,12 +73,13 @@ export function Leaderboard() {
             >
               <div className="table-cell pl-4">Rank</div>
               <div className="table-cell min-w-[200px] pl-4">Address</div>
-              <div className="table-cell min-w-[200px] pl-4">Score</div>
+              <div className="table-cell min-w-[200px] pl-4">Mint Count</div>
+              <div className="table-cell min-w-[200px] pl-4">Imagine Score</div>
               <div className="table-cell min-w-[200px] pl-4">
                 ZK Token Rewords
               </div>
             </div>
-            {data.map((item: any, index: number) => (
+            {data.map((item: LeaderboardData, index: number) => (
               <div
                 key={index}
                 className="table-row font-sfMono text-[20px] font-semibold leading-[24px] text-[#171717]"
@@ -116,8 +112,18 @@ export function Leaderboard() {
                       index === 0 && page === 1,
                   })}
                 >
+                  {item.mint_count}
+                </div>
+
+                <div
+                  className={cn('table-cell border-y bg-[#F8FAFD]/60 pl-4', {
+                    'border-y-[3px] border-y-[#CDF138]':
+                      index === 0 && page === 1,
+                  })}
+                >
                   {item.score}
                 </div>
+
                 <div
                   className={cn(
                     'table-cell rounded-r-[16px] border-y border-r bg-[#F8FAFD]/60 pl-4',
@@ -127,7 +133,7 @@ export function Leaderboard() {
                     },
                   )}
                 >
-                  87654
+                  {item.zk_cashback}
                 </div>
               </div>
             ))}
@@ -170,6 +176,7 @@ export function Leaderboard() {
                   </PaginationLink>
                 </PaginationItem>
               )}
+
               <PaginationItem>
                 <PaginationNext
                   className={

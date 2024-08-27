@@ -117,20 +117,29 @@ export interface LeaderboardData {
   twitter_share_count?: number
 }
 
+export interface LeaderboardResponse {
+  items: LeaderboardData[]
+  pageInfo: {
+    currentPage: number
+    hasNextPage: boolean
+    nextPage: number
+  }
+}
+
 export const API_LEADERBOARD =
-  'https://xl53ziu42g.execute-api.us-east-1.amazonaws.com/prod/leaderboard'
+  'https://xl53ziu42g.execute-api.us-east-1.amazonaws.com/prod/leaderboard-stats'
 
 /**
  * Fetches leaderboard data for a specific epoch and page.
  * @param {string} [epoch] - Optional epoch parameter (e.g., 'EPOCH_10').
  * @param {number} [page] - Optional page number, defaults to 1.
- * @returns {Promise<LeaderboardData[]>} A promise that resolves to an array of leaderboard data.
+ * @returns {Promise<LeaderboardResponse>} A promise that resolves to a LeaderboardResponse object.
  * @throws {Error} If the fetch request fails or returns a non-OK status.
  */
 export const getLeaderboard = async (
   epoch?: string,
   page: number = 1,
-): Promise<LeaderboardData[]> => {
+): Promise<LeaderboardResponse> => {
   const params = new URLSearchParams()
   if (epoch) params.append('epoch', epoch)
   params.append('page', page.toString())
@@ -142,11 +151,19 @@ export const getLeaderboard = async (
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    const data = await response.json()
+    const data: LeaderboardResponse = await response.json()
     console.log('debug leaderboard', data)
     return data
   } catch (error) {
     console.error('Error fetching leaderboard data:', error)
-    throw error
+    // Return default data if there's an error
+    return {
+      items: [],
+      pageInfo: {
+        currentPage: page,
+        hasNextPage: false,
+        nextPage: page,
+      },
+    }
   }
 }
