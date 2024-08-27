@@ -559,8 +559,8 @@ export function FeatureModel({ lists }: { lists: any[] }) {
         >
           Featured Models of the Day
         </div>
-        <div className="mb-4 mt-1.5 text-sm leading-6 text-neutral-500 lg:mb-8">
-          Select a model from today's curated collection to generate and mint.
+        <div className="mb-4 mt-1.5 font-['SF_Mono'] text-sm leading-6 text-neutral-500 lg:mb-8">
+          Select a model from today's curated collection to generate and mint.{' '}
         </div>
         <div className="flex flex-col items-center gap-4 lg:flex-row lg:gap-16">
           <div className="flex h-[552px] w-full flex-1 flex-col gap-4 lg:gap-8">
@@ -578,7 +578,10 @@ export function FeatureModel({ lists }: { lists: any[] }) {
 
             <div className="hidden lg:block">
               {!!loadingGetModels ? (
-                <div>Loading...</div>
+                <div className="flex h-[392px] items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-white" />
+                  <span className="ml-2 text-white">Loading models...</span>
+                </div>
               ) : (
                 <div className="flex items-center justify-center">
                   {models.map((item, index) => (
@@ -586,14 +589,14 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                       <AlertDialogTrigger asChild>
                         <div
                           className={cn(
-                            'relative h-[240px] w-[165px] cursor-pointer overflow-hidden rounded-md bg-slate-50',
+                            'relative h-[240px] w-[165px] cursor-pointer overflow-hidden rounded-[8px] border-2 border-[#CDF138] bg-[#CDF138]',
                             index === 0 && 'translate-x-5 rotate-[15deg]',
                             index === 1 && 'z-10 h-[392px] w-[259px]',
                             index === 2 && '-translate-x-5 -rotate-[15deg]',
                           )}
                         >
                           <Image
-                            className="transition-opacity duration-image hover:opacity-80"
+                            className="rounded-[8px] transition-opacity duration-image hover:opacity-80"
                             unoptimized
                             width={512}
                             height={768}
@@ -635,6 +638,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                               form.setValue('height', item.data.height || 768)
                               form.setValue('seed', item.data.seed || '-1')
                             }}
+                            className="bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
                           >
                             Use this prompt
                           </AlertDialogAction>
@@ -646,269 +650,274 @@ export function FeatureModel({ lists }: { lists: any[] }) {
               )}
 
               <div className="mt-8 flex flex-col items-center justify-center">
-                <div className="text-lg font-semibold text-neutral-900">
+                <div className="text-lg font-semibold text-neutral-300">
                   {findActiveModel?.name}
                 </div>
-                <div className="text-lg font-semibold text-gray-500">
+                <div className="text-lg font-semibold text-neutral-500">
                   Created by{' '}
-                  <span className="text-neutral-900">
+                  <span className="text-neutral-300">
                     {findActiveModel?.author}
                   </span>
                 </div>
               </div>
             </div>
           </div>
-          {mintType === 'quick' ? (
-            <div className="flex-1">
-              <div className="text-lg font-semibold">
-                Quick Generate and Mint
-              </div>
-              <div className="mb-4 mt-1.5 text-sm leading-6 text-slate-500">
-                Generate an image instantly with a pre-filled prompt. For more
-                customization options, use Advanced Mint.
-              </div>
-              <Form {...form}>
-                <FormField
-                  control={form.control}
-                  name="prompt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center">
-                        Prompt
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="rounded-[6px]"
-                          placeholder="Prompt"
-                          autoComplete="off"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </Form>
-              <div className="mt-4 flex items-center gap-2">
-                <Button
-                  className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
-                  onClick={onGenerate}
-                  disabled={loadingGenerate || !!loadingGetModels}
-                >
-                  {(loadingGenerate || !!loadingGetModels) && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Generate and Mint
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  className="rounded-full text-sm leading-6 text-black underline"
-                  onClick={() => {
-                    setMintType('advanced')
-                  }}
-                  disabled={loadingGenerate}
-                >
-                  Advanced Mint
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-1 flex-col gap-4">
-              <div className="text-lg font-semibold">
-                Advanced Generate and Mint
-              </div>
-              <Form {...form}>
-                <FormField
-                  control={form.control}
-                  name="prompt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center">
-                        Prompt
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="rounded-[6px]"
-                          placeholder="Prompt"
-                          autoComplete="off"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="neg_prompt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center">
-                        Negative Prompt
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="rounded-[6px]"
-                          placeholder="Negative Prompt"
-                          autoComplete="off"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex flex-col gap-6 lg:flex-row">
-                  <FormField
-                    control={form.control}
-                    name="num_iterations"
-                    render={({ field }) => (
-                      <FormItem className="flex-1 space-y-4">
-                        <FormLabel className="flex items-center">
-                          Sampling Steps ({field.value})
-                        </FormLabel>
-                        <Input
-                          className="hidden"
-                          name="num_iterations"
-                          value={field.value}
-                          onChange={() => {}}
-                        />
-                        <FormControl>
-                          <Slider
-                            value={[field.value]}
-                            onValueChange={(value) => field.onChange(value[0])}
-                            min={1}
-                            max={50}
-                            step={1}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="guidance_scale"
-                    render={({ field }) => (
-                      <FormItem className="flex-1 space-y-4">
-                        <FormLabel className="flex items-center">
-                          Guidance Scale ({field.value})
-                        </FormLabel>
-                        <Input
-                          className="hidden"
-                          name="guidance_scale"
-                          value={field.value}
-                          onChange={() => {}}
-                        />
-                        <FormControl>
-                          <Slider
-                            value={[field.value]}
-                            onValueChange={(value) => field.onChange(value[0])}
-                            min={1}
-                            max={12}
-                            step={0.1}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+          <div className="flex flex-col gap-4 rounded-[10px] bg-[#262626] p-12">
+            {mintType === 'quick' ? (
+              <div className="flex-1">
+                <div className="text-lg font-semibold">
+                  Quick Generate and Mint
                 </div>
-                <div className="flex gap-6">
-                  <FormField
-                    control={form.control}
-                    name="width"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Width</FormLabel>
-                        <FormControl>
-                          <Input
-                            className="rounded-[6px]"
-                            placeholder="Width"
-                            type="number"
-                            {...field}
-                            onBlur={(e) => {
-                              if (Number(e.target.value) < 512) {
-                                field.onChange(512)
-                              }
-                              if (Number(e.target.value) > 1024) {
-                                field.onChange(1024)
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="height"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Height</FormLabel>
-                        <FormControl>
-                          <Input
-                            className="rounded-[6px]"
-                            placeholder="Height"
-                            type="number"
-                            {...field}
-                            onBlur={(e) => {
-                              if (Number(e.target.value) < 512) {
-                                field.onChange(512)
-                              }
-                              if (Number(e.target.value) > 1024) {
-                                field.onChange(1024)
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="seed"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Seed</FormLabel>
-                        <FormControl>
-                          <Input
-                            className="rounded-[6px]"
-                            placeholder="Seed"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <div className="mb-4 mt-1.5 font-['SF_Mono'] text-sm leading-6 text-neutral-400">
+                  Generate an image instantly with a pre-filled prompt. For more
+                  customization options, use Advanced Mint.
                 </div>
-              </Form>
-              <div className="flex items-center gap-2">
-                <Button
-                  className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
-                  onClick={onGenerate}
-                >
-                  Generate and Mint
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="rounded-full text-sm leading-6 text-black underline"
-                  onClick={() => {
-                    setMintType('quick')
-                  }}
-                >
-                  Quick Mint
-                </Button>
+                <Form {...form}>
+                  <FormField
+                    control={form.control}
+                    name="prompt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center">
+                          Prompt
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="rounded-[6px] font-['SF_Mono'] text-black"
+                            placeholder="Prompt"
+                            autoComplete="off"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </Form>
+                <div className="mt-4 flex items-center gap-2">
+                  <Button
+                    className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
+                    onClick={onGenerate}
+                    disabled={loadingGenerate || !!loadingGetModels}
+                  >
+                    {(loadingGenerate || !!loadingGetModels) && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Generate and Mint
+                  </Button>
+
+                  <Button
+                    className="rounded-full bg-transparent text-neutral-300 underline hover:bg-transparent"
+                    onClick={() => {
+                      setMintType('advanced')
+                    }}
+                    disabled={loadingGenerate}
+                  >
+                    Advanced Mint
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="flex flex-1 flex-col gap-4">
+                <div className="text-lg font-semibold">
+                  Advanced Generate and Mint
+                </div>
+                <Form {...form}>
+                  <FormField
+                    control={form.control}
+                    name="prompt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center">
+                          Prompt
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="rounded-[6px]"
+                            placeholder="Prompt"
+                            autoComplete="off"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="neg_prompt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center">
+                          Negative Prompt
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="rounded-[6px]"
+                            placeholder="Negative Prompt"
+                            autoComplete="off"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex flex-col gap-6 lg:flex-row">
+                    <FormField
+                      control={form.control}
+                      name="num_iterations"
+                      render={({ field }) => (
+                        <FormItem className="flex-1 space-y-4">
+                          <FormLabel className="flex items-center">
+                            Sampling Steps ({field.value})
+                          </FormLabel>
+                          <Input
+                            className="hidden"
+                            name="num_iterations"
+                            value={field.value}
+                            onChange={() => {}}
+                          />
+                          <FormControl>
+                            <Slider
+                              value={[field.value]}
+                              onValueChange={(value) =>
+                                field.onChange(value[0])
+                              }
+                              min={1}
+                              max={50}
+                              step={1}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="guidance_scale"
+                      render={({ field }) => (
+                        <FormItem className="flex-1 space-y-4">
+                          <FormLabel className="flex items-center">
+                            Guidance Scale ({field.value})
+                          </FormLabel>
+                          <Input
+                            className="hidden"
+                            name="guidance_scale"
+                            value={field.value}
+                            onChange={() => {}}
+                          />
+                          <FormControl>
+                            <Slider
+                              value={[field.value]}
+                              onValueChange={(value) =>
+                                field.onChange(value[0])
+                              }
+                              min={1}
+                              max={12}
+                              step={0.1}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex gap-6">
+                    <FormField
+                      control={form.control}
+                      name="width"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Width</FormLabel>
+                          <FormControl>
+                            <Input
+                              className="rounded-[6px]"
+                              placeholder="Width"
+                              type="number"
+                              {...field}
+                              onBlur={(e) => {
+                                if (Number(e.target.value) < 512) {
+                                  field.onChange(512)
+                                }
+                                if (Number(e.target.value) > 1024) {
+                                  field.onChange(1024)
+                                }
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="height"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Height</FormLabel>
+                          <FormControl>
+                            <Input
+                              className="rounded-[6px]"
+                              placeholder="Height"
+                              type="number"
+                              {...field}
+                              onBlur={(e) => {
+                                if (Number(e.target.value) < 512) {
+                                  field.onChange(512)
+                                }
+                                if (Number(e.target.value) > 1024) {
+                                  field.onChange(1024)
+                                }
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="seed"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Seed</FormLabel>
+                          <FormControl>
+                            <Input
+                              className="rounded-[6px]"
+                              placeholder="Seed"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </Form>
+                <div className="flex items-center gap-2">
+                  <Button
+                    className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
+                    onClick={onGenerate}
+                  >
+                    Generate and Mint
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="rounded-full text-sm leading-6 text-black underline"
+                    onClick={() => {
+                      setMintType('quick')
+                    }}
+                  >
+                    Quick Mint
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -1072,12 +1081,16 @@ const ModelTabs: React.FC<ModelTabsProps> = ({
   loadingGetModels,
   onSelectModel,
 }) => (
-  <Tabs value={selectedModel} onValueChange={onSelectModel} className="flex">
+  <Tabs
+    value={selectedModel}
+    onValueChange={onSelectModel}
+    className="flex rounded-[8px]"
+  >
     <TabsList className="flex-1 border border-slate-300 bg-white">
       {featureModels.map((model, index) => (
         <TabsTrigger
           key={model.name}
-          className="flex-1 gap-2 data-[state=active]:bg-black data-[state=active]:text-white"
+          className="flex-1 gap-1 rounded-[8px] data-[state=active]:bg-[#CDF138]"
           value={model.name}
         >
           <span>Model {index + 1}</span>
