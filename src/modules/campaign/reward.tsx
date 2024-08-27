@@ -141,7 +141,7 @@ export function CampaignReward() {
           className="bg-campaign-reward-work flex h-auto w-auto flex-1 flex-col rounded-2xl bg-cover p-12 text-white"
           containerClassName="flex-1 flex flex-col"
           gradientColor="#CDF138"
-          gradientOpacity={0.3}
+          gradientOpacity={0.25}
         >
           <div
             className={cn(
@@ -158,8 +158,10 @@ export function CampaignReward() {
             )}
           >
             <div className="flex gap-6">
-              <div className="flex flex-1 flex-col gap-2">
-                <div className="text-[24px] leading-[29px]">Step 1</div>
+              <div className="group/item flex flex-1 flex-col gap-2">
+                <div className="text-[24px] leading-[29px] transition-all group-hover/item:translate-x-1 group-hover/item:text-[#CDF138]">
+                  Step 1
+                </div>
                 <div className="text-[24px] font-semibold leading-[29px]">
                   Choose a model
                 </div>
@@ -168,8 +170,10 @@ export function CampaignReward() {
                   creating a specific visual style.
                 </div>
               </div>
-              <div className="flex flex-1 flex-col gap-2">
-                <div className="text-[24px] leading-[29px]">Step 2</div>
+              <div className="group/item flex flex-1 flex-col gap-2">
+                <div className="text-[24px] leading-[29px] transition-all group-hover/item:translate-x-1 group-hover/item:text-[#CDF138]">
+                  Step 2
+                </div>
                 <div className="text-[24px] font-semibold leading-[29px]">
                   Write a prompt
                 </div>
@@ -181,8 +185,10 @@ export function CampaignReward() {
               </div>
             </div>
             <div className="flex gap-6">
-              <div className="flex flex-1 flex-col gap-2">
-                <div className="text-[24px] leading-[29px]">Step 3</div>
+              <div className="group/item flex flex-1 flex-col gap-2">
+                <div className="text-[24px] leading-[29px] transition-all group-hover/item:translate-x-1 group-hover/item:text-[#CDF138]">
+                  Step 3
+                </div>
                 <div className="text-[24px] font-semibold leading-[29px]">
                   Generate and min
                 </div>
@@ -192,8 +198,10 @@ export function CampaignReward() {
                   per day.
                 </div>
               </div>
-              <div className="flex flex-1 flex-col gap-2">
-                <div className="text-[24px] leading-[29px]">Step 4</div>
+              <div className="group/item flex flex-1 flex-col gap-2">
+                <div className="text-[24px] leading-[29px] transition-all group-hover/item:translate-x-1 group-hover/item:text-[#CDF138]">
+                  Step 4
+                </div>
                 <div className="text-[24px] font-semibold leading-[29px]">
                   Upload and share
                 </div>
