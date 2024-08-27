@@ -36,31 +36,20 @@ const ShimmerButton = React.forwardRef<HTMLButtonElement, ShimmerButtonProps>(
             '--radius': borderRadius,
             '--speed': shimmerDuration,
             '--cut': shimmerSize,
-            '--bg': background,
+            // '--bg': background,
           } as CSSProperties
         }
         className={cn(
-          'group relative z-0 flex cursor-pointer items-center justify-center overflow-hidden whitespace-nowrap border border-white/10 text-white [background:var(--bg)] [border-radius:var(--radius)] dark:text-black',
-          'transform-gpu transition-transform duration-300 ease-in-out active:translate-y-[1px]',
+          '[--bg:rgba(0,0,0,1)] hover:[--bg:#CDF138]',
+          'group relative z-0 flex cursor-pointer items-center justify-center overflow-hidden whitespace-nowrap border border-white/10 text-white dark:text-black',
+          '[background:var(--bg)] [border-radius:var(--radius)]',
+          'transform-gpu transition-all active:translate-y-[1px]',
           className,
         )}
         ref={ref}
         {...props}
       >
         {/* spark container */}
-        <div
-          className={cn(
-            '-z-30 blur-[2px]',
-            'absolute inset-0 overflow-visible [container-type:size]',
-          )}
-        >
-          {/* spark */}
-          <div className="animate-slide absolute inset-0 h-[100cqh] [aspect-ratio:1] [border-radius:0] [mask:none]">
-            {/* spark before */}
-            <div className="animate-spin-around absolute inset-[-100%] w-auto rotate-0 [background:conic-gradient(from_calc(270deg-(var(--spread)*0.5)),transparent_0,var(--shimmer-color)_var(--spread),transparent_var(--spread))] [translate:0_0]" />
-          </div>
-        </div>
-        {children}
 
         {/* Highlight */}
         <div
@@ -70,7 +59,7 @@ const ShimmerButton = React.forwardRef<HTMLButtonElement, ShimmerButtonProps>(
             'rounded-2xl text-sm font-medium shadow-[inset_0_-8px_10px_#ffffff1f]',
 
             // transition
-            'transform-gpu transition-all duration-300 ease-in-out',
+            'transform-gpu transition-all',
 
             // on hover
             'group-hover:shadow-[inset_0_-6px_10px_#ffffff3f]',
