@@ -18,10 +18,11 @@ const inter = Inter({ subsets: ['latin'] })
 export function Leaderboard() {
   const [page, setPage] = useState(1)
   const [data, setData] = useState<any>([])
+  const [loading, setLoading] = useState(false)
   const [hasNextPage, setHasNextPage] = useState(false)
 
   const getData = async (currentPage?: number) => {
-    setData([])
+    setLoading(true)
 
     try {
       const res = await fetch(
@@ -34,8 +35,11 @@ export function Leaderboard() {
       }
       setData(data.items)
       setHasNextPage(data.pageInfo.hasNextPage)
+      if (currentPage) setPage(currentPage)
     } catch (error) {
       setData([])
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -47,12 +51,12 @@ export function Leaderboard() {
     <div className="relative overflow-hidden bg-[#F6F8FC] pb-20 pt-[120px]">
       <div
         className={cn(
-          'animate-pop-blob absolute -right-12 -top-20 h-80 w-80 rounded-sm bg-[#877DFF]/20 p-8 mix-blend-multiply blur-3xl filter',
+          'absolute -right-12 -top-20 h-80 w-80 animate-pop-blob rounded-sm bg-[#877DFF]/20 p-8 mix-blend-multiply blur-3xl filter',
         )}
       />
       <div
         className={cn(
-          'animate-pop-blob absolute -bottom-24 -left-24 h-80 w-80 rounded-sm bg-[#CDF138]/80 p-8 mix-blend-multiply blur-3xl filter',
+          'absolute -bottom-24 -left-24 h-80 w-80 animate-pop-blob rounded-sm bg-[#CDF138]/80 p-8 mix-blend-multiply blur-3xl filter',
         )}
       />
       <div className="container px-0">
@@ -64,7 +68,7 @@ export function Leaderboard() {
         >
           Mint Leaderboard
         </div>
-        <div className="mt-[50px] w-full overflow-auto">
+        <div className="relative mt-[50px] w-full overflow-auto">
           <div className="table w-full border-spacing-y-4">
             <div
               className={cn(
@@ -84,24 +88,55 @@ export function Leaderboard() {
                 key={index}
                 className="table-row font-sfMono text-[20px] font-semibold leading-[24px] text-[#171717]"
               >
-                <div className="table-cell items-center rounded-l-[16px] border bg-[#F8FAFD]/60 py-7 pl-4">
+                <div
+                  className={cn(
+                    'table-cell items-center rounded-l-[16px] border border-[#E5E5E5] bg-[#F8FAFD]/60 py-7 pl-4',
+                    {
+                      'border-y-[3px] border-l-[3px] border-y-[#CDF138] border-l-[#CDF138]':
+                        index === 0 && page === 1,
+                    },
+                  )}
+                >
                   {index + 1 + (page - 1) * 10 < 10
                     ? `0${index + 1 + (page - 1) * 10}`
                     : index + 1 + (page - 1) * 10}
                 </div>
-                <div className="table-cell border-y bg-[#F8FAFD]/60 pl-4">
+                <div
+                  className={cn('table-cell border-y bg-[#F8FAFD]/60 pl-4', {
+                    'border-y-[3px] border-y-[#CDF138]':
+                      index === 0 && page === 1,
+                  })}
+                >
                   {item.epoch_address.slice(0, 6)}...
                   {item.epoch_address.slice(-4)}
                 </div>
-                <div className="table-cell border-y bg-[#F8FAFD]/60 pl-4">
+                <div
+                  className={cn('table-cell border-y bg-[#F8FAFD]/60 pl-4', {
+                    'border-y-[3px] border-y-[#CDF138]':
+                      index === 0 && page === 1,
+                  })}
+                >
                   {item.score}
                 </div>
-                <div className="table-cell rounded-r-[16px] border-y border-r bg-[#F8FAFD]/60 pl-4">
+                <div
+                  className={cn(
+                    'table-cell rounded-r-[16px] border-y border-r bg-[#F8FAFD]/60 pl-4',
+                    {
+                      'border-y-[3px] border-r-[3px] border-y-[#CDF138] border-r-[#CDF138]':
+                        index === 0 && page === 1,
+                    },
+                  )}
+                >
                   87654
                 </div>
               </div>
             ))}
           </div>
+          {loading && (
+            <div className="absolute bottom-4 left-0 right-0 top-0 flex items-center justify-center bg-white/30">
+              <span className="i-mingcute-loading-fill h-6 w-6 animate-spin" />
+            </div>
+          )}
         </div>
         <div className="mt-[18px]">
           <Pagination>
@@ -113,7 +148,6 @@ export function Leaderboard() {
                   }
                   onClick={() => {
                     if (page > 1) {
-                      setPage(page - 1)
                       getData(page - 1)
                     }
                   }}
@@ -129,7 +163,6 @@ export function Leaderboard() {
                   <PaginationLink
                     className="cursor-pointer"
                     onClick={() => {
-                      setPage(page + 1)
                       getData(page + 1)
                     }}
                   >
@@ -144,7 +177,6 @@ export function Leaderboard() {
                   }
                   onClick={() => {
                     if (hasNextPage) {
-                      setPage(page + 1)
                       getData(page + 1)
                     }
                   }}
