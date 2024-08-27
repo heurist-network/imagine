@@ -11,21 +11,23 @@ import { FadeText } from '@/components/magicui/fade-text'
 import { NumberTicker } from '@/components/magicui/number-ticker'
 import SwapText from '@/components/magicui/swap-text'
 import { TextGenerateEffect } from '@/components/magicui/text-generate-effect'
+import { EpochRewardsData, getEpochRewards } from '@/lib/endpoints'
 import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export function CampaignPreview() {
-  // 当前时间距离某个时刻的间隔时间。按照天，小时，分钟来计算
-  const endTime = new Date('2024-09-10')
-
   const [days, setDays] = useState(0)
   const [hours, setHours] = useState(0)
   const [minutes, setMinutes] = useState(0)
+  const [rewardsData, setRewardsData] = useState<EpochRewardsData | null>(null)
 
   const calculateTime = () => {
     const now = new Date()
-    const diff = endTime.getTime() - now.getTime()
+    // 2024-08-23T00:00:00Z
+    const diff = rewardsData?.epochCutoffTime
+      ? new Date(rewardsData.epochCutoffTime).getTime() - now.getTime()
+      : 0
     const days = Math.floor(diff / (1000 * 60 * 60 * 24))
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
@@ -37,11 +39,22 @@ export function CampaignPreview() {
 
   useLayoutEffect(() => {
     calculateTime()
+    fetchRewardsData()
   }, [])
 
   useInterval(() => {
     calculateTime()
   }, 1000)
+
+  const fetchRewardsData = async () => {
+    try {
+      // optional epoch param: 'epoch_1'
+      const data = await getEpochRewards()
+      setRewardsData(data)
+    } catch (error) {
+      console.error('Error fetching epoch rewards:', error)
+    }
+  }
 
   return (
     <div className="h-[1110px] bg-campaign-preview bg-cover">
@@ -146,7 +159,9 @@ export function CampaignPreview() {
               Pool 1
             </div>
             <div className="flex gap-4 font-sfMono text-[72px] leading-[86px]">
-              <NumberTicker value="73505.3" />
+              <NumberTicker
+                value={rewardsData?.pool1TotalRewards.toFixed(1) || '0.0'}
+              />
               <span>ZK</span>
             </div>
           </div>
@@ -160,7 +175,9 @@ export function CampaignPreview() {
               Pool 2
             </div>
             <div className="flex gap-4 font-sfMono text-[72px] leading-[86px]">
-              <NumberTicker value="73505.3" />
+              <NumberTicker
+                value={rewardsData?.pool2TotalRewards.toFixed(1) || '0.0'}
+              />
               <span>ZK</span>
             </div>
           </div>
