@@ -103,16 +103,32 @@ export function CampaignReward() {
       <div className="container relative z-10 flex gap-5 px-0 py-[233px]">
         <div className="flex flex-col gap-5">
           <div className="group flex h-[178px] w-[466px] flex-col gap-2 rounded-2xl bg-[#CDF138] px-12 py-[33px] transition-colors hover:bg-black">
-            <div
-              className={cn(
-                'text-[32px] leading-[42px] text-[#080808] transition-colors group-hover:text-[#CDF138]',
-                inter.className,
-              )}
-            >
-              My Score
+            <div className="flex justify-between">
+              <div
+                className={cn(
+                  'text-[32px] leading-[42px] text-[#080808] transition-colors group-hover:text-[#CDF138]',
+                  inter.className,
+                )}
+              >
+                My Score
+              </div>
+
+              <div
+                className={cn(
+                  'text-[32px] leading-[42px] text-[#080808] transition-colors group-hover:text-[#CDF138]',
+                  inter.className,
+                )}
+              >
+                Rank
+              </div>
             </div>
-            <div className="font-sfMono text-[48px] font-bold leading-[62px] text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]">
-              {userRewards ? userRewards.score.toLocaleString() : '---'}
+            <div className="flex justify-between">
+              <div className="font-sfMono text-[48px] font-bold leading-[62px] text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]">
+                {userRewards ? userRewards.score.toLocaleString() : '---'}
+              </div>
+              <div className="font-sfMono text-[48px] font-bold leading-[62px] text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]">
+                {userRewards ? userRewards.ranking : '---'}
+              </div>
             </div>
           </div>
           <div className="group flex h-[178px] w-[466px] cursor-pointer flex-col gap-2 rounded-2xl bg-[#CDF138] px-12 py-[21px] transition-colors hover:bg-black">
