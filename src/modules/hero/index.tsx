@@ -54,23 +54,6 @@ export function Hero() {
         >
           a decentralized network of GPUs
         </motion.h1>
-        <motion.p
-          className="mt-8 text-center text-lg text-muted-foreground"
-          variants={VARIANTS}
-        >
-          <b>Call for model creators:</b> Want to get your models listed and
-          earn HUE token rewards?
-        </motion.p>
-        <motion.div variants={VARIANTS} whileHover={{ scale: 1.03 }}>
-          <Link
-            href="mailto:team@heurist.xyz"
-            className="flex items-center space-x-2.5 rounded-lg px-3 text-center text-sm"
-          >
-            <span className="i-ri-mail-send-line" />
-            <Separator orientation="vertical" className="h-4" />
-            <b>team@heurist.xyz</b>
-          </Link>
-        </motion.div>
         <motion.div
           variants={VARIANTS}
           className="mt-8 hidden items-center gap-4 md:flex"
