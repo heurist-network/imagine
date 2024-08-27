@@ -1,8 +1,13 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
+import { useAccount } from 'wagmi'
 
 import { MagicCard } from '@/components/magicui/magic-card'
 import Marquee from '@/components/magicui/marquee'
+import { getUserRewards, UserRewardsData } from '@/lib/endpoints'
 import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -28,6 +33,24 @@ export function Arrow({ className }: { className?: string }) {
 }
 
 export function CampaignReward() {
+  const { address } = useAccount()
+  const [userRewards, setUserRewards] = useState<UserRewardsData | null>(null)
+
+  useEffect(() => {
+    const fetchUserRewards = async () => {
+      if (address) {
+        try {
+          const rewards = await getUserRewards(address)
+          setUserRewards(rewards)
+        } catch (error) {
+          console.error('Error fetching user rewards:', error)
+        }
+      }
+    }
+
+    fetchUserRewards()
+  }, [address])
+
   return (
     <div className="relative h-[1040px]">
       <div className="absolute inset-0 flex flex-col gap-[55px] bg-white pt-[76px]">
@@ -89,7 +112,7 @@ export function CampaignReward() {
               My Score
             </div>
             <div className="font-sfMono text-[48px] font-bold leading-[62px] text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]">
-              123456
+              {userRewards ? userRewards.score.toLocaleString() : '---'}
             </div>
           </div>
           <div className="group flex h-[178px] w-[466px] cursor-pointer flex-col gap-2 rounded-2xl bg-[#CDF138] px-12 py-[21px] transition-colors hover:bg-black">
@@ -102,7 +125,7 @@ export function CampaignReward() {
               My Pool 1 Rewards
             </div>
             <div className="font-sfMono text-[48px] font-bold leading-[62px] text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]">
-              45.3 ZK
+              {userRewards ? userRewards.pool1_rewards.toFixed(2) : '---'} ZK
             </div>
             <div className="flex justify-between">
               <div className="rounded-[2px] bg-white px-2">
@@ -124,7 +147,7 @@ export function CampaignReward() {
               My Pool 2 Rewards
             </div>
             <div className="font-sfMono text-[48px] font-bold leading-[62px] text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]">
-              45.3 ZK
+              {userRewards ? userRewards.pool2_rewards.toFixed(2) : '---'} ZK
             </div>
             <div className="flex justify-between">
               <div className="rounded-[2px] bg-white px-2">
@@ -179,7 +202,7 @@ export function CampaignReward() {
                 </div>
                 <div className="font-sfMono text-base leading-[18px] text-white/90">
                   Describe the image using natural language to convey your
-                  wishes. It’s recommended to use key words separated by commas.
+                  wishes. It's recommended to use key words separated by commas.
                   Click on the preset images to get inspired.
                 </div>
               </div>

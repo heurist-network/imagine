@@ -1,3 +1,5 @@
+import { getAddress } from 'viem'
+
 export const API_NOTIFY_IMAGE_GEN =
   'https://uoub6ss185.execute-api.us-east-1.amazonaws.com/prod/notify-image-gen'
 
@@ -49,8 +51,17 @@ export const getEpochRewards = async (
 }
 
 /**
- * API endpoint for fetching user rewards.
+ * >> API endpoint for fetching user rewards.
  */
+export interface UserRewardsData {
+  address: string
+  epoch: string
+  score: number
+  pool1_rewards: number
+  pool2_rewards: number
+  ranking: number
+}
+
 export const API_USER_REWARDS =
   'https://xl53ziu42g.execute-api.us-east-1.amazonaws.com/prod/user-rewards'
 
@@ -58,14 +69,36 @@ export const API_USER_REWARDS =
  * Fetches user rewards for a given address and optional epoch.
  * @param {string} address - The user's address.
  * @param {string} [epoch] - Optional epoch parameter.
- * @returns {Promise<any>} A promise that resolves to the user rewards data.
+ * @returns {Promise<UserRewardsData>} A promise that resolves to the user rewards data.
  */
-export const getUserRewards = async (address: string, epoch?: string) => {
-  const params = new URLSearchParams({ address })
-  if (epoch) params.append('epoch', epoch)
-  const response = await fetch(`${API_USER_REWARDS}?${params}`)
-  console.log('debug user rewards', await response.json())
-  return response.json()
+export const getUserRewards = async (
+  address: string,
+  epoch?: string,
+): Promise<UserRewardsData> => {
+  try {
+    const params = new URLSearchParams({ address })
+    const lowerCaseAddress = address.toLowerCase()
+
+    params.set('address', lowerCaseAddress)
+    if (epoch) params.append('epoch', epoch)
+    const response = await fetch(`${API_USER_REWARDS}?${params}`)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const data: UserRewardsData = await response.json()
+    console.log('debug user rewards', data)
+    return data
+  } catch (error) {
+    console.error('Error fetching user rewards:', error)
+    return {
+      address: address,
+      epoch: epoch || '',
+      score: 0,
+      pool1_rewards: 0,
+      pool2_rewards: 0,
+      ranking: 0,
+    }
+  }
 }
 
 /**
