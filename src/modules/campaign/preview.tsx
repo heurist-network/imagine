@@ -9,6 +9,7 @@ import { ArrowIcon } from '@/components/icon/arrow'
 import BlurIn from '@/components/magicui/blur-in'
 import { FadeText } from '@/components/magicui/fade-text'
 import { NumberTicker } from '@/components/magicui/number-ticker'
+import SwapText from '@/components/magicui/swap-text'
 import { TextGenerateEffect } from '@/components/magicui/text-generate-effect'
 import { cn } from '@/lib/utils'
 
@@ -43,7 +44,7 @@ export function CampaignPreview() {
   }, 1000)
 
   return (
-    <div className="bg-campaign-preview h-[1110px] bg-cover">
+    <div className="h-[1110px] bg-campaign-preview bg-cover">
       <div className="container px-0 py-[135px]">
         <div className="flex gap-12">
           <div className="w-[682px]">
@@ -54,7 +55,7 @@ export function CampaignPreview() {
               )}
               direction="up"
               framerProps={{
-                show: { transition: { delay: 0.2, duration: 0.6 } },
+                show: { transition: { delay: 0.2, duration: 0.7 } },
               }}
               text="CREATE WITH AI"
             />
@@ -65,17 +66,18 @@ export function CampaignPreview() {
               )}
               direction="up"
               framerProps={{
-                show: { transition: { delay: 0.35, duration: 0.6 } },
+                show: { transition: { delay: 0.4, duration: 0.7 } },
               }}
               text="EARN ZK TOKEN"
             />
             <div className="flex justify-end">
               <BlurIn className="group mt-6 flex cursor-pointer items-center justify-end gap-4">
-                <div
-                  className={cn('text-[24px] font-semibold', inter.className)}
-                >
-                  Mint Now
-                </div>
+                <SwapText
+                  initialText="Mint Now"
+                  finalText="Mint Now"
+                  supportsHover
+                  textClassName="text-[24px] font-semibold"
+                />
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#1D1D1B] text-white transition-colors group-hover:bg-[#CDF138] group-hover:text-black">
                   <ArrowIcon
                     size={32}
@@ -143,7 +145,7 @@ export function CampaignPreview() {
             >
               Pool 1
             </div>
-            <div className="font-sfMono flex gap-4 text-[72px] leading-[86px]">
+            <div className="flex gap-4 font-sfMono text-[72px] leading-[86px]">
               <NumberTicker value="73505.3" />
               <span>ZK</span>
             </div>
@@ -157,14 +159,14 @@ export function CampaignPreview() {
             >
               Pool 2
             </div>
-            <div className="font-sfMono flex gap-4 text-[72px] leading-[86px]">
+            <div className="flex gap-4 font-sfMono text-[72px] leading-[86px]">
               <NumberTicker value="73505.3" />
               <span>ZK</span>
             </div>
           </div>
         </div>
         <div className="mt-24 flex">
-          <div className="font-sfMono relative max-w-[750px] bg-white py-3 pl-14 pr-6 text-base leading-[19px] -tracking-[0.0075em]">
+          <div className="relative max-w-[750px] bg-white py-3 pl-14 pr-6 font-sfMono text-base leading-[19px] -tracking-[0.0075em]">
             <Image
               className="absolute left-6 top-3"
               src="/icon/plus.svg"

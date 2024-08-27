@@ -62,6 +62,10 @@ const config = {
           'blur-25': 'blur(25px)',
         },
       },
+      transitionTimingFunction: {
+        slow: 'cubic-bezier(.405, 0, .025, 1)',
+        'minor-spring': 'cubic-bezier(0.18,0.89,0.82,1.04)',
+      },
       backgroundImage: {
         logo: 'linear-gradient(to right,#C57CFF,#FF71D4,#FF80A2,#FFA676)',
         'section-title':
