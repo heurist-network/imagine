@@ -16,6 +16,8 @@ import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })
 
+const PAGE_SIZE = 20;
+
 export function Leaderboard() {
   const [page, setPage] = useState(1)
   const [data, setData] = useState<LeaderboardData[]>([])
@@ -98,9 +100,9 @@ export function Leaderboard() {
                     },
                   )}
                 >
-                  {index + 1 + (page - 1) * 10 < 10
-                    ? `0${index + 1 + (page - 1) * 10}`
-                    : index + 1 + (page - 1) * 10}
+                  {index + 1 + (page - 1) * PAGE_SIZE < 10
+                    ? `0${index + 1 + (page - 1) * PAGE_SIZE}`
+                    : index + 1 + (page - 1) * PAGE_SIZE}
                 </div>
                 <div
                   className={cn('table-cell border-y bg-[#F8FAFD]/60 pl-4', {
