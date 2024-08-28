@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { motion, Variants } from 'framer-motion'
 
 type FadeTextProps = {
+  id?: string
   className?: string
   direction?: 'up' | 'down' | 'left' | 'right'
   framerProps?: Variants
@@ -11,6 +12,7 @@ type FadeTextProps = {
 }
 
 export function FadeText({
+  id,
   direction = 'up',
   className,
   framerProps = {
@@ -53,7 +55,9 @@ export function FadeText({
       viewport={{ once: true }}
       variants={FADE_ANIMATION_VARIANTS}
     >
-      <motion.div className={className}>{text}</motion.div>
+      <motion.div className={className} id={id}>
+        {text}
+      </motion.div>
     </motion.div>
   )
 }

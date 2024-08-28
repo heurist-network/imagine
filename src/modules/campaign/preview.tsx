@@ -1,8 +1,9 @@
 'use client'
 
-import { useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
+import { PowerGlitch } from 'powerglitch'
 import { useInterval } from 'usehooks-ts'
 
 import { ArrowIcon } from '@/components/icon/arrow'
@@ -48,15 +49,6 @@ export function CampaignPreview() {
     setSprint(currentSprint)
   }
 
-  useLayoutEffect(() => {
-    calculateTime()
-    fetchRewardsData()
-  }, [])
-
-  useInterval(() => {
-    calculateTime()
-  }, 1000)
-
   const fetchRewardsData = async () => {
     try {
       // optional epoch param: 'epoch_1'
@@ -66,6 +58,22 @@ export function CampaignPreview() {
       console.error('Error fetching epoch rewards:', error)
     }
   }
+
+  useLayoutEffect(() => {
+    calculateTime()
+    fetchRewardsData()
+  }, [])
+
+  useInterval(() => {
+    calculateTime()
+  }, 1000)
+
+  useEffect(() => {
+    PowerGlitch.glitch('#zk-token', {
+      playMode: 'hover',
+      hideOverflow: false,
+    })
+  }, [])
 
   return (
     <div className="flex h-[calc(100vh-56px)] min-h-[800px] items-center bg-campaign-preview bg-cover md:min-h-[1100px] lg:min-h-[1200px] xl:min-h-[1100px] 2xl:min-h-[900px]">
@@ -86,6 +94,7 @@ export function CampaignPreview() {
                 text="CREATE WITH AI"
               />
               <FadeText
+                id="zk-token"
                 className={cn(
                   inter.className,
                   '-mt-2 mr-2 !italic text-[#7269E1]',
