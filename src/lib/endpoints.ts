@@ -46,7 +46,6 @@ export const getEpochRewards = async (
     throw new Error(`HTTP error! status: ${response.status}`)
   }
   const data: EpochRewardsData = await response.json()
-  console.log('debug epoch rewards', data)
   return data
 }
 
@@ -87,7 +86,6 @@ export const getUserRewards = async (
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     const data: UserRewardsData = await response.json()
-    console.log('debug user rewards', data)
     return data
   } catch (error) {
     console.error('Error fetching user rewards:', error)
@@ -154,7 +152,6 @@ export const getLeaderboard = async (
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     const data: LeaderboardResponse = await response.json()
-    console.log('debug leaderboard', data)
     return data
   } catch (error) {
     console.error('Error fetching leaderboard data:', error)
