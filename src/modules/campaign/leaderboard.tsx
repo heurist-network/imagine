@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Inter } from 'next/font/google'
+import { useAccount } from 'wagmi'
 
 import {
   Pagination,
@@ -11,7 +12,12 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
-import { getLeaderboard, LeaderboardData } from '@/lib/endpoints'
+import {
+  getLeaderboard,
+  getUserRewards,
+  LeaderboardData,
+  UserRewardsData,
+} from '@/lib/endpoints'
 import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -24,6 +30,8 @@ export function Leaderboard() {
   const [sprint, setSprint] = useState('')
   const [loading, setLoading] = useState(false)
   const [hasNextPage, setHasNextPage] = useState(false)
+  const [userRank, setUserRank] = useState<UserRewardsData | null>(null)
+  const { address } = useAccount()
 
   const getData = async (currentPage?: number) => {
     setLoading(true)
@@ -37,6 +45,14 @@ export function Leaderboard() {
       if (response.items[0]) {
         setSprint(response.items[0].epoch.toString())
       }
+
+      // Fetch user's rank if address is available
+      if (address) {
+        const userRewards = await getUserRewards(address)
+        setUserRank(userRewards)
+      } else {
+        setUserRank(null)
+      }
     } catch (error) {
       console.error('Error fetching leaderboard data:', error)
       setData([])
@@ -47,7 +63,7 @@ export function Leaderboard() {
 
   useEffect(() => {
     getData()
-  }, [])
+  }, [address])
 
   return (
     <div className="relative overflow-hidden bg-[#F6F8FC] pb-20 pt-[120px]">
@@ -93,66 +109,33 @@ export function Leaderboard() {
                 ZK Token Rewords
               </div>
             </div>
+            {/* User's rank (if available) */}
+            {userRank && (
+              <LeaderboardRow
+                item={{
+                  epoch_address: userRank.address,
+                  mint_count: userRank.mint_count,
+                  score: userRank.score,
+                  zk_cashback: userRank.pool1_rewards + userRank.pool2_rewards,
+                  epoch: parseInt(userRank.epoch),
+                  ranking: userRank.ranking,
+                  pay_in_eth: 0,
+                }}
+                index={userRank.ranking} // Special index to indicate it's the user's row
+                page={1}
+                PAGE_SIZE={PAGE_SIZE}
+                isUser={true}
+              />
+            )}
+
             {data.map((item: LeaderboardData, index: number) => (
-              <div
+              <LeaderboardRow
                 key={index}
-                className={cn(
-                  'table-row font-sfMono font-semibold text-[#171717]',
-                  'text-[16px] leading-[1.2] lg:text-[20px]',
-                )}
-              >
-                <div
-                  className={cn(
-                    'table-cell items-center rounded-l-[16px] border border-[#E5E5E5] bg-[#F8FAFD]/60 py-7 pl-4',
-                    {
-                      'border-y-[3px] border-l-[3px] border-y-[#CDF138] border-l-[#CDF138]':
-                        index === 0 && page === 1,
-                    },
-                  )}
-                >
-                  {index + 1 + (page - 1) * PAGE_SIZE < 10
-                    ? `0${index + 1 + (page - 1) * PAGE_SIZE}`
-                    : index + 1 + (page - 1) * PAGE_SIZE}
-                </div>
-                <div
-                  className={cn('table-cell border-y bg-[#F8FAFD]/60 pl-4', {
-                    'border-y-[3px] border-y-[#CDF138]':
-                      index === 0 && page === 1,
-                  })}
-                >
-                  {item.epoch_address?.slice(0, 6)}...
-                  {item.epoch_address?.slice(-4)}
-                </div>
-                <div
-                  className={cn('table-cell border-y bg-[#F8FAFD]/60 pl-4', {
-                    'border-y-[3px] border-y-[#CDF138]':
-                      index === 0 && page === 1,
-                  })}
-                >
-                  {item.mint_count}
-                </div>
-
-                <div
-                  className={cn('table-cell border-y bg-[#F8FAFD]/60 pl-4', {
-                    'border-y-[3px] border-y-[#CDF138]':
-                      index === 0 && page === 1,
-                  })}
-                >
-                  {item.score}
-                </div>
-
-                <div
-                  className={cn(
-                    'table-cell rounded-r-[16px] border-y border-r bg-[#F8FAFD]/60 pl-4',
-                    {
-                      'border-y-[3px] border-r-[3px] border-y-[#CDF138] border-r-[#CDF138]':
-                        index === 0 && page === 1,
-                    },
-                  )}
-                >
-                  {item.zk_cashback}
-                </div>
-              </div>
+                item={item}
+                index={index}
+                page={page}
+                PAGE_SIZE={PAGE_SIZE}
+              />
             ))}
           </div>
           {loading && (
@@ -214,6 +197,79 @@ export function Leaderboard() {
             </PaginationContent>
           </Pagination>
         </div>
+      </div>
+    </div>
+  )
+}
+
+interface LeaderboardRowProps {
+  item: LeaderboardData
+  index: number
+  page: number
+  PAGE_SIZE: number
+  isUser?: boolean
+}
+
+export function LeaderboardRow({
+  item,
+  index,
+  page,
+  PAGE_SIZE,
+  isUser,
+}: LeaderboardRowProps) {
+  return (
+    <div
+      className={cn(
+        'table-row font-sfMono font-semibold text-[#171717]',
+        'text-[16px] leading-[1.2] lg:text-[20px]',
+      )}
+    >
+      <div
+        className={cn(
+          'table-cell items-center rounded-l-[16px] border border-[#E5E5E5] bg-[#F8FAFD]/60 py-7 pl-4',
+          {
+            'border-y-[3px] border-l-[3px] border-y-[#CDF138] border-l-[#CDF138]':
+              isUser,
+          },
+        )}
+      >
+        {index + 1 + (page - 1) * PAGE_SIZE < 10
+          ? `0${index + 1 + (page - 1) * PAGE_SIZE}`
+          : index + 1 + (page - 1) * PAGE_SIZE}
+      </div>
+      <div
+        className={cn('table-cell border-y bg-[#F8FAFD]/60 pl-4', {
+          'border-y-[3px] border-y-[#CDF138]': isUser,
+        })}
+      >
+        {isUser
+          ? 'My Wallet'
+          : `${item.epoch_address?.slice(0, 6)}...${item.epoch_address?.slice(-4)}`}
+      </div>
+      <div
+        className={cn('table-cell border-y bg-[#F8FAFD]/60 pl-4', {
+          'border-y-[3px] border-y-[#CDF138]': isUser,
+        })}
+      >
+        {item.mint_count}
+      </div>
+      <div
+        className={cn('table-cell border-y bg-[#F8FAFD]/60 pl-4', {
+          'border-y-[3px] border-y-[#CDF138]': isUser,
+        })}
+      >
+        {item.score}
+      </div>
+      <div
+        className={cn(
+          'table-cell rounded-r-[16px] border-y border-r bg-[#F8FAFD]/60 pl-4',
+          {
+            'border-y-[3px] border-r-[3px] border-y-[#CDF138] border-r-[#CDF138]':
+              isUser,
+          },
+        )}
+      >
+        {item.zk_cashback}
       </div>
     </div>
   )

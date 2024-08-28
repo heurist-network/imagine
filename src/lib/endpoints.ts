@@ -60,6 +60,7 @@ export interface UserRewardsData {
   pool1_rewards: number
   pool2_rewards: number
   ranking: number
+  mint_count: number
 }
 
 export const API_USER_REWARDS =
