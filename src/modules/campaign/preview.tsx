@@ -76,7 +76,12 @@ export function CampaignPreview() {
   }, [])
 
   return (
-    <div className="flex h-[calc(100vh-56px)] min-h-[800px] items-center bg-campaign-preview bg-cover md:min-h-[1100px] lg:min-h-[1200px] xl:min-h-[1100px] 2xl:min-h-[900px]">
+    <div
+      className={cn(
+        'flex h-[calc(100vh-56px)] items-center bg-campaign-preview bg-cover',
+        'min-h-[800px] md:min-h-[1100px] lg:min-h-[1200px] xl:min-h-[1100px] 2xl:min-h-[900px]',
+      )}
+    >
       <div className="container">
         <div className="flex flex-col justify-between gap-6 2xl:flex-row 2xl:gap-12">
           <div className="flex flex-col justify-between 2xl:h-[293px]">
@@ -107,34 +112,36 @@ export function CampaignPreview() {
                 text="EARN ZK TOKEN"
               />
             </div>
-            <BlurIn
-              className="group mt-6 flex cursor-pointer items-center gap-4 md:justify-end 2xl:mt-0"
-              onClick={() => {
-                document.getElementById('featured-models')?.scrollIntoView({
-                  behavior: 'smooth',
-                })
-              }}
-            >
-              <SwapText
-                initialText="Mint Now"
-                finalText="Mint Now"
-                supportsHover
-                textClassName="text-[16px] font-semibold md:text-[16.8px] lg:text-[19.2px] xl:text-[21.6px] 2xl:text-[24px]"
-              />
-              <div
-                className={cn(
-                  'flex items-center justify-center rounded-full bg-[#1D1D1B] text-white transition-colors group-hover:bg-[#CDF138] group-hover:text-black',
-                  'h-8 w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 xl:h-14 xl:w-14 2xl:h-16 2xl:w-16',
-                )}
+            <div className="flex md:justify-end">
+              <BlurIn
+                className="group mt-6 flex cursor-pointer items-center gap-4 2xl:mt-0"
+                onClick={() => {
+                  document.getElementById('featured-models')?.scrollIntoView({
+                    behavior: 'smooth',
+                  })
+                }}
               >
-                <ArrowIcon
-                  className={cn(
-                    'transition-transform group-hover:rotate-45 group-hover:scale-105',
-                    'w-[18px] md:w-5 lg:w-6 xl:w-7 2xl:w-8',
-                  )}
+                <SwapText
+                  initialText="Mint Now"
+                  finalText="Mint Now"
+                  supportsHover
+                  textClassName="text-[16px] font-semibold md:text-[16.8px] lg:text-[19.2px] xl:text-[21.6px] 2xl:text-[24px]"
                 />
-              </div>
-            </BlurIn>
+                <div
+                  className={cn(
+                    'flex items-center justify-center rounded-full bg-[#1D1D1B] text-white transition-colors group-hover:bg-[#CDF138] group-hover:text-black',
+                    'h-8 w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 xl:h-14 xl:w-14 2xl:h-16 2xl:w-16',
+                  )}
+                >
+                  <ArrowIcon
+                    className={cn(
+                      'transition-transform group-hover:rotate-45 group-hover:scale-105',
+                      'w-[18px] md:w-5 lg:w-6 xl:w-7 2xl:w-8',
+                    )}
+                  />
+                </div>
+              </BlurIn>
+            </div>
           </div>
           <div className="flex flex-1 justify-center">
             <div className="grid max-w-[709px] flex-1 grid-cols-3 justify-between gap-5">
