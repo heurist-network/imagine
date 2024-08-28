@@ -20,21 +20,24 @@ export function CampaignPreview() {
   const [days, setDays] = useState(0)
   const [hours, setHours] = useState(0)
   const [minutes, setMinutes] = useState(0)
+  const [sprint, setSprint] = useState("")
   const [rewardsData, setRewardsData] = useState<EpochRewardsData | null>(null)
 
   const calculateTime = () => {
     const now = new Date()
-    // 2024-08-23T00:00:00Z
     const diff = rewardsData?.epochCutoffTime
       ? new Date(rewardsData.epochCutoffTime).getTime() - now.getTime()
       : 0
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+    const days = Math.max(Math.floor(diff / (1000 * 60 * 60 * 24)), 0)
+    const hours = Math.max(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)), 0)
+    const minutes = Math.max(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)), 0)
 
     setDays(days)
     setHours(hours)
     setMinutes(minutes)
+
+    const currentSprint = rewardsData ? rewardsData.currentEpoch.split("_")[1] : "";
+    setSprint(currentSprint);
   }
 
   useLayoutEffect(() => {
@@ -105,7 +108,7 @@ export function CampaignPreview() {
               <div
                 className={cn('font-sfMono text-2xl leading-[31px] text-white')}
               >
-                SPRINT 1
+                SPRINT {sprint}
               </div>
               <div className="font-sfMono text-[80px] font-bold leading-[95px]">
                 <NumberTicker className="text-[#cdf138]" value={String(days)} />
