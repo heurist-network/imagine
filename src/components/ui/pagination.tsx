@@ -8,19 +8,11 @@ import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export function Arrow({
-  className,
-  size = 24,
-}: {
-  className?: string
-  size?: number
-}) {
+export function Arrow({ className }: { className?: string; size?: number }) {
   return (
     <svg
       className={className}
       xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
       viewBox="0 0 16 16"
       fill="none"
     >
@@ -99,10 +91,14 @@ const PaginationPrevious = ({
   <PaginationLink
     aria-label="Go to previous page"
     size="default"
-    className={cn('h-16 w-16 rounded-full border border-[#BCBCBC]', className)}
+    className={cn(
+      'rounded-full border border-[#BCBCBC] p-0',
+      'h-16 w-16',
+      className,
+    )}
     {...props}
   >
-    <Arrow className="-rotate-[135deg] text-black/40" />
+    <Arrow className="w-6 -rotate-[135deg] text-black/40" />
   </PaginationLink>
 )
 PaginationPrevious.displayName = 'PaginationPrevious'
@@ -114,10 +110,13 @@ const PaginationNext = ({
   <PaginationLink
     aria-label="Go to next page"
     size="default"
-    className={cn('h-16 w-16 rounded-full border border-[#BCBCBC]', className)}
+    className={cn(
+      'h-16 w-16 rounded-full border border-[#BCBCBC] p-0',
+      className,
+    )}
     {...props}
   >
-    <Arrow className="rotate-45 text-black/40" />
+    <Arrow className="w-6 rotate-45 text-black/40" />
   </PaginationLink>
 )
 PaginationNext.displayName = 'PaginationNext'

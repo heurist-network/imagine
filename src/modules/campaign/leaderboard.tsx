@@ -61,20 +61,27 @@ export function Leaderboard() {
           'absolute -bottom-24 -left-24 h-80 w-80 animate-pop-blob rounded-sm bg-[#CDF138]/80 p-8 mix-blend-multiply blur-3xl filter',
         )}
       />
-      <div className="container px-0">
+      <div className="container">
         <div
           className={cn(
-            'text-[48px] font-semibold leading-[36px] -tracking-[0.0075em] text-[#080808]',
+            'font-semibold -tracking-[0.0075em] text-[#080808]',
+            'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
             inter.className,
           )}
         >
           Sprint {sprint} Leaderboard
         </div>
-        <div className="relative mt-[50px] w-full overflow-auto">
+        <div
+          className={cn(
+            'relative w-full overflow-auto',
+            'mt-[35px] md:mt-[38px] lg:mt-[42px] xl:mt-[46px] 2xl:mt-[50px]',
+          )}
+        >
           <div className="table w-full border-spacing-y-4">
             <div
               className={cn(
-                'table-row text-[20px] font-semibold leading-[24px] text-[#171717]/80',
+                'table-row font-semibold text-[#171717]/80',
+                'text-[16px] leading-[1.2] lg:text-[20px]',
                 inter.className,
               )}
             >
@@ -89,7 +96,10 @@ export function Leaderboard() {
             {data.map((item: LeaderboardData, index: number) => (
               <div
                 key={index}
-                className="table-row font-sfMono text-[20px] font-semibold leading-[24px] text-[#171717]"
+                className={cn(
+                  'table-row font-sfMono font-semibold text-[#171717]',
+                  'text-[16px] leading-[1.2] lg:text-[20px]',
+                )}
               >
                 <div
                   className={cn(
@@ -156,9 +166,10 @@ export function Leaderboard() {
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  className={
-                    page === 1 ? 'cursor-not-allowed' : 'cursor-pointer'
-                  }
+                  className={cn(
+                    page === 1 ? 'cursor-not-allowed' : 'cursor-pointer',
+                    'h-10 w-10 lg:h-16 lg:w-16',
+                  )}
                   onClick={() => {
                     if (page > 1) {
                       getData(page - 1)
@@ -167,14 +178,17 @@ export function Leaderboard() {
                 />
               </PaginationItem>
               <PaginationItem>
-                <PaginationLink className="cursor-pointer" isActive>
+                <PaginationLink
+                  className="h-10 w-10 cursor-pointer lg:h-16 lg:w-16"
+                  isActive
+                >
                   {page}
                 </PaginationLink>
               </PaginationItem>
               {hasNextPage && (
                 <PaginationItem>
                   <PaginationLink
-                    className="cursor-pointer"
+                    className="h-10 w-10 cursor-pointer lg:h-16 lg:w-16"
                     onClick={() => {
                       getData(page + 1)
                     }}
@@ -186,9 +200,10 @@ export function Leaderboard() {
 
               <PaginationItem>
                 <PaginationNext
-                  className={
-                    hasNextPage ? 'cursor-pointer' : 'cursor-not-allowed'
-                  }
+                  className={cn(
+                    hasNextPage ? 'cursor-pointer' : 'cursor-not-allowed',
+                    'h-10 w-10 lg:h-16 lg:w-16',
+                  )}
                   onClick={() => {
                     if (hasNextPage) {
                       getData(page + 1)

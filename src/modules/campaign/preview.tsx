@@ -80,7 +80,7 @@ export function CampaignPreview() {
       <div className="container">
         <div className="flex flex-col justify-between gap-6 2xl:flex-row 2xl:gap-12">
           <div className="flex flex-col justify-between 2xl:h-[293px]">
-            <div className="w-[682px]">
+            <div className="2xl:w-[682px]">
               <FadeText
                 className={cn(
                   inter.className,
