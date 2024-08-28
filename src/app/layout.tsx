@@ -13,9 +13,9 @@ import '../styles/globals.css'
 
 import { cn } from '@/lib/utils'
 
-const title = 'Imagine | AI Image generator by Heurist'
+const title = 'Heurist Imagine'
 const description =
-  'Access Stable Diffusion models on a decentralized network of GPUs. Create and reproduce IP without limiation. Showcase your creativity and earn cryptocurrencies.'
+  'Access Stable Diffusion models provided by a decentralized network of GPUs. Create and reproduce IP without limiation. Showcase your creativity and earn crypto.'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://imagine.heurist.ai'),
