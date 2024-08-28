@@ -19,6 +19,7 @@ const inter = Inter({ subsets: ['latin'] })
 export function Leaderboard() {
   const [page, setPage] = useState(1)
   const [data, setData] = useState<LeaderboardData[]>([])
+  const [sprint, setSprint] = useState("")
   const [loading, setLoading] = useState(false)
   const [hasNextPage, setHasNextPage] = useState(false)
 
@@ -30,6 +31,10 @@ export function Leaderboard() {
       setData(response.items)
       setHasNextPage(response.pageInfo.hasNextPage)
       if (currentPage) setPage(currentPage)
+      
+      if (response.items[0]) {
+        setSprint(response.items[0].epoch.toString())
+      }
     } catch (error) {
       console.error('Error fetching leaderboard data:', error)
       setData([])
@@ -61,7 +66,7 @@ export function Leaderboard() {
             inter.className,
           )}
         >
-          Mint Leaderboard
+          Sprint {sprint} Leaderboard
         </div>
         <div className="relative mt-[50px] w-full overflow-auto">
           <div className="table w-full border-spacing-y-4">

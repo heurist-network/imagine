@@ -202,7 +202,7 @@ export function CampaignReward() {
                   Step 1
                 </div>
                 <div className="text-[24px] font-semibold leading-[29px]">
-                  Choose a model
+                  Choose a Model
                 </div>
                 <div className="font-sfMono text-base leading-[18px] text-white/90">
                   Some models are general-purpose and some models excel at
@@ -214,11 +214,11 @@ export function CampaignReward() {
                   Step 2
                 </div>
                 <div className="text-[24px] font-semibold leading-[29px]">
-                  Write a prompt
+                  Write a Prompt
                 </div>
                 <div className="font-sfMono text-base leading-[18px] text-white/90">
                   Describe the image using natural language to convey your
-                  wishes. It's recommended to use key words separated by commas.
+                  wishes. It's recommended to use keywords separated by commas.
                   Click on the preset images to get inspired.
                 </div>
               </div>
@@ -229,7 +229,7 @@ export function CampaignReward() {
                   Step 3
                 </div>
                 <div className="text-[24px] font-semibold leading-[29px]">
-                  Generate and min
+                  Generate and Mint
                 </div>
                 <div className="font-sfMono text-base leading-[18px] text-white/90">
                   Mint fee is 0.0006 ETH on ZKsync Era. Partner NFT holders and
@@ -242,7 +242,7 @@ export function CampaignReward() {
                   Step 4
                 </div>
                 <div className="text-[24px] font-semibold leading-[29px]">
-                  Upload and share
+                  Upload and Share
                 </div>
                 <div className="font-sfMono text-base leading-[18px] text-white/90">
                   Upload the artwork to Gateway Network and share on X (Twitter)
