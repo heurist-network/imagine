@@ -1,6 +1,5 @@
 import { FeatureModel } from '@/modules/campaign/feature-model'
 import { Leaderboard } from '@/modules/campaign/leaderboard'
-import { NewPreview } from '@/modules/campaign/new-preview'
 import { CampaignPreview } from '@/modules/campaign/preview'
 import { CampaignReward } from '@/modules/campaign/reward'
 
@@ -63,8 +62,7 @@ export default async function NewCampaign() {
 
   return (
     <main className="flex-1">
-      <NewPreview />
-      {/* <CampaignPreview /> */}
+      <CampaignPreview />
       <CampaignReward />
       <FeatureModel lists={finalLists} />
       <Leaderboard />

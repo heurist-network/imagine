@@ -68,61 +68,72 @@ export function CampaignPreview() {
   }
 
   return (
-    <div className="bg-campaign-preview bg-cover">
-      <div
-        className={cn(
-          's2:px-8 container max-w-screen-2xl px-4',
-          's2:pt-[135px] py-[134px] pt-16',
-        )}
-      >
-        <div className="s5:flex-row flex flex-col gap-12">
-          <div className="s5:w-[682px] w-full">
-            <FadeText
-              className={cn(
-                inter.className,
-                'font-bold !italic leading-[104px]',
-                's2:text-[80px] text-[40px]',
-              )}
-              direction="up"
-              framerProps={{
-                show: { transition: { delay: 0.2, duration: 0.7 } },
-              }}
-              text="CREATE WITH AI"
-            />
-            <FadeText
-              className={cn(
-                inter.className,
-                '-mt-2 mr-2 !italic leading-[104px] text-[#7269E1]',
-                's2:text-[80px] text-[40px]',
-                's2:text-right text-left',
-              )}
-              direction="up"
-              framerProps={{
-                show: { transition: { delay: 0.4, duration: 0.7 } },
-              }}
-              text="EARN ZK TOKEN"
-            />
-            <div className="flex justify-end">
-              <BlurIn className="group mt-6 flex cursor-pointer items-center justify-end gap-4">
-                <SwapText
-                  initialText="Mint Now"
-                  finalText="Mint Now"
-                  supportsHover
-                  textClassName="s2:text-[24px] text-[16px] font-semibold"
-                />
-                <div className="s2:h-16 s2:w-16 flex h-8 w-8 items-center justify-center rounded-full bg-[#1D1D1B] text-white transition-colors group-hover:bg-[#CDF138] group-hover:text-black">
-                  <ArrowIcon className="s2:w-8 w-[18px] transition-transform group-hover:rotate-45 group-hover:scale-105" />
-                </div>
-              </BlurIn>
+    <div className="flex h-[calc(100vh-56px)] min-h-[800px] items-center bg-campaign-preview bg-cover md:min-h-[1100px] lg:min-h-[1200px] xl:min-h-[1100px] 2xl:min-h-[900px]">
+      <div className="container">
+        <div className="flex flex-col justify-between gap-6 2xl:flex-row 2xl:gap-12">
+          <div className="flex flex-col justify-between 2xl:h-[293px]">
+            <div className="w-[682px]">
+              <FadeText
+                className={cn(
+                  inter.className,
+                  'font-bold !italic',
+                  'text-[40px] leading-[1.3] md:text-[56px] lg:text-[64px] xl:text-[72px] 2xl:text-[80px]',
+                )}
+                direction="up"
+                framerProps={{
+                  show: { transition: { delay: 0.2, duration: 0.7 } },
+                }}
+                text="CREATE WITH AI"
+              />
+              <FadeText
+                className={cn(
+                  inter.className,
+                  '-mt-2 mr-2 !italic text-[#7269E1]',
+                  'text-[40px] leading-[1.3] md:text-right md:text-[56px] lg:text-[64px] xl:text-[72px] 2xl:text-[80px]',
+                )}
+                direction="up"
+                framerProps={{
+                  show: { transition: { delay: 0.4, duration: 0.7 } },
+                }}
+                text="EARN ZK TOKEN"
+              />
             </div>
+            <BlurIn
+              className="group mt-6 flex cursor-pointer items-center gap-4 md:justify-end 2xl:mt-0"
+              onClick={() => {
+                document.getElementById('featured-models')?.scrollIntoView({
+                  behavior: 'smooth',
+                })
+              }}
+            >
+              <SwapText
+                initialText="Mint Now"
+                finalText="Mint Now"
+                supportsHover
+                textClassName="text-[16px] font-semibold md:text-[16.8px] lg:text-[19.2px] xl:text-[21.6px] 2xl:text-[24px]"
+              />
+              <div
+                className={cn(
+                  'flex items-center justify-center rounded-full bg-[#1D1D1B] text-white transition-colors group-hover:bg-[#CDF138] group-hover:text-black',
+                  'h-8 w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 xl:h-14 xl:w-14 2xl:h-16 2xl:w-16',
+                )}
+              >
+                <ArrowIcon
+                  className={cn(
+                    'transition-transform group-hover:rotate-45 group-hover:scale-105',
+                    'w-[18px] md:w-5 lg:w-6 xl:w-7 2xl:w-8',
+                  )}
+                />
+              </div>
+            </BlurIn>
           </div>
           <div className="flex flex-1 justify-center">
-            <div className="s5:max-w-none s2:max-w-[684px] grid max-w-[400px] flex-1 grid-cols-3 gap-5">
-              <div className="s5:py-0 s2:py-12 flex flex-col items-center justify-center gap-1 bg-[#1d1d1b] py-6">
+            <div className="grid max-w-[709px] flex-1 grid-cols-3 justify-between gap-5">
+              <div className="flex h-[148px] flex-col items-center justify-center bg-[#1D1D1B] md:h-[293px]">
                 <div
                   className={cn(
                     'font-sfMono text-white',
-                    's2:text-[24px] text-[14px] leading-[1.3]',
+                    'text-[14px] leading-[1.3] md:text-[18px] lg:text-[20px] xl:text-[22px] 2xl:text-[24px]',
                   )}
                 >
                   SPRINT {sprint}
@@ -130,7 +141,7 @@ export function CampaignPreview() {
                 <div
                   className={cn(
                     'font-sfMono font-bold',
-                    's2:text-[80px] text-[40px] leading-[1.1875]',
+                    'text-[40px] leading-[1.1875] md:text-[56px] lg:text-[64px] xl:text-[72px] 2xl:text-[80px]',
                   )}
                 >
                   <NumberTicker
@@ -141,17 +152,17 @@ export function CampaignPreview() {
                 <div
                   className={cn(
                     'font-sfMono font-light text-[#cdf138]',
-                    's2:text-[48px] text-[24px] leading-[1.3]',
+                    'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
                   )}
                 >
                   DAY
                 </div>
               </div>
-              <div className="s5:py-0 s2:py-12 flex flex-col items-center justify-center gap-1 bg-[#1d1d1b] py-6">
+              <div className="flex h-[148px] flex-col items-center justify-center bg-[#1D1D1B] md:h-[293px]">
                 <div
                   className={cn(
                     'font-sfMono text-white',
-                    's2:text-[24px] text-[14px] leading-[1.3]',
+                    'text-[14px] leading-[1.3] md:text-[18px] lg:text-[20px] xl:text-[22px] 2xl:text-[24px]',
                   )}
                 >
                   ENDS
@@ -159,7 +170,7 @@ export function CampaignPreview() {
                 <div
                   className={cn(
                     'font-sfMono font-bold',
-                    's2:text-[80px] text-[40px] leading-[1.1875]',
+                    'text-[40px] leading-[1.1875] md:text-[56px] lg:text-[64px] xl:text-[72px] 2xl:text-[80px]',
                   )}
                 >
                   <NumberTicker
@@ -170,17 +181,17 @@ export function CampaignPreview() {
                 <div
                   className={cn(
                     'font-sfMono font-light text-[#cdf138]',
-                    's2:text-[48px] text-[24px] leading-[1.3]',
+                    'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
                   )}
                 >
                   HRS
                 </div>
               </div>
-              <div className="s5:py-0 s2:py-12 flex flex-col items-center justify-center gap-1 bg-[#1d1d1b] py-6">
+              <div className="flex h-[148px] flex-col items-center justify-center bg-[#1D1D1B] md:h-[293px]">
                 <div
                   className={cn(
                     'font-sfMono text-white',
-                    's2:text-[24px] text-[14px] leading-[1.3]',
+                    'text-[14px] leading-[1.3] md:text-[18px] lg:text-[20px] xl:text-[22px] 2xl:text-[24px]',
                   )}
                 >
                   IN
@@ -188,7 +199,7 @@ export function CampaignPreview() {
                 <div
                   className={cn(
                     'font-sfMono font-bold',
-                    's2:text-[80px] text-[40px] leading-[1.1875]',
+                    'text-[40px] leading-[1.1875] md:text-[56px] lg:text-[64px] xl:text-[72px] 2xl:text-[80px]',
                   )}
                 >
                   <NumberTicker
@@ -199,7 +210,7 @@ export function CampaignPreview() {
                 <div
                   className={cn(
                     'font-sfMono font-light text-[#cdf138]',
-                    's2:text-[48px] text-[24px] leading-[1.3]',
+                    'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
                   )}
                 >
                   MINS
@@ -208,33 +219,63 @@ export function CampaignPreview() {
             </div>
           </div>
         </div>
-        <div className="s3:flex-row mt-24 flex flex-col border-y-[3px] border-black">
-          <div className="s3:border-r-[3px] s3:border-b-0 flex flex-1 flex-col gap-4 border-b-[3px] border-black py-12 pl-12">
+
+        <div
+          className={cn(
+            'flex flex-col border-y-[3px] border-black xl:flex-row',
+            'mt-[24px] md:mt-[32px] lg:mt-[38px] xl:mt-[44px] 2xl:mt-[50px]',
+          )}
+        >
+          <div
+            className={cn(
+              'flex flex-1 flex-col gap-2 border-b-[3px] border-r-0 border-black xl:border-b-0 xl:border-r-[3px]',
+              'py-6 md:py-[26px] lg:py-7 xl:py-[30px] 2xl:py-8',
+              'pl-6 md:pl-[30px] lg:pl-9 xl:pl-[42px] 2xl:pl-12',
+            )}
+          >
             <div
               className={cn(
-                'text-[48px] leading-[58px] text-black/90',
+                'font-medium text-black/90',
+                'text-[24px] leading-[1.2] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
                 inter.className,
               )}
             >
               Pool 1
             </div>
-            <div className="flex gap-4 font-sfMono text-[72px] leading-[86px]">
+            <div
+              className={cn(
+                'flex gap-4 font-sfMono font-bold',
+                'text-[34px] leading-[1.19] md:text-[42px] lg:text-[52px] xl:text-[62px] 2xl:text-[72px]',
+              )}
+            >
               <NumberTicker
                 value={rewardsData?.pool1TotalRewards.toFixed(1) || '0.0'}
               />
               <span>ZK</span>
             </div>
           </div>
-          <div className="flex flex-1 flex-col gap-4 py-12 pl-12">
+          <div
+            className={cn(
+              'flex flex-1 flex-col gap-2',
+              'py-6 md:py-[26px] lg:py-7 xl:py-[30px] 2xl:py-8',
+              'pl-6 md:pl-[30px] lg:pl-9 xl:pl-[42px] 2xl:pl-12',
+            )}
+          >
             <div
               className={cn(
-                'text-[48px] leading-[58px] text-black/90',
+                'font-medium text-black/90',
+                'text-[24px] leading-[1.2] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
                 inter.className,
               )}
             >
               Pool 2
             </div>
-            <div className="flex gap-4 font-sfMono text-[72px] leading-[86px]">
+            <div
+              className={cn(
+                'flex gap-4 font-sfMono font-bold',
+                'text-[34px] leading-[1.19] md:text-[42px] lg:text-[52px] xl:text-[62px] 2xl:text-[72px]',
+              )}
+            >
               <NumberTicker
                 value={rewardsData?.pool2TotalRewards.toFixed(1) || '0.0'}
               />
@@ -242,7 +283,8 @@ export function CampaignPreview() {
             </div>
           </div>
         </div>
-        <div className="mt-24 flex">
+
+        <div className="mt-[24px] flex md:mt-[32px] lg:mt-[38px] xl:mt-[44px] 2xl:mt-[50px]">
           <div className="relative max-w-[750px] bg-white py-3 pl-14 pr-6 font-sfMono text-base leading-[19px] -tracking-[0.0075em]">
             <Image
               className="absolute left-6 top-3"
