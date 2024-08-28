@@ -1,12 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
-import { useAccount } from 'wagmi'
+import { ContractFunctionExecutionError, formatEther } from 'viem'
+import { useAccount, useChains, usePublicClient, useWalletClient } from 'wagmi'
 
 import { MagicCard } from '@/components/magicui/magic-card'
 import Marquee from '@/components/magicui/marquee'
+import { showSuccessToast } from '@/components/SuccessToast'
+import { Market } from '@/constants/MarketConfig'
+import { RewardType, useChestRewards } from '@/hooks/useChestRewards'
 import { getUserRewards, UserRewardsData } from '@/lib/endpoints'
 import { cn } from '@/lib/utils'
 
@@ -32,9 +37,73 @@ export function Arrow({ className }: { className?: string }) {
   )
 }
 
+// New component for Pool Rewards
+function PoolRewardCard({
+  title,
+  rewards,
+  claimableRewards,
+  onClaim,
+}: {
+  title: string
+  rewards: string
+  claimableRewards: bigint
+  onClaim: () => void
+}) {
+  return (
+    <div
+      className={cn(
+        'group flex cursor-pointer flex-col justify-between rounded-2xl bg-[#CDF138] py-[21px] transition-colors hover:bg-black xl:w-[466px]',
+        'h-[140px] md:h-[154px] lg:h-[166px] xl:h-[178px]',
+        'px-[24px] md:px-[32px] lg:px-[40px] xl:px-[48px]',
+      )}
+    >
+      <div
+        className={cn(
+          'text-[#080808] transition-colors group-hover:text-[#CDF138]',
+          'text-[16px] leading-[1.3] md:text-[20px] lg:text-[24px] xl:text-[28px] 2xl:text-[32px]',
+          inter.className,
+        )}
+      >
+        {title}
+      </div>
+      <div
+        className={cn(
+          'font-sfMono font-bold text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]',
+          'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
+        )}
+      >
+        {rewards}
+      </div>
+      <div className="flex justify-between">
+        <div className="line-clamp-1 rounded-[2px] bg-white px-2">
+          Claimable:{' '}
+          <span className="font-bold">{formatEther(claimableRewards)} ZK</span>
+        </div>
+        <div
+          className={`flex cursor-pointer items-center gap-2 transition-colors group-hover:text-[#CDF138] ${
+            claimableRewards === BigInt(0)
+              ? 'pointer-events-none opacity-50'
+              : ''
+          }`}
+          onClick={onClaim}
+        >
+          <div className="font-semibold underline">Claim</div>
+          <Arrow className="transition-transform group-hover:rotate-45" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function CampaignReward() {
   const { address } = useAccount()
+  const { data: walletClient } = useWalletClient()
+  const publicClient = usePublicClient({
+    chainId: walletClient?.chain?.id,
+  })
+
   const [userRewards, setUserRewards] = useState<UserRewardsData | null>(null)
+  const { rewards, claimRewards } = useChestRewards(Market.zksync)
 
   useEffect(() => {
     const fetchUserRewards = async () => {
@@ -45,11 +114,48 @@ export function CampaignReward() {
         } catch (error) {
           console.error('Error fetching user rewards:', error)
         }
+      } else {
+        setUserRewards(null)
       }
     }
 
     fetchUserRewards()
   }, [address])
+
+  const handleClaimRewards = async (poolType: RewardType) => {
+    if (!publicClient) {
+      toast.error('Error claiming rewards: Wallet not connected')
+      return
+    }
+
+    try {
+      const tx = await claimRewards(poolType)
+      console.log('claim rewards tx', tx)
+      showSuccessToast(
+        publicClient,
+        'Rewards claimed successfully!',
+        tx?.transactionHash,
+      )
+    } catch (error) {
+      console.error('Error claiming rewards:', error)
+      if (
+        error instanceof ContractFunctionExecutionError &&
+        error.message.includes('No rewards to claim')
+      ) {
+        toast.error(
+          'No claimable rewards at this time. Please try again later.',
+        )
+      } else {
+        toast.error('Error claiming rewards. Please try again.')
+      }
+    } finally {
+      // Refresh user rewards after claiming
+      if (address) {
+        const updatedRewards = await getUserRewards(address)
+        setUserRewards(updatedRewards)
+      }
+    }
+  }
 
   return (
     <div className="relative min-h-[1040px]">
@@ -168,74 +274,31 @@ export function CampaignReward() {
               </div>
             </div>
           </div>
-          <div
-            className={cn(
-              'group flex cursor-pointer flex-col justify-between rounded-2xl bg-[#CDF138] py-[21px] transition-colors hover:bg-black xl:w-[466px]',
-              'h-[140px] md:h-[154px] lg:h-[166px] xl:h-[178px]',
-              'px-[24px] md:px-[32px] lg:px-[40px] xl:px-[48px]',
-            )}
-          >
-            <div
-              className={cn(
-                'text-[#080808] transition-colors group-hover:text-[#CDF138]',
-                'text-[16px] leading-[1.3] md:text-[20px] lg:text-[24px] xl:text-[28px] 2xl:text-[32px]',
-                inter.className,
-              )}
-            >
-              My Pool 1 Rewards
-            </div>
-            <div
-              className={cn(
-                'font-sfMono font-bold text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]',
-                'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
-              )}
-            >
-              {userRewards ? userRewards.pool1_rewards.toFixed(2) : '---'} ZK
-            </div>
-            <div className="flex justify-between">
-              <div className="line-clamp-1 rounded-[2px] bg-white px-2">
-                Claimable: <span className="font-bold">contractRead ZK</span>
-              </div>
-              <div className="flex items-center gap-2 transition-colors group-hover:text-[#CDF138]">
-                <div className="font-semibold underline">Claim</div>
-                <Arrow className="transition-transform group-hover:rotate-45" />
-              </div>
-            </div>
-          </div>
-          <div
-            className={cn(
-              'group flex cursor-pointer flex-col justify-between rounded-2xl bg-[#CDF138] py-[21px] transition-colors hover:bg-black xl:w-[466px]',
-              'h-[140px] md:h-[154px] lg:h-[166px] xl:h-[178px]',
-              'px-[24px] md:px-[32px] lg:px-[40px] xl:px-[48px]',
-            )}
-          >
-            <div
-              className={cn(
-                'text-[#080808] transition-colors group-hover:text-[#CDF138]',
-                'text-[16px] leading-[1.3] md:text-[20px] lg:text-[24px] xl:text-[28px] 2xl:text-[32px]',
-                inter.className,
-              )}
-            >
-              My Pool 2 Rewards
-            </div>
-            <div
-              className={cn(
-                'font-sfMono font-bold text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]',
-                'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
-              )}
-            >
-              {userRewards ? userRewards.pool2_rewards.toFixed(2) : '---'} ZK
-            </div>
-            <div className="flex justify-between">
-              <div className="line-clamp-1 rounded-[2px] bg-white px-2">
-                Claimable: <span className="font-bold">contractRead ZK</span>
-              </div>
-              <div className="flex items-center gap-2 transition-colors group-hover:text-[#CDF138]">
-                <div className="font-semibold underline">Claim</div>
-                <Arrow className="transition-transform group-hover:rotate-45" />
-              </div>
-            </div>
-          </div>
+          <PoolRewardCard
+            title="My Pool 1 Rewards"
+            rewards={
+              userRewards ? userRewards.pool1_rewards.toLocaleString() : '---'
+            }
+            claimableRewards={rewards.silverRewards}
+            onClaim={() => {
+              if (rewards.silverRewards > BigInt(0)) {
+                handleClaimRewards(RewardType.SILVER)
+              }
+            }}
+          />
+
+          <PoolRewardCard
+            title="My Pool 2 Rewards"
+            rewards={
+              userRewards ? userRewards.pool2_rewards.toLocaleString() : '---'
+            }
+            claimableRewards={rewards.goldRewards}
+            onClaim={() => {
+              if (rewards.goldRewards > BigInt(0)) {
+                handleClaimRewards(RewardType.GOLD)
+              }
+            }}
+          />
         </div>
         <MagicCard
           className={cn(

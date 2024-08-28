@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Abi, Address, encodeFunctionData, keccak256 } from 'viem'
-import { eip712WalletActions, zkSync } from 'viem/zksync'
+import { eip712WalletActions, zksync } from 'viem/zksync'
 import {
   useAccount,
   usePublicClient,
@@ -69,8 +69,8 @@ export const useMintZkImagine = () => {
   }, [publicClient, currentMarket])
 
   useEffect(() => {
-    if (chain && chain.id !== zkSync.id) {
-      switchChain({ chainId: zkSync.id })
+    if (chain && chain.id !== zksync.id) {
+      switchChain({ chainId: zksync.id })
     }
   }, [chain, switchChain])
 
