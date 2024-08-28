@@ -20,7 +20,7 @@ export function CampaignPreview() {
   const [days, setDays] = useState(0)
   const [hours, setHours] = useState(0)
   const [minutes, setMinutes] = useState(0)
-  const [sprint, setSprint] = useState("")
+  const [sprint, setSprint] = useState('')
   const [rewardsData, setRewardsData] = useState<EpochRewardsData | null>(null)
 
   const calculateTime = () => {
@@ -29,15 +29,23 @@ export function CampaignPreview() {
       ? new Date(rewardsData.epochCutoffTime).getTime() - now.getTime()
       : 0
     const days = Math.max(Math.floor(diff / (1000 * 60 * 60 * 24)), 0)
-    const hours = Math.max(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)), 0)
-    const minutes = Math.max(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)), 0)
+    const hours = Math.max(
+      Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+      0,
+    )
+    const minutes = Math.max(
+      Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+      0,
+    )
 
     setDays(days)
     setHours(hours)
     setMinutes(minutes)
 
-    const currentSprint = rewardsData ? rewardsData.currentEpoch.split("_")[1] : "";
-    setSprint(currentSprint);
+    const currentSprint = rewardsData
+      ? rewardsData.currentEpoch.split('_')[1]
+      : ''
+    setSprint(currentSprint)
   }
 
   useLayoutEffect(() => {
@@ -60,14 +68,20 @@ export function CampaignPreview() {
   }
 
   return (
-    <div className="h-[1110px] bg-campaign-preview bg-cover">
-      <div className="container px-0 py-[135px]">
-        <div className="flex gap-12">
-          <div className="w-[682px]">
+    <div className="bg-campaign-preview bg-cover">
+      <div
+        className={cn(
+          's2:px-8 container max-w-screen-2xl px-4',
+          's2:pt-[135px] py-[134px] pt-16',
+        )}
+      >
+        <div className="s5:flex-row flex flex-col gap-12">
+          <div className="s5:w-[682px] w-full">
             <FadeText
               className={cn(
                 inter.className,
-                'text-[80px] font-bold !italic leading-[104px]',
+                'font-bold !italic leading-[104px]',
+                's2:text-[80px] text-[40px]',
               )}
               direction="up"
               framerProps={{
@@ -78,7 +92,9 @@ export function CampaignPreview() {
             <FadeText
               className={cn(
                 inter.className,
-                '-mt-2 mr-2 text-right text-[80px] !italic leading-[104px] text-[#7269E1]',
+                '-mt-2 mr-2 !italic leading-[104px] text-[#7269E1]',
+                's2:text-[80px] text-[40px]',
+                's2:text-right text-left',
               )}
               direction="up"
               framerProps={{
@@ -92,67 +108,108 @@ export function CampaignPreview() {
                   initialText="Mint Now"
                   finalText="Mint Now"
                   supportsHover
-                  textClassName="text-[24px] font-semibold"
+                  textClassName="s2:text-[24px] text-[16px] font-semibold"
                 />
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#1D1D1B] text-white transition-colors group-hover:bg-[#CDF138] group-hover:text-black">
-                  <ArrowIcon
-                    size={32}
-                    className="transition-transform group-hover:rotate-45 group-hover:scale-105"
-                  />
+                <div className="s2:h-16 s2:w-16 flex h-8 w-8 items-center justify-center rounded-full bg-[#1D1D1B] text-white transition-colors group-hover:bg-[#CDF138] group-hover:text-black">
+                  <ArrowIcon className="s2:w-8 w-[18px] transition-transform group-hover:rotate-45 group-hover:scale-105" />
                 </div>
               </BlurIn>
             </div>
           </div>
-          <div className="grid flex-1 grid-cols-3 gap-5">
-            <div className="flex flex-col items-center justify-center gap-1 bg-[#1d1d1b]">
-              <div
-                className={cn('font-sfMono text-2xl leading-[31px] text-white')}
-              >
-                SPRINT {sprint}
+          <div className="flex flex-1 justify-center">
+            <div className="s5:max-w-none s2:max-w-[684px] grid max-w-[400px] flex-1 grid-cols-3 gap-5">
+              <div className="s5:py-0 s2:py-12 flex flex-col items-center justify-center gap-1 bg-[#1d1d1b] py-6">
+                <div
+                  className={cn(
+                    'font-sfMono text-white',
+                    's2:text-[24px] text-[14px] leading-[1.3]',
+                  )}
+                >
+                  SPRINT {sprint}
+                </div>
+                <div
+                  className={cn(
+                    'font-sfMono font-bold',
+                    's2:text-[80px] text-[40px] leading-[1.1875]',
+                  )}
+                >
+                  <NumberTicker
+                    className="text-[#cdf138]"
+                    value={String(days)}
+                  />
+                </div>
+                <div
+                  className={cn(
+                    'font-sfMono font-light text-[#cdf138]',
+                    's2:text-[48px] text-[24px] leading-[1.3]',
+                  )}
+                >
+                  DAY
+                </div>
               </div>
-              <div className="font-sfMono text-[80px] font-bold leading-[95px]">
-                <NumberTicker className="text-[#cdf138]" value={String(days)} />
+              <div className="s5:py-0 s2:py-12 flex flex-col items-center justify-center gap-1 bg-[#1d1d1b] py-6">
+                <div
+                  className={cn(
+                    'font-sfMono text-white',
+                    's2:text-[24px] text-[14px] leading-[1.3]',
+                  )}
+                >
+                  ENDS
+                </div>
+                <div
+                  className={cn(
+                    'font-sfMono font-bold',
+                    's2:text-[80px] text-[40px] leading-[1.1875]',
+                  )}
+                >
+                  <NumberTicker
+                    className="text-[#cdf138]"
+                    value={String(hours)}
+                  />
+                </div>
+                <div
+                  className={cn(
+                    'font-sfMono font-light text-[#cdf138]',
+                    's2:text-[48px] text-[24px] leading-[1.3]',
+                  )}
+                >
+                  HRS
+                </div>
               </div>
-              <div className="font-sfMono text-[48px] font-light leading-[62px] text-[#cdf138]">
-                DAY
-              </div>
-            </div>
-            <div className="flex flex-col items-center justify-center gap-1 bg-[#1d1d1b]">
-              <div
-                className={cn('font-sfMono text-2xl leading-[31px] text-white')}
-              >
-                ENDS
-              </div>
-              <div className="font-sfMono text-[80px] font-bold leading-[95px]">
-                <NumberTicker
-                  className="text-[#cdf138]"
-                  value={String(hours)}
-                />
-              </div>
-              <div className="font-sfMono text-[48px] font-light leading-[62px] text-[#cdf138]">
-                HRS
-              </div>
-            </div>
-            <div className="flex flex-col items-center justify-center gap-1 bg-[#1d1d1b]">
-              <div
-                className={cn('font-sfMono text-2xl leading-[31px] text-white')}
-              >
-                IN
-              </div>
-              <div className="font-sfMono text-[80px] font-bold leading-[95px]">
-                <NumberTicker
-                  className="text-[#cdf138]"
-                  value={String(minutes)}
-                />
-              </div>
-              <div className="font-sfMono text-[48px] font-light leading-[62px] text-[#cdf138]">
-                MINS
+              <div className="s5:py-0 s2:py-12 flex flex-col items-center justify-center gap-1 bg-[#1d1d1b] py-6">
+                <div
+                  className={cn(
+                    'font-sfMono text-white',
+                    's2:text-[24px] text-[14px] leading-[1.3]',
+                  )}
+                >
+                  IN
+                </div>
+                <div
+                  className={cn(
+                    'font-sfMono font-bold',
+                    's2:text-[80px] text-[40px] leading-[1.1875]',
+                  )}
+                >
+                  <NumberTicker
+                    className="text-[#cdf138]"
+                    value={String(minutes)}
+                  />
+                </div>
+                <div
+                  className={cn(
+                    'font-sfMono font-light text-[#cdf138]',
+                    's2:text-[48px] text-[24px] leading-[1.3]',
+                  )}
+                >
+                  MINS
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="mt-24 flex border-y-[3px] border-black">
-          <div className="flex flex-1 flex-col gap-4 border-r-[3px] border-black py-12 pl-12">
+        <div className="s3:flex-row mt-24 flex flex-col border-y-[3px] border-black">
+          <div className="s3:border-r-[3px] s3:border-b-0 flex flex-1 flex-col gap-4 border-b-[3px] border-black py-12 pl-12">
             <div
               className={cn(
                 'text-[48px] leading-[58px] text-black/90',

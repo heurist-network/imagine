@@ -1,7 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { createDropdownMenuScope } from '@radix-ui/react-dropdown-menu'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
+import { useDebounceCallback, useResizeObserver } from 'usehooks-ts'
 
 import { cn } from '@/lib/utils'
 
@@ -86,10 +88,20 @@ export function NumberTicker({
 }) {
   const parts = String(value).trim().split('')
   const divRef = useRef<HTMLDivElement>(null)
+
+  const [random, setRandom] = useState(0)
+
   const getHeight = useCallback(
     () => divRef.current?.getBoundingClientRect().height ?? 0,
-    [],
+    [random],
   )
+
+  useResizeObserver({
+    ref: divRef,
+    onResize: () => {
+      setRandom(Math.random())
+    },
+  })
 
   return (
     <div

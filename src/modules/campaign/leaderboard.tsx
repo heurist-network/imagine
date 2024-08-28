@@ -16,12 +16,12 @@ import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 20
 
 export function Leaderboard() {
   const [page, setPage] = useState(1)
   const [data, setData] = useState<LeaderboardData[]>([])
-  const [sprint, setSprint] = useState("")
+  const [sprint, setSprint] = useState('')
   const [loading, setLoading] = useState(false)
   const [hasNextPage, setHasNextPage] = useState(false)
 
@@ -33,7 +33,7 @@ export function Leaderboard() {
       setData(response.items)
       setHasNextPage(response.pageInfo.hasNextPage)
       if (currentPage) setPage(currentPage)
-      
+
       if (response.items[0]) {
         setSprint(response.items[0].epoch.toString())
       }
@@ -110,8 +110,8 @@ export function Leaderboard() {
                       index === 0 && page === 1,
                   })}
                 >
-                  {item.epoch_address.slice(0, 6)}...
-                  {item.epoch_address.slice(-4)}
+                  {item.epoch_address?.slice(0, 6)}...
+                  {item.epoch_address?.slice(-4)}
                 </div>
                 <div
                   className={cn('table-cell border-y bg-[#F8FAFD]/60 pl-4', {

@@ -52,7 +52,7 @@ export default function SwapText({
   ...props
 }: SwapTextProps) {
   const [active, setActive] = useState(false)
-  const common = 'block transition-all duration-1000 ease-slow'
+  const common = 'block transition-all duration-500 ease-slow'
 
   const longWord = finalText.length > initialText.length ? finalText : null
 
@@ -61,13 +61,7 @@ export default function SwapText({
       {...props}
       className={cn('relative overflow-hidden text-foreground', className)}
     >
-      <div
-        className={cn(
-          'group cursor-pointer select-none text-3xl font-bold',
-          textClassName,
-        )}
-        onClick={() => !disableClick && setActive((current) => !current)}
-      >
+      <div className={cn('group cursor-pointer select-none', textClassName)}>
         <span
           className={cn(common, initialTextClassName, {
             'flex flex-col': true,

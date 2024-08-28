@@ -549,7 +549,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
   }, [models, form])
 
   return (
-    <div className="h-[1040px] bg-[#1D1D1B] pt-[129px]">
+    <div className="h-[1040px] bg-[#1D1D1B] pt-[129px]" id="featured-models">
       <div className="container px-0 text-white">
         <div
           className={cn(
@@ -559,7 +559,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
         >
           Featured Models of the Day
         </div>
-        <div className="mb-4 mt-1.5 font-['SF_Mono'] text-sm leading-6 text-neutral-500 lg:mb-8">
+        <div className="'SF_Mono'] mb-4 mt-1.5 text-sm leading-6 text-neutral-500 lg:mb-8">
           Select a model from today's curated collection to generate and mint.{' '}
         </div>
         <div className="flex flex-col items-center gap-4 lg:flex-row lg:gap-16">
@@ -668,7 +668,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                 <div className="text-lg font-semibold">
                   Quick Generate and Mint
                 </div>
-                <div className="mb-4 mt-1.5 font-['SF_Mono'] text-sm leading-6 text-neutral-400">
+                <div className="'SF_Mono'] mb-4 mt-1.5 text-sm leading-6 text-neutral-400">
                   Generate an image instantly with a pre-filled prompt. For more
                   customization options, use Advanced Mint.
                 </div>
@@ -683,7 +683,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                         </FormLabel>
                         <FormControl>
                           <Input
-                            className="rounded-[6px] font-['SF_Mono'] text-black"
+                            className="'SF_Mono'] rounded-[6px] text-black"
                             placeholder="Prompt"
                             autoComplete="off"
                             {...field}

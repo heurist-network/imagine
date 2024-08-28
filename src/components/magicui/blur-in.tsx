@@ -12,12 +12,14 @@ interface BlurIntProps {
     visible: { filter: string; opacity: number }
   }
   duration?: number
+  onClick?: () => void
 }
 const BlurIn = ({
   children,
   className,
   variant,
   duration = 1,
+  onClick,
 }: BlurIntProps) => {
   const defaultVariants: Variants = {
     hidden: {
@@ -40,6 +42,7 @@ const BlurIn = ({
       transition={{ duration }}
       variants={combinedVariants}
       className={cn(className, 'drop-shadow-sm')}
+      onClick={onClick}
     >
       {children}
     </motion.div>
