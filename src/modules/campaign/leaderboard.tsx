@@ -121,7 +121,7 @@ export function Leaderboard() {
                   ranking: userRank.ranking,
                   pay_in_eth: 0,
                 }}
-                index={userRank.ranking} // Special index to indicate it's the user's row
+                index={userRank.ranking - 1} // Special index to indicate it's the user's row
                 page={1}
                 PAGE_SIZE={PAGE_SIZE}
                 isUser={true}

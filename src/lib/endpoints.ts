@@ -98,6 +98,7 @@ export const getUserRewards = async (
       pool1_rewards: 0,
       pool2_rewards: 0,
       ranking: 0,
+      mint_count: 0,
     }
   }
 }

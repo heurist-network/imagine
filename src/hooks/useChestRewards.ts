@@ -18,8 +18,8 @@ type Rewards = {
 
 // Enum for reward types
 export enum RewardType {
-  SILVER = 'SILVER',
-  GOLD = 'GOLD',
+  SILVER = 0,
+  GOLD = 1,
 }
 
 /**

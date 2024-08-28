@@ -1,12 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
-import { useAccount } from 'wagmi'
+import { ContractFunctionExecutionError, formatEther } from 'viem'
+import { useAccount, useChains } from 'wagmi'
 
 import { MagicCard } from '@/components/magicui/magic-card'
 import Marquee from '@/components/magicui/marquee'
+import { Market } from '@/constants/MarketConfig'
+import { RewardType, useChestRewards } from '@/hooks/useChestRewards'
 import { getUserRewards, UserRewardsData } from '@/lib/endpoints'
 import { cn } from '@/lib/utils'
 
@@ -36,6 +40,7 @@ export function CampaignReward() {
   const { address } = useAccount()
   const [userRewards, setUserRewards] = useState<UserRewardsData | null>(null)
 
+  const { rewards, claimRewards } = useChestRewards(Market.zkSync)
   useEffect(() => {
     const fetchUserRewards = async () => {
       if (address) {
@@ -50,6 +55,30 @@ export function CampaignReward() {
 
     fetchUserRewards()
   }, [address])
+
+  const handleClaim = async (poolType: RewardType) => {
+    try {
+      await claimRewards(poolType)
+    } catch (error) {
+      console.error('Error claiming rewards:', error)
+      if (
+        error instanceof ContractFunctionExecutionError &&
+        error.message.includes('No rewards to claim')
+      ) {
+        toast.error(
+          'No claimable rewards at this time. Please try again later.',
+        )
+      } else {
+        toast.error('Error claiming rewards. Please try again.')
+      }
+    } finally {
+      // Refresh user rewards after claiming
+      if (address) {
+        const updatedRewards = await getUserRewards(address)
+        setUserRewards(updatedRewards)
+      }
+    }
+  }
 
   return (
     <div className="relative min-h-[1040px]">
@@ -190,13 +219,27 @@ export function CampaignReward() {
                 'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
               )}
             >
-              {userRewards ? userRewards.pool1_rewards.toFixed(2) : '---'} ZK
+              {userRewards ? userRewards.pool1_rewards.toLocaleString() : '---'}
             </div>
             <div className="flex justify-between">
               <div className="line-clamp-1 rounded-[2px] bg-white px-2">
-                Claimable: <span className="font-bold">contractRead ZK</span>
+                Claimable:{' '}
+                <span className="font-bold">
+                  {formatEther(rewards.silverRewards)} ZK
+                </span>
               </div>
-              <div className="flex items-center gap-2 transition-colors group-hover:text-[#CDF138]">
+              <div
+                className={`flex cursor-pointer items-center gap-2 transition-colors group-hover:text-[#CDF138] ${
+                  rewards.goldRewards === BigInt(0)
+                    ? 'pointer-events-none opacity-50'
+                    : ''
+                }`}
+                onClick={() => {
+                  if (rewards.goldRewards > BigInt(0)) {
+                    handleClaim(RewardType.SILVER)
+                  }
+                }}
+              >
                 <div className="font-semibold underline">Claim</div>
                 <Arrow className="transition-transform group-hover:rotate-45" />
               </div>
@@ -224,13 +267,27 @@ export function CampaignReward() {
                 'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
               )}
             >
-              {userRewards ? userRewards.pool2_rewards.toFixed(2) : '---'} ZK
+              {userRewards ? userRewards.pool2_rewards.toLocaleString() : '---'}
             </div>
             <div className="flex justify-between">
               <div className="line-clamp-1 rounded-[2px] bg-white px-2">
-                Claimable: <span className="font-bold">contractRead ZK</span>
+                Claimable:{' '}
+                <span className="font-bold">
+                  {formatEther(rewards.goldRewards)} ZK
+                </span>
               </div>
-              <div className="flex items-center gap-2 transition-colors group-hover:text-[#CDF138]">
+              <div
+                className={`flex cursor-pointer items-center gap-2 transition-colors group-hover:text-[#CDF138] ${
+                  rewards.goldRewards === BigInt(0)
+                    ? 'pointer-events-none opacity-50'
+                    : ''
+                }`}
+                onClick={() => {
+                  if (rewards.goldRewards > BigInt(0)) {
+                    handleClaim(RewardType.GOLD)
+                  }
+                }}
+              >
                 <div className="font-semibold underline">Claim</div>
                 <Arrow className="transition-transform group-hover:rotate-45" />
               </div>
@@ -341,4 +398,7 @@ export function CampaignReward() {
       </div>
     </div>
   )
+}
+function useNetwork(): { chain: any } {
+  throw new Error('Function not implemented.')
 }
