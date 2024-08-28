@@ -5,10 +5,11 @@ import toast from 'react-hot-toast'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
 import { ContractFunctionExecutionError, formatEther } from 'viem'
-import { useAccount, useChains } from 'wagmi'
+import { useAccount, useChains, usePublicClient, useWalletClient } from 'wagmi'
 
 import { MagicCard } from '@/components/magicui/magic-card'
 import Marquee from '@/components/magicui/marquee'
+import { showSuccessToast } from '@/components/SuccessToast'
 import { Market } from '@/constants/MarketConfig'
 import { RewardType, useChestRewards } from '@/hooks/useChestRewards'
 import { getUserRewards, UserRewardsData } from '@/lib/endpoints'
@@ -96,9 +97,14 @@ function PoolRewardCard({
 
 export function CampaignReward() {
   const { address } = useAccount()
-  const [userRewards, setUserRewards] = useState<UserRewardsData | null>(null)
+  const { data: walletClient } = useWalletClient()
+  const publicClient = usePublicClient({
+    chainId: walletClient?.chain?.id,
+  })
 
+  const [userRewards, setUserRewards] = useState<UserRewardsData | null>(null)
   const { rewards, claimRewards } = useChestRewards(Market.zkSync)
+
   useEffect(() => {
     const fetchUserRewards = async () => {
       if (address) {
@@ -108,6 +114,8 @@ export function CampaignReward() {
         } catch (error) {
           console.error('Error fetching user rewards:', error)
         }
+      } else {
+        setUserRewards(null)
       }
     }
 
@@ -115,8 +123,19 @@ export function CampaignReward() {
   }, [address])
 
   const handleClaimRewards = async (poolType: RewardType) => {
+    if (!publicClient) {
+      toast.error('Error claiming rewards: Wallet not connected')
+      return
+    }
+
     try {
-      await claimRewards(poolType)
+      const tx = await claimRewards(poolType)
+      console.log('claim rewards tx', tx)
+      showSuccessToast(
+        publicClient,
+        'Rewards claimed successfully!',
+        tx?.transactionHash,
+      )
     } catch (error) {
       console.error('Error claiming rewards:', error)
       if (
