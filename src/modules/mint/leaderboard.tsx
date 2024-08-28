@@ -23,7 +23,7 @@ export interface LeaderboardData {
 
 export async function Leaderboard() {
   // fetch leader board data
-  const leaderboard: LeaderboardData[] = await getLeaderboard()
+  const leaderboard: LeaderboardData[] = (await getLeaderboard()).items
 
   return (
     <div className={cn('container mt-16')}>
