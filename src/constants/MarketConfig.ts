@@ -1,5 +1,5 @@
 import { Address, Chain } from 'viem'
-import { zkSync, zkSyncSepoliaTestnet } from 'viem/chains'
+import { zksync, zkSyncSepoliaTestnet } from 'viem/chains'
 
 export type MarketDataType = {
   market: Market
@@ -12,7 +12,7 @@ export type MarketDataType = {
 
 export enum Market {
   test_zkSync = 'test_zkSync',
-  zkSync = 'zkSync',
+  zksync = 'zksync',
 }
 
 export const MarketConfig: {
@@ -26,9 +26,9 @@ export const MarketConfig: {
       ChestRewards: '0x32CAFbF04758B8152D7e4ACf40b1f6012Fc5C5E4',
     },
   },
-  zkSync: {
-    market: Market.zkSync,
-    chain: zkSync,
+  zksync: {
+    market: Market.zksync,
+    chain: zksync,
     addresses: {
       ZkImagine: '0x5c63369e3F04018A0C32559661E025F051fB071E',
       ChestRewards: '0x1379E87b0fFdD43839C298E5Af047D2ccbbFea6F',

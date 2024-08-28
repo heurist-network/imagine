@@ -103,7 +103,7 @@ export function CampaignReward() {
   })
 
   const [userRewards, setUserRewards] = useState<UserRewardsData | null>(null)
-  const { rewards, claimRewards } = useChestRewards(Market.zkSync)
+  const { rewards, claimRewards } = useChestRewards(Market.zksync)
 
   useEffect(() => {
     const fetchUserRewards = async () => {
