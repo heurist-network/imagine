@@ -8,7 +8,8 @@ import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Address, Hash, isAddress } from 'viem'
-import { useAccount, useBalance, useClient } from 'wagmi'
+import { zksync } from 'viem/zksync'
+import { useAccount, useBalance, useClient, useSwitchChain } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
@@ -89,6 +90,7 @@ const formSchema = z.object({
 
 export function FeatureModels({ lists }: { lists: any[] }) {
   const account = useAccount()
+  const { switchChain } = useSwitchChain()
   const client = useClient()
   const { openConnectModal } = useConnectModal()
   const {
@@ -345,6 +347,8 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     // TODO: Update function, add signatureFreeMint and partnerFreeMint
     if (!account.address) return openConnectModal?.()
 
+    // Switch to zkSync chain
+
     const extractedImageId = extractImageId(info.url)
     const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
 
@@ -544,6 +548,15 @@ export function FeatureModels({ lists }: { lists: any[] }) {
       }
     }
   }, [models, form])
+
+  // Switch to zkSync chain
+  useEffect(() => {
+    const chain = account?.chain
+
+    if (chain && chain.id !== zksync.id) {
+      switchChain({ chainId: zksync.id })
+    }
+  }, [account, switchChain])
 
   return (
     <div className="mt-16 lg:bg-slate-50">
