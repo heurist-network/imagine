@@ -4,6 +4,7 @@ import localFont from 'next/font/local'
 import type { Metadata, Viewport } from 'next'
 
 import { env } from '@/env.mjs'
+import { cn } from '@/lib/utils'
 import { Header } from '@/modules/header'
 
 import { Providers } from './providers'
@@ -101,6 +102,14 @@ export default function RootLayout({
       )}
       <body className="min-h-screen bg-background">
         <Providers>
+          <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+            <div
+              className={cn(
+                `after:animate-aurora absolute -inset-[10px] opacity-30 blur-[10px] invert filter will-change-transform [--aurora:repeating-linear-gradient(100deg,var(--blue-500)_10%,var(--indigo-300)_15%,var(--blue-300)_20%,var(--violet-200)_25%,var(--blue-400)_30%)] [--dark-gradient:repeating-linear-gradient(100deg,var(--black)_0%,var(--black)_7%,var(--transparent)_10%,var(--transparent)_12%,var(--black)_16%)] [--white-gradient:repeating-linear-gradient(100deg,var(--white)_0%,var(--white)_7%,var(--transparent)_10%,var(--transparent)_12%,var(--white)_16%)] [background-image:var(--white-gradient),var(--aurora)] [background-position:50%_50%,50%_50%] [background-size:300%,_200%] after:absolute after:inset-0 after:mix-blend-difference after:content-[""] after:[background-attachment:fixed] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_100%] dark:invert-0 dark:[background-image:var(--dark-gradient),var(--aurora)] after:dark:[background-image:var(--dark-gradient),var(--aurora)]`,
+                `[mask-image:radial-gradient(ellipse_at_100%_0%,black_10%,var(--transparent)_70%)]`,
+              )}
+            />
+          </div>
           <div className="relative flex min-h-screen flex-col bg-background">
             <Header />
             {children}
