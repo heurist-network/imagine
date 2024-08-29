@@ -5,12 +5,12 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
-import { nanoid } from 'nanoid'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Address, Hash, isAddress } from 'viem'
-import { useAccount, useBalance, useClient } from 'wagmi'
+import { zksync } from 'viem/chains'
+import { useAccount, useBalance, useClient, useSwitchChain } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
@@ -52,7 +52,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
@@ -93,6 +92,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export function FeatureModel({ lists }: { lists: any[] }) {
   const account = useAccount()
+  const { switchChain } = useSwitchChain()
   const client = useClient()
   const { openConnectModal } = useConnectModal()
   const {
@@ -101,7 +101,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     setReferralAddress,
     loading: loadingMintNFT,
   } = useMintToNFT()
-  const { mint, mintFee, discountedFee, signatureFreeMint, partnerFreeMint } =
+  const { mint, mintFee, signatureFreeMint, partnerFreeMint } =
     useMintZkImagine()
   const featureModels = lists.slice(0, 4)
 
@@ -113,7 +113,6 @@ export function FeatureModel({ lists }: { lists: any[] }) {
   const [modelList, setModelList] = useState<any[]>([])
   const [models, setModels] = useState<any[]>([])
   const [activeModelIndex, setActiveModelIndex] = useState(0)
-
   const [selectedModel, setSelectedModel] = useState(
     featureModels[0]?.name || '',
   )
@@ -209,7 +208,6 @@ export function FeatureModel({ lists }: { lists: any[] }) {
   useEffect(() => {
     getAllModels()
   }, [featureModels.length])
-
 
   /**
    * Generates an image based on the current form values
@@ -349,9 +347,6 @@ export function FeatureModel({ lists }: { lists: any[] }) {
    * Handles the regular minting process.
    */
   const onMintToNFT = async () => {
-    // TODO: Update function, add signatureFreeMint and partnerFreeMint
-    if (!account.address) return openConnectModal?.()
-
     const extractedImageId = extractImageId(info.url)
     const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
 
@@ -383,12 +378,15 @@ export function FeatureModel({ lists }: { lists: any[] }) {
 
       await handleMintingProcess()
       showSuccessToast('Mint zkImagine NFT successfully!', txHash)
+
+      setLoading(false)
+      setReferralAddress('')
+      setIsMinted(true)
     } catch (error: unknown) {
       handleMintError(error)
     } finally {
       setLoading(false)
       setReferralAddress('')
-      setIsMinted(true)
     }
   }
 
@@ -516,10 +514,6 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     }
   }
 
-  useEffect(() => {
-    getModels()
-  }, [])
-
   // Refresh partner NFTs when the component mounts
   useEffect(() => {
     refreshPartnerNFTs()
@@ -552,6 +546,15 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     }
   }, [models, form])
 
+  // Switch to zksync chain
+  useEffect(() => {
+    const chain = account?.chain
+
+    if (chain && chain.id !== zksync.id) {
+      switchChain({ chainId: zksync.id })
+    }
+  }, [account, switchChain])
+
   return (
     <div
       className={cn(
@@ -566,7 +569,6 @@ export function FeatureModel({ lists }: { lists: any[] }) {
           className={cn(
             'font-semibold -tracking-[0.0075em]',
             'text-[24px] leading-[1.2] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
-
             inter.className,
           )}
         >
@@ -696,7 +698,6 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                   Quick Generate and Mint
                 </div>
                 <div className="mb-4 mt-1.5 font-sfMono text-sm leading-6 text-neutral-400">
-
                   Generate an image instantly with a pre-filled prompt. For more
                   customization options, use Advanced Mint.
                 </div>
@@ -729,7 +730,6 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                     disabled={loadingGenerate || loadingGetModels}
                   >
                     {(loadingGenerate || loadingGetModels) && (
-
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Generate and Mint
@@ -1149,7 +1149,6 @@ export function NavTabs({
     </div>
   )
 }
-
 
 /**
  * ModelCarousel component for displaying model carousel on mobile

@@ -4,14 +4,10 @@ import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Address, Hash, isAddress } from 'viem'
 import { useAccount, useBalance, useClient } from 'wagmi'
-import { zksync } from 'viem/zksync'
-import { useAccount, useBalance, useClient, useSwitchChain } from 'wagmi'
-
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
@@ -54,12 +50,6 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
@@ -92,7 +82,6 @@ const formSchema = z.object({
 
 export function FeatureModels({ lists }: { lists: any[] }) {
   const account = useAccount()
-  const { switchChain } = useSwitchChain()
   const client = useClient()
   const { openConnectModal } = useConnectModal()
   const {
@@ -315,6 +304,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
    */
   const onShareTwitter = async () => {
     if (!isMinted) return toast.error('You need to mint the image to NFT first')
+
     const resOfNotifyAfterMintActions = await fetch(
       API_NOTIFY_AFTER_MINT_ACTIONS,
       {
@@ -547,16 +537,6 @@ export function FeatureModels({ lists }: { lists: any[] }) {
       }
     }
   }, [models, form])
-
-
-  // Switch to zkSync chain
-  useEffect(() => {
-    const chain = account?.chain
-
-    if (chain && chain.id !== zksync.id) {
-      switchChain({ chainId: zksync.id })
-    }
-  }, [account, switchChain])
 
   return (
     <div className="mt-16 lg:bg-slate-50">
