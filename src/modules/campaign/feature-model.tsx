@@ -727,7 +727,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                         </FormLabel>
                         <FormControl>
                           <Input
-                            className="rounded-[6px]"
+                            className="rounded-[6px] text-black"
                             placeholder="Prompt"
                             autoComplete="off"
                             {...field}
@@ -747,7 +747,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                         </FormLabel>
                         <FormControl>
                           <Input
-                            className="rounded-[6px]"
+                            className="rounded-[6px] text-black"
                             placeholder="Negative Prompt"
                             autoComplete="off"
                             {...field}
@@ -774,6 +774,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                           />
                           <FormControl>
                             <Slider
+                              className="[&>.slider-thumb]:bg-[#CDF138] [&>.slider-track]:bg-white"
                               value={[field.value]}
                               onValueChange={(value) =>
                                 field.onChange(value[0])
@@ -811,6 +812,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                               min={1}
                               max={12}
                               step={0.1}
+                              className="[&>.slider-thumb]:bg-[#CDF138] [&>.slider-track]:bg-[#EEEEEE]"
                             />
                           </FormControl>
                           <FormMessage />
@@ -827,7 +829,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                           <FormLabel>Width</FormLabel>
                           <FormControl>
                             <Input
-                              className="rounded-[6px]"
+                              className="rounded-[6px] text-black"
                               placeholder="Width"
                               type="number"
                               {...field}
@@ -854,7 +856,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                           <FormLabel>Height</FormLabel>
                           <FormControl>
                             <Input
-                              className="rounded-[6px]"
+                              className="rounded-[6px] text-black"
                               placeholder="Height"
                               type="number"
                               {...field}
@@ -881,7 +883,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                           <FormLabel>Seed</FormLabel>
                           <FormControl>
                             <Input
-                              className="rounded-[6px]"
+                              className="rounded-[6px] text-black"
                               placeholder="Seed"
                               {...field}
                             />
@@ -901,7 +903,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                   </Button>
                   <Button
                     variant="ghost"
-                    className="rounded-full text-sm leading-6 text-black underline"
+                    className="rounded-full bg-transparent text-neutral-300 underline hover:bg-transparent"
                     onClick={() => {
                       setMintType('quick')
                     }}
