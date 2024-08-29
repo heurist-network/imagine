@@ -87,7 +87,7 @@ export function MintToNFT({
     try {
       const txHash = await signatureFreeMint(model, imageId)
       await handleMintingProcess(txHash)
-      showSuccessToast('Signature free mint successful.')
+      showSuccessToast('Mint zkImagine NFT successfully!', txHash)
     } catch (error) {
       console.error('Signature free mint failed', error)
       toast.error(
@@ -116,7 +116,7 @@ export function MintToNFT({
         BigInt(availableNFT.tokenId),
       )
       await handleMintingProcess(txHash)
-      showSuccessToast('Partner free minting successful!')
+      showSuccessToast('Mint zkImagine NFT successfully!', txHash)
     } catch (error) {
       console.error('Partner free minting failed:', error)
       toast.error(
@@ -150,7 +150,7 @@ export function MintToNFT({
         extractedImageId,
       )
       await handleMintingProcess(txHash)
-      showSuccessToast('Mint zkImagine NFT successfully.')
+      showSuccessToast('Mint zkImagine NFT successfully!', txHash)
     } catch (error: unknown) {
       handleMintError(error)
     } finally {

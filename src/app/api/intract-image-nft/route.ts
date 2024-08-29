@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createPublicClient, http } from 'viem'
-import { zkSync } from 'viem/chains'
+import { zksync } from 'viem/chains'
 
 import { MarketConfig } from '@/constants/MarketConfig'
 
@@ -14,11 +14,11 @@ interface ResponseData {
   }
 }
 
-const ZkImagineAddress = MarketConfig['zkSync'].addresses.ZkImagine
+const ZkImagineAddress = MarketConfig['zksync'].addresses.ZkImagine
 
 // Create a Viem public client
 const client = createPublicClient({
-  chain: zkSync,
+  chain: zksync,
   transport: http(),
 })
 

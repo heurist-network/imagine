@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
           'X-API-Key': env.ZYFI_API_KEY,
         },
         body: JSON.stringify({
-          chain: 324, // zkSync Era Mainnet
-          // feeTokenAddress: '0x000000000000000000000000000000000000800A', // ETH on zkSync
+          chain: 324, // zksync Era Mainnet
+          // feeTokenAddress: '0x000000000000000000000000000000000000800A', // ETH on zksync
           sponsorshipRatio: 100, // 100% sponsored for partner free mint
           txData: {
             from: txRequest.from,

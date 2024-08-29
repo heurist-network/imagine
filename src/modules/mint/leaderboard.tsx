@@ -6,105 +6,55 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { getLeaderboard } from '@/lib/endpoints'
+import { cn } from '@/lib/utils'
 
-const invoices = [
-  {
-    invoice: 'INV001',
-    walletAddress: '0xabcd...1234',
-    nftBalance: '$250.00',
-    paymentMethod: 'Credit Card',
-  },
-  {
-    invoice: 'INV002',
-    walletAddress: '0xabcd...1234',
-    nftBalance: '$150.00',
-    paymentMethod: 'PayPal',
-  },
-  {
-    invoice: 'INV003',
-    walletAddress: '0xabcd...1234',
-    nftBalance: '$350.00',
-    paymentMethod: 'Bank Transfer',
-  },
-  {
-    invoice: 'INV004',
-    walletAddress: '0xabcd...1234',
-    nftBalance: '$450.00',
-    paymentMethod: 'Credit Card',
-  },
-  {
-    invoice: 'INV005',
-    walletAddress: '0xabcd...1234',
-    nftBalance: '$550.00',
-    paymentMethod: 'PayPal',
-  },
-  {
-    invoice: 'INV006',
-    walletAddress: '0xabcd...1234',
-    nftBalance: '$200.00',
-    paymentMethod: 'Bank Transfer',
-  },
-  {
-    invoice: 'INV007',
-    walletAddress: '0xabcd...1234',
-    nftBalance: '$300.00',
-    paymentMethod: 'Credit Card',
-  },
-  {
-    invoice: 'INV008',
-    walletAddress: '0xabcd...1234',
-    nftBalance: '$300.00',
-    paymentMethod: 'Credit Card',
-  },
-  {
-    invoice: 'INV009',
-    walletAddress: '0xabcd...1234',
-    nftBalance: '$300.00',
-    paymentMethod: 'Credit Card',
-  },
-  {
-    invoice: 'INV010',
-    walletAddress: '0xabcd...1234',
-    nftBalance: '$300.00',
-    paymentMethod: 'Credit Card',
-  },
-  {
-    invoice: 'INV011',
-    walletAddress: '0xabcd...1234',
-    nftBalance: '$300.00',
-    paymentMethod: 'Credit Card',
-  },
-]
+export interface LeaderboardData {
+  epoch: number
+  mint_count: number
+  epoch_address: string
+  ranking: number
+  gateway_upload_count?: number
+  score: number
+  zk_cashback: number
+  pay_in_eth: number
+  twitter_share_count?: number
+}
 
-export function Leaderboard() {
+export async function Leaderboard() {
+  // fetch leader board data
+  const leaderboard: LeaderboardData[] = (await getLeaderboard()).items
+
   return (
-    <div className="container mt-16">
-      <div className="text-3xl font-semibold -tracking-[0.0075em] text-neutral-900">
-        Mint Leaderboard
+    <div className={cn('container mt-16')}>
+      <div
+        className={cn(
+          'text-3xl font-semibold -tracking-[0.0075em] text-neutral-900',
+        )}
+      >
+        Leaderboard
       </div>
-      <div className="mt-8 overflow-hidden rounded-[6px] border border-neutral-200">
+      <div
+        className={cn(
+          'mt-8 overflow-hidden rounded-[6px] border border-neutral-200',
+        )}
+      >
         <Table>
-          <TableHeader className="bg-slate-50">
+          <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px] text-neutral-900">Rank</TableHead>
-              <TableHead className="text-neutral-900">Wallet address</TableHead>
-              <TableHead className="text-neutral-900">NFT Balance</TableHead>
-              <TableHead className="text-right text-neutral-900">
-                Imagine Power
-              </TableHead>
+              <TableHead>Rank</TableHead>
+              <TableHead>Wallet address</TableHead>
+              <TableHead>NFT Balance</TableHead>
+              <TableHead>Imagine Power</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoices.map((invoice, index) => (
-              <TableRow key={invoice.invoice}>
-                <TableCell className="font-medium">
-                  {index + 1 < 10 ? '0' + (index + 1) : index + 1}
-                </TableCell>
-                <TableCell>{invoice.walletAddress}</TableCell>
-                <TableCell>{invoice.nftBalance}</TableCell>
-                <TableCell className="text-right">
-                  {invoice.paymentMethod}
-                </TableCell>
+            {leaderboard.map((item, index) => (
+              <TableRow key={item.epoch_address}>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{item.epoch_address}</TableCell>
+                <TableCell>{item.mint_count}</TableCell>
+                <TableCell>{item.score}</TableCell>
               </TableRow>
             ))}
           </TableBody>

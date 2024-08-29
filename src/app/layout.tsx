@@ -1,5 +1,6 @@
 import { Toaster } from 'react-hot-toast'
 import { GeistSans } from 'geist/font/sans'
+import localFont from 'next/font/local'
 import type { Metadata, Viewport } from 'next'
 
 import { env } from '@/env.mjs'
@@ -11,9 +12,11 @@ import { Providers } from './providers'
 import '@rainbow-me/rainbowkit/styles.css'
 import '../styles/globals.css'
 
-const title = 'Imagine | AI Image generator by Heurist'
+import { cn } from '@/lib/utils'
+
+const title = 'Heurist Imagine'
 const description =
-  'Access Stable Diffusion models on a decentralized network of GPUs. Create and reproduce IP without limiation. Showcase your creativity and earn cryptocurrencies.'
+  'Access Stable Diffusion models provided by a decentralized network of GPUs. Create and reproduce IP without limiation. Showcase your creativity and earn crypto.'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://imagine.heurist.ai'),
@@ -59,11 +62,37 @@ export const viewport: Viewport = {
   userScalable: false,
 }
 
+const sfMono = localFont({
+  src: [
+    {
+      path: '../../public/font/SFMono-Light.otf',
+      weight: '300',
+      style: 'normal',
+    },
+    {
+      path: '../../public/font/SFMono-Regular.otf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/font/SFMono-Semibold.otf',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: '../../public/font/SFMono-Bold.otf',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-sf-mono',
+})
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={GeistSans.className}>
+    <html lang="en" className={cn(GeistSans.className, sfMono.variable)}>
       {!!(env.UMAMI_URL && env.UMAMI_WEBSITE_ID) && (
         <script
           async

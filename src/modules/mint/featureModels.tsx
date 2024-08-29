@@ -8,7 +8,7 @@ import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Address, Hash, isAddress } from 'viem'
-import { useAccount, useClient } from 'wagmi'
+import { useAccount, useBalance, useClient } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
@@ -51,8 +51,20 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { useMintZkImagine } from '@/hooks/useMintZkImagine'
-import { cn } from '@/lib/utils'
+import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
+import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
+import {
+  API_NOTIFY_AFTER_MINT_ACTIONS,
+  API_NOTIFY_IMAGE_GEN,
+} from '@/lib/endpoints'
+import { cn, extractImageId } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
@@ -61,20 +73,32 @@ import { useMintToNFT } from '../mintToNFT'
 const formSchema = z.object({
   prompt: z.string().optional(),
   neg_prompt: z.string().optional(),
-  num_iterations: z.number(),
-  guidance_scale: z.number(),
+  num_iterations: z.number().min(1).max(50),
+  guidance_scale: z.number().min(1).max(12),
   width: z.number().min(512).max(1024),
   height: z.number().min(512).max(1024),
   seed: z.string().optional(),
   model: z.string().optional(),
 })
 
+/**
+ * FeatureModels component for displaying and interacting with featured AI models
+ * @param {Object} props - Component props
+ * @param {any[]} props.lists - List of available models
+ */
+
 export function FeatureModels({ lists }: { lists: any[] }) {
   const account = useAccount()
   const client = useClient()
   const { openConnectModal } = useConnectModal()
-  const { setLoading, referralAddress, setReferralAddress } = useMintToNFT()
-  const { mint, mintFee, discountedFee } = useMintZkImagine()
+  const {
+    setLoading,
+    referralAddress,
+    setReferralAddress,
+    loading: loadingMintNFT,
+  } = useMintToNFT()
+  const { mint, mintFee, discountedFee, signatureFreeMint, partnerFreeMint } =
+    useMintZkImagine()
   const featureModels = lists.slice(0, 4)
 
   const [open, setOpen] = useState(false)
@@ -96,7 +120,27 @@ export function FeatureModels({ lists }: { lists: any[] }) {
   const [loadingUpload, setLoadingUpload] = useState(false)
   const [transactionId, setTransactionId] = useState('')
   const [isValidReferral, setIsValidReferral] = useState(false)
+  const [isMinted, setIsMinted] = useState(false)
+  const [isUploaded, setIsUploaded] = useState(false)
   const [loadingMint, setLoadingMint] = useState(false)
+
+  const {
+    canSignatureFreeMint,
+    isLoading: loadingSignatureFreeMint,
+    error: signatureFreeMintError,
+  } = useSignatureFreeMint()
+
+  const {
+    availableNFT,
+    isLoading: loadingPartnerFreeMint,
+    error: partnerFreeMintError,
+    refreshPartnerNFTs,
+  } = usePartnerFreeMint()
+
+  const balance =
+    (useBalance({
+      address: account.address,
+    }).data?.value as bigint) || BigInt(0)
 
   const findActiveModel = featureModels.find(
     (model) => model.name === selectedModel,
@@ -115,6 +159,10 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     },
   })
 
+  /**
+   * Fetches model data from GitHub
+   * @param {string} [params] - Optional model parameter
+   */
   const getModels = async (params?: string) => {
     const model = params || selectedModel
 
@@ -156,6 +204,9 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     }
   }
 
+  /**
+   * Generates an image based on the current form values
+   */
   const onGenerate = async () => {
     try {
       setResult({ url: '', width: 0, height: 0 })
@@ -183,7 +234,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
       }`
 
       const item = {
-        id: nanoid(),
+        id: extractImageId(url),
         url,
         prompt: data.prompt,
         neg_prompt: data.neg_prompt,
@@ -193,6 +244,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
         num_inference_steps: data.num_iterations,
         guidance_scale: data.guidance_scale,
         create_at: new Date().toISOString(),
+        model: selectedModel,
       }
 
       setInfo(item)
@@ -205,19 +257,19 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     }
   }
 
+  /**
+   * Uploads the generated image to the Gateway
+   */
   const onUpload = async () => {
-    if (!account.address) {
-      setOpen(false)
-      openConnectModal?.()
-      return
-    }
+    if (!isMinted) return toast.error('You need to mint the image to NFT first')
+    if (!account.address) return openConnectModal?.()
 
     setTransactionId('')
 
     try {
       setLoadingUpload(true)
       const res = await issueToGateway(
-        { ...info, model: selectedModel },
+        { ...info, model: info.model },
         account.address,
       )
 
@@ -229,106 +281,242 @@ export function FeatureModels({ lists }: { lists: any[] }) {
 
       setTransactionId(res.data?.transactionId!)
 
-      toast.success('Issue to Gateway successfully.')
+      const resOfNotifyAfterMintActions = await fetch(
+        API_NOTIFY_AFTER_MINT_ACTIONS,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            modelId: info.model,
+            imageId: info.id,
+            actionType: 'GATEWAY_UPLOAD',
+          }),
+        },
+      ).catch(handleFetchError)
+      handleApiResponse(resOfNotifyAfterMintActions)
+
+      toast.success('Image uploaded to Gateway successfully!')
     } finally {
       setLoadingUpload(false)
+      setIsUploaded(true)
     }
   }
 
-  const onMintToNFT = async () => {
-    if (!account.address) {
-      setOpen(false)
-      openConnectModal?.()
-      return
-    }
+  /**
+   * Handles sharing the generated image on Twitter.
+   * Constructs a tweet with a predefined text and a link to the shared image.
+   * Opens a new window with the Twitter intent URL.
+   */
+  const onShareTwitter = async () => {
+    if (!isMinted) return toast.error('You need to mint the image to NFT first')
 
-    const arr = mintUrl.split('/').slice(-1)[0].split('-').slice(-3)
-    const imageId = `${arr[0]}-${arr[1]}-${arr[2].split('.')[0]}`
-
-    const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
-
-    setLoadingMint(true)
-    setLoading(true)
-
-    try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
-
-      const txHash = await mint(
-        isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
-        selectedModel,
-        imageId,
-      )
-
-      // TODO: Post the image right after the mint button is clicked. don't wait for the txn
-      const response = await fetch('/api/notify-image-gen', {
+    const resOfNotifyAfterMintActions = await fetch(
+      API_NOTIFY_AFTER_MINT_ACTIONS,
+      {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          imageId: imageId,
-          modelId: selectedModel,
-          url: mintUrl,
-          transactionHash: txHash as Hash,
+          modelId: info.model,
+          imageId: info.id,
+          actionType: 'TWITTER_SHARE',
         }),
-        signal: controller.signal,
-      }).catch((err) => {
-        if (err.name === 'AbortError') {
-          console.log('Request timed out')
-          return null
+      },
+    ).catch(handleFetchError)
+    handleApiResponse(resOfNotifyAfterMintActions)
+
+    const path = mintUrl.split('/')
+    const name = path[path.length - 1].split('.')[0]
+    const intentUrl =
+      'https://twitter.com/intent/tweet?text=' +
+      encodeURIComponent('My latest #AIart creation with Imagine #Heurist 🎨') +
+      '&url=' +
+      encodeURIComponent(`https://imagine.heurist.ai/share/${name}`)
+    window.open(intentUrl, '_blank', 'width=550,height=420')
+  }
+
+  /**
+   * Handles the regular minting process.
+   */
+  const onMintToNFT = async () => {
+    // TODO: Update function, add signatureFreeMint and partnerFreeMint
+    if (!account.address) return openConnectModal?.()
+
+    const extractedImageId = extractImageId(info.url)
+    const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
+
+    setLoading(true)
+
+    try {
+      // Signature Free Mint  - Partner Free Mint - Mint
+      let txHash: Hash
+      if (canSignatureFreeMint) {
+        txHash = await signatureFreeMint(info.model, extractedImageId)
+      } else if (availableNFT) {
+        txHash = await partnerFreeMint(
+          info.model,
+          extractedImageId,
+          availableNFT.address,
+          BigInt(availableNFT.tokenId),
+        )
+      } else {
+        if (mintFee && balance < mintFee) {
+          toast.error('Insufficient ETH balance to mint NFT.')
+          return
         }
-        throw err
-      })
-
-      clearTimeout(timeoutId)
-
-      if (!response) {
-        console.log('notify-image-gen API: Proceeding to next step due to timeout')
-      } else if (!response.ok) {
-        const data = await response.json()
-        console.error('notify-image-gen API: Error:', data)
+        txHash = await mint(
+          isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
+          info.model,
+          extractedImageId,
+        )
       }
 
-      // View in Etherscan
-      const txUrl = `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
-      toast.success(
-        <div>
-          <div>Mint zkImagine NFT successfully.</div>
-          {client?.chain?.blockExplorers?.default.url && (
-            <a
-              href={txUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-800 underline"
-            >
-              View in explorer.
-            </a>
-          )}
-        </div>,
-      )
+      await handleMintingProcess()
+      showSuccessToast('Mint zkImagine NFT successfully!', txHash)
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('Failed to Mint zkImagine NFT:', error)
-        // error handler - user rejected transaction
-        if (error.message.includes('User rejected the request.')) {
-          toast.error('User rejected transaction signature.')
-        } else {
-          toast.error(
-            `Failed to Mint zkImagine NFT: ${error.message}. Please try again later.`,
-          )
-        }
-      }
+      handleMintError(error)
     } finally {
       setLoading(false)
-      setLoadingMint(false)
       setReferralAddress('')
+      setIsMinted(true)
+    }
+  }
+
+  /**
+   * Handles the common minting process after a transaction is initiated.
+   * @param txHash - The transaction hash
+   */
+  const handleMintingProcess = async () => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 20000)
+
+    try {
+      await postMintingData(controller.signal)
+    } catch (error) {
+      console.error('Error in minting process:', error)
+    } finally {
+      clearTimeout(timeoutId)
+    }
+  }
+
+  /**
+   * Posts minting data to the API.
+   * @param txHash - The transaction hash
+   * @param signal - The AbortController signal
+   */
+  const postMintingData = async (signal: AbortSignal) => {
+    const response = await fetch(API_NOTIFY_IMAGE_GEN, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: window.location.origin,
+      },
+      body: JSON.stringify({
+        imageId: info.id,
+        modelId: info.model,
+        url: info.url,
+      }),
+      signal,
+    }).catch(handleFetchError)
+
+    handleApiResponse(response)
+  }
+
+  /**
+   * Handles fetch errors.
+   * @param err - The error object
+   */
+  const handleFetchError = (err: Error) => {
+    if (err.name === 'AbortError') {
+      console.log('Request timed out')
+      return null
+    }
+    throw err
+  }
+
+  /**
+   * Ensures the user is connected to their wallet
+   * @returns {boolean} True if connected, false otherwise
+   */
+  const ensureUserConnected = (): boolean => {
+    if (!account.address) {
+      setOpen(false)
+      openConnectModal?.()
+      return false
+    }
+    return true
+  }
+
+  /**
+   * Handles API response.
+   * @param response - The fetch response object
+   */
+  const handleApiResponse = (response: Response | null) => {
+    if (!response) {
+      console.log(
+        'notify-image-gen API: Proceeding to next step due to timeout',
+      )
+    } else if (!response.ok) {
+      response
+        .json()
+        .then((data) => console.error('notify-image-gen API: Error:', data))
+    }
+  }
+
+  /**
+   * Shows a success toast with a transaction link.
+   * @param message - The success message
+   * @param txHash - The transaction hash
+   */
+  const showSuccessToast = (message: string, txHash?: Hash) => {
+    const txUrl = txHash
+      ? `${client?.chain?.blockExplorers?.default.url}/tx/${txHash}`
+      : ''
+    toast.success(
+      <div>
+        <div>{message}</div>
+        {txUrl && (
+          <a
+            href={txUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-800 underline"
+          >
+            View in explorer.
+          </a>
+        )}
+      </div>,
+    )
+  }
+
+  /**
+   * Handles errors that occur during minting
+   * @param {unknown} error - The error that occurred
+   */
+  const handleMintError = (error: unknown) => {
+    if (error instanceof Error) {
+      console.error('Failed to Mint zkImagine NFT:', error)
+      if (error.message.includes('User rejected the request.')) {
+        toast.error('User rejected transaction signature.')
+      } else {
+        toast.error(
+          `Failed to Mint zkImagine NFT: ${error.message}. Please try again later.`,
+        )
+      }
     }
   }
 
   useEffect(() => {
     getModels()
   }, [])
+
+  // Refresh partner NFTs when the component mounts
+  useEffect(() => {
+    refreshPartnerNFTs()
+  }, [refreshPartnerNFTs])
 
   useEffect(() => {
     if (
@@ -342,6 +530,21 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     }
   }, [referralAddress])
 
+  useEffect(() => {
+    if (models.length > 0) {
+      const defaultModel = models[1]
+      if (defaultModel && defaultModel.data) {
+        form.setValue('prompt', defaultModel.data.prompt || '')
+        form.setValue('neg_prompt', defaultModel.data.neg_prompt || '')
+        form.setValue('num_iterations', defaultModel.data.num_iterations || 25)
+        form.setValue('guidance_scale', defaultModel.data.guidance_scale || 7)
+        form.setValue('width', defaultModel.data.width || 512)
+        form.setValue('height', defaultModel.data.height || 768)
+        form.setValue('seed', '-1')
+      }
+    }
+  }, [models, form])
+
   return (
     <div className="mt-16 lg:bg-slate-50">
       <div className="container py-8">
@@ -353,78 +556,18 @@ export function FeatureModels({ lists }: { lists: any[] }) {
         </div>
         <div className="flex flex-col items-center gap-4 lg:flex-row lg:gap-16">
           <div className="flex h-[552px] w-full flex-1 flex-col gap-4 lg:gap-8">
-            <Tabs
-              value={selectedModel}
-              onValueChange={(value) => {
+            <ModelTabs
+              featureModels={featureModels}
+              selectedModel={selectedModel}
+              loadingGetModels={loadingGetModels}
+              onSelectModel={(value) => {
                 if (!!loadingGetModels) return
                 setSelectedModel(value)
                 getModels(value)
               }}
-              className="flex"
-            >
-              <TabsList className="flex-1 border border-slate-300 bg-white">
-                {featureModels.map((model, index) => (
-                  <TabsTrigger
-                    className="flex-1 gap-2 data-[state=active]:bg-black data-[state=active]:text-white"
-                    key={model.name}
-                    value={model.name}
-                  >
-                    <span>Model {index + 1}</span>
-                    {loadingGetModels === index + 1 && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-            <div className="flex justify-center lg:hidden">
-              <Carousel className="w-[259px]">
-                <CarouselContent>
-                  {models.map((item, index) => (
-                    <CarouselItem key={index} className="flex justify-center">
-                      <div className="flex h-[408px] w-[259px] p-1">
-                        <Card className="flex flex-1">
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <CardContent className="relative flex-1 cursor-pointer items-center justify-center p-6">
-                                <Image
-                                  className="absolute inset-0 rounded-lg"
-                                  unoptimized
-                                  priority
-                                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
-                                  alt="model"
-                                  objectFit="cover"
-                                  layout="fill"
-                                />
-                                <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
-                              </CardContent>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Prompt</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  <div className="whitespace-pre-wrap text-left">
-                                    {JSON.stringify(item.data, null, 2)}
-                                  </div>
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction>
-                                  Use this prompt
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </Card>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
-            </div>
+            />
+            <ModelCarousel models={models} />
+
             <div className="hidden lg:block">
               {!!loadingGetModels ? (
                 <div>Loading...</div>
@@ -466,7 +609,23 @@ export function FeatureModels({ lists }: { lists: any[] }) {
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => {
-                              console.log(124124)
+                              // TODO: use the model prompt
+                              form.setValue('prompt', item.data.prompt)
+                              form.setValue(
+                                'neg_prompt',
+                                item.data.neg_prompt || '',
+                              )
+                              form.setValue(
+                                'num_iterations',
+                                item.data.num_iterations || 25,
+                              )
+                              form.setValue(
+                                'guidance_scale',
+                                item.data.guidance_scale || 7,
+                              )
+                              form.setValue('width', item.data.width || 512)
+                              form.setValue('height', item.data.height || 768)
+                              form.setValue('seed', item.data.seed || '-1')
                             }}
                           >
                             Use this prompt
@@ -748,8 +907,14 @@ export function FeatureModels({ lists }: { lists: any[] }) {
       <Dialog
         open={open}
         onOpenChange={(isOpen) => {
-          if (loadingGenerate) {
-            return toast.error('Please wait for the generation to complete.')
+          // Reset state when dialog is closed
+          if (!isOpen) {
+            setLoadingGenerate(false)
+            setMintUrl('')
+            setInfo(null)
+            setTransactionId('')
+            setLoadingUpload(false)
+            setLoadingMint(false)
           }
 
           setOpen(isOpen)
@@ -794,52 +959,54 @@ export function FeatureModels({ lists }: { lists: any[] }) {
                   <Button
                     className="gap-1.5 rounded-full"
                     variant="outline"
-                    onClick={() => {
-                      const path = mintUrl.split('/')
-                      const name = path[path.length - 1].split('.')[0]
-                      const intentUrl =
-                        'https://twitter.com/intent/tweet?text=' +
-                        encodeURIComponent(
-                          'My latest #AIart creation with Imagine #Heurist 🎨',
-                        ) +
-                        '&url=' +
-                        encodeURIComponent(
-                          `https://imagine.heurist.ai/share/${name}`,
-                        )
-                      window.open(intentUrl, '_blank', 'width=550,height=420')
-                    }}
+                    onClick={onShareTwitter}
                   >
                     <span>Share on</span>
                     <span className="i-ri-twitter-x-fill h-4 w-4" />
                   </Button>
-                  <Button
-                    className="gap-1.5 rounded-full"
-                    variant="outline"
-                    disabled={loadingUpload}
-                    onClick={onUpload}
-                  >
-                    {loadingUpload ? (
-                      <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                    ) : (
+
+                  {!isUploaded && (
+                    <Button
+                      className="gap-1.5 rounded-full"
+                      variant="outline"
+                      disabled={loadingUpload}
+                      onClick={onUpload}
+                    >
+                      {loadingUpload ? (
+                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Image
+                          src="/gateway.svg"
+                          alt="gateway"
+                          width={26}
+                          height={26}
+                        />
+                      )}
+                      Upload to Gateway
+                    </Button>
+                  )}
+                </div>
+
+                {!!transactionId && (
+                  <div className="mt-2">
+                    <Button
+                      className="gap-1.5 rounded-full"
+                      variant="outline"
+                      onClick={() =>
+                        window.open(
+                          `https://mygateway.xyz/explorer/transactions/${transactionId}`,
+                          '_blank',
+                        )
+                      }
+                    >
                       <Image
                         src="/gateway.svg"
                         alt="gateway"
                         width={26}
                         height={26}
                       />
-                    )}
-                    Upload to Gateway
-                  </Button>
-                </div>
-                {!!transactionId && (
-                  <div className="mt-2">
-                    <Link
-                      className="text-sky-400 underline"
-                      href={`https://mygateway.xyz/explorer/transactions/${transactionId}`}
-                      target="_blank"
-                    >
                       Open in Gateway
-                    </Link>
+                    </Button>
                   </div>
                 )}
                 <Separator className="my-4" />
@@ -848,23 +1015,30 @@ export function FeatureModels({ lists }: { lists: any[] }) {
                   onClick={onMintToNFT}
                   disabled={loadingMint}
                 >
-                  {loadingMint && (
-                    <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                  {(loadingMintNFT ||
+                    loadingSignatureFreeMint ||
+                    loadingPartnerFreeMint) && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Mint to NFT
+                  ✨ Mint zkImagine NFT{' '}
+                  {canSignatureFreeMint || availableNFT
+                    ? ' (Free & Zero Gas)'
+                    : ''}
                 </Button>
-                <div className="mt-4 flex flex-col space-y-2">
-                  <Label htmlFor="address">Referral Address</Label>
-                  <Input
-                    id="address"
-                    placeholder="Referral Address"
-                    autoComplete="off"
-                    value={referralAddress}
-                    onChange={(e) =>
-                      setReferralAddress(e.target.value as Address)
-                    }
-                  />
-                </div>
+                {!canSignatureFreeMint && !availableNFT && (
+                  <div className="mt-4 flex flex-col space-y-2">
+                    <Label htmlFor="address">Referral Address</Label>
+                    <Input
+                      id="address"
+                      placeholder="Referral Address"
+                      autoComplete="off"
+                      value={referralAddress}
+                      onChange={(e) =>
+                        setReferralAddress(e.target.value as Address)
+                      }
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -873,3 +1047,88 @@ export function FeatureModels({ lists }: { lists: any[] }) {
     </div>
   )
 }
+
+/**
+ * ModelTabs component for displaying model selection tabs
+ */
+interface ModelTabsProps {
+  featureModels: { name: string }[]
+  selectedModel: string
+  loadingGetModels: number | null
+  onSelectModel: (value: string) => void
+}
+
+const ModelTabs: React.FC<ModelTabsProps> = ({
+  featureModels,
+  selectedModel,
+  loadingGetModels,
+  onSelectModel,
+}) => (
+  <Tabs value={selectedModel} onValueChange={onSelectModel} className="flex">
+    <TabsList className="flex-1 border border-slate-300 bg-white">
+      {featureModels.map((model, index) => (
+        <TabsTrigger
+          key={model.name}
+          className="flex-1 gap-2 data-[state=active]:bg-black data-[state=active]:text-white"
+          value={model.name}
+        >
+          <span>Model {index + 1}</span>
+          {loadingGetModels === index + 1 && (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          )}
+        </TabsTrigger>
+      ))}
+    </TabsList>
+  </Tabs>
+)
+
+/**
+ * ModelCarousel component for displaying model carousel on mobile
+ */
+interface ModelCarouselProps {
+  models: Array<{
+    label: string
+    // Add other properties of the model object as neede
+  }>
+}
+
+const ModelCarousel: React.FC<ModelCarouselProps> = ({ models }) => (
+  <div className="flex justify-center lg:hidden">
+    <Carousel className="w-[259px]">
+      <CarouselContent>
+        {models.map((item, index) => (
+          <CarouselItem key={index} className="flex justify-center">
+            <ModelCard item={item} />
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+    </Carousel>
+  </div>
+)
+
+/**
+ * ModelCard component for displaying individual model cards
+ */
+interface ModelCardProps {
+  item: {
+    label: string
+    // Add other properties of the item object as needed
+  }
+}
+
+const ModelCard: React.FC<ModelCardProps> = ({ item }) => (
+  <Card className="flex flex-1">
+    <CardContent className="relative flex-1 cursor-pointer items-center justify-center p-6">
+      <Image
+        className="absolute inset-0 rounded-lg"
+        unoptimized
+        priority
+        src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
+        alt="model"
+        objectFit="cover"
+        layout="fill"
+      />
+      <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
+    </CardContent>
+  </Card>
+)
