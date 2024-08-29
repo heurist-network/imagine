@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { motion } from 'framer-motion'
 import { nanoid } from 'nanoid'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
@@ -65,6 +66,12 @@ import { useConnectModal } from '@rainbow-me/rainbowkit'
 
 import { useMintToNFT } from '../mintToNFT'
 
+interface TabProps {
+  text: string
+  selected: boolean
+  setSelected: React.Dispatch<React.SetStateAction<string>>
+}
+
 const formSchema = z.object({
   prompt: z.string().optional(),
   neg_prompt: z.string().optional(),
@@ -100,10 +107,13 @@ export function FeatureModel({ lists }: { lists: any[] }) {
 
   const [open, setOpen] = useState(false)
 
-  const [loadingGetModels, setLoadingGetModels] = useState(0)
+  const [loadingGetModels, setLoadingGetModels] = useState(true)
   const [loadingGenerate, setLoadingGenerate] = useState(false)
   const [mintType, setMintType] = useState<'quick' | 'advanced'>('quick')
+  const [modelList, setModelList] = useState<any[]>([])
   const [models, setModels] = useState<any[]>([])
+  const [activeModelIndex, setActiveModelIndex] = useState(0)
+
   const [selectedModel, setSelectedModel] = useState(
     featureModels[0]?.name || '',
   )
@@ -139,9 +149,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
       address: account.address,
     }).data?.value as bigint) || BigInt(0)
 
-  const findActiveModel = featureModels.find(
-    (model) => model.name === selectedModel,
-  )
+  const findActiveModel = featureModels[activeModelIndex]
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -156,50 +164,52 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     },
   })
 
-  /**
-   * Fetches model data from GitHub
-   * @param {string} [params] - Optional model parameter
-   */
-  const getModels = async (params?: string) => {
-    const model = params || selectedModel
+  const getModel = async (model: string) => {
+    const model1 = await fetch(
+      `https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}.json`,
+      {
+        next: { revalidate: 3600 },
+      },
+    ).then((res) => res.json())
+    const model2 = await fetch(
+      `https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-2.json`,
+      {
+        next: { revalidate: 3600 },
+      },
+    ).then((res) => res.json())
+    const model3 = await fetch(
+      `https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-3.json`,
+      {
+        next: { revalidate: 3600 },
+      },
+    ).then((res) => res.json())
 
-    if (!model) return setModels([])
+    return [
+      { label: model, data: model1 },
+      { label: `${model}-2`, data: model2 },
+      { label: `${model}-3`, data: model3 },
+    ]
+  }
 
-    const findIndex = featureModels.findIndex((item) => item.name === model)
-
-    setLoadingGetModels(findIndex + 1)
-
+  const getAllModels = async () => {
     try {
-      const model1 = await fetch(
-        `https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}.json`,
-        {
-          next: { revalidate: 3600 },
-        },
-      ).then((res) => res.json())
-      const model2 = await fetch(
-        `https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-2.json`,
-        {
-          next: { revalidate: 3600 },
-        },
-      ).then((res) => res.json())
-      const model3 = await fetch(
-        `https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${model}-3.json`,
-        {
-          next: { revalidate: 3600 },
-        },
-      ).then((res) => res.json())
-
-      const models = [
-        { label: model, data: model1 },
-        { label: `${model}-2`, data: model2 },
-        { label: `${model}-3`, data: model3 },
-      ]
-
-      setModels(models)
+      setLoadingGetModels(true)
+      const models = await Promise.all(
+        featureModels.map(async (model) => await getModel(model.name)),
+      )
+      setModelList(models)
+      setModels(models[0])
+    } catch (error) {
+      setModelList([])
     } finally {
-      setLoadingGetModels(0)
+      setLoadingGetModels(false)
     }
   }
+
+  useEffect(() => {
+    getAllModels()
+  }, [featureModels.length])
+
 
   /**
    * Generates an image based on the current form values
@@ -543,35 +553,53 @@ export function FeatureModel({ lists }: { lists: any[] }) {
   }, [models, form])
 
   return (
-    <div className="h-[1040px] bg-[#1D1D1B] pt-[129px]" id="featured-models">
-      <div className="container px-0 text-white">
+    <div
+      className={cn(
+        'bg-[#1D1D1B]',
+        'pt-[32px] md:pt-[57px] lg:pt-[81px] xl:pt-[105px] 2xl:pt-[129px]',
+        'pb-[32px] md:pb-[54px] lg:pb-[74px] xl:pb-[94px] 2xl:pb-[114px]',
+      )}
+      id="featured-models"
+    >
+      <div className="container text-white">
         <div
           className={cn(
-            'text-[48px] font-semibold leading-[58px] -tracking-[0.0075em]',
+            'font-semibold -tracking-[0.0075em]',
+            'text-[24px] leading-[1.2] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
+
             inter.className,
           )}
         >
           Featured Models of the Day
         </div>
-        <div className="'SF_Mono'] mb-4 mt-1.5 text-sm leading-6 text-neutral-500 lg:mb-8">
-          Select a model from today's curated collection to generate and mint.{' '}
+        <div className="mt-1.5 font-sfMono text-[14px] leading-[1.5] text-neutral-500 lg:text-[16px]">
+          Select a model from today's curated collection to generate and mint.
         </div>
-        <div className="flex flex-col items-center gap-4 lg:flex-row lg:gap-16">
-          <div className="flex h-[552px] w-full flex-1 flex-col gap-4 lg:gap-8">
-            <ModelTabs
-              featureModels={featureModels}
-              selectedModel={selectedModel}
-              loadingGetModels={loadingGetModels}
-              onSelectModel={(value) => {
-                if (!!loadingGetModels) return
-                setSelectedModel(value)
-                getModels(value)
+
+        <div
+          className={cn(
+            'flex flex-col items-center xl:flex-row xl:gap-20',
+            'mt-[16px] md:mt-[24px] lg:mt-[32px] xl:mt-[40px] 2xl:mt-[48px]',
+          )}
+        >
+          <div
+            className={cn(
+              'flex w-full flex-1 flex-col',
+              'gap-[16px] md:gap-[24px] lg:gap-[32px] xl:gap-[40px] 2xl:gap-[48px]',
+            )}
+          >
+            <NavTabs
+              tabs={['Model 1', 'Model 2', 'Model 3', 'Model 4']}
+              onSelect={(index) => {
+                setModels(modelList[index])
+                setActiveModelIndex(index)
               }}
             />
+
             <ModelCarousel models={models} />
 
-            <div className="hidden lg:block">
-              {!!loadingGetModels ? (
+            <div className="hidden xl:block">
+              {loadingGetModels ? (
                 <div className="flex h-[392px] items-center justify-center">
                   <Loader2 className="h-8 w-8 animate-spin text-white" />
                   <span className="ml-2 text-white">Loading models...</span>
@@ -656,13 +684,19 @@ export function FeatureModel({ lists }: { lists: any[] }) {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-4 rounded-[10px] bg-[#262626] p-12">
+          <div
+            className={cn(
+              'mt-4 flex w-full flex-col gap-4 rounded-[10px] bg-transparent p-0 xl:mt-0 xl:w-[652px] xl:bg-[#262626] xl:p-12',
+              inter.className,
+            )}
+          >
             {mintType === 'quick' ? (
               <div className="flex-1">
-                <div className="text-lg font-semibold">
+                <div className="text-[18px] font-semibold leading-[1.56]">
                   Quick Generate and Mint
                 </div>
-                <div className="'SF_Mono'] mb-4 mt-1.5 text-sm leading-6 text-neutral-400">
+                <div className="mb-4 mt-1.5 font-sfMono text-sm leading-6 text-neutral-400">
+
                   Generate an image instantly with a pre-filled prompt. For more
                   customization options, use Advanced Mint.
                 </div>
@@ -692,9 +726,10 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                   <Button
                     className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
                     onClick={onGenerate}
-                    disabled={loadingGenerate || !!loadingGetModels}
+                    disabled={loadingGenerate || loadingGetModels}
                   >
-                    {(loadingGenerate || !!loadingGetModels) && (
+                    {(loadingGenerate || loadingGetModels) && (
+
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Generate and Mint
@@ -774,7 +809,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                           />
                           <FormControl>
                             <Slider
-                              className="[&>.slider-thumb]:bg-[#CDF138] [&>.slider-track]:bg-white"
+                              rangeClassName="bg-[#CDF138]"
                               value={[field.value]}
                               onValueChange={(value) =>
                                 field.onChange(value[0])
@@ -812,7 +847,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                               min={1}
                               max={12}
                               step={0.1}
-                              className="[&>.slider-thumb]:bg-[#CDF138] [&>.slider-track]:bg-[#EEEEEE]"
+                              rangeClassName="bg-[#CDF138]"
                             />
                           </FormControl>
                           <FormMessage />
@@ -1061,43 +1096,60 @@ export function FeatureModel({ lists }: { lists: any[] }) {
   )
 }
 
-/**
- * ModelTabs component for displaying model selection tabs
- */
-interface ModelTabsProps {
-  featureModels: { name: string }[]
-  selectedModel: string
-  loadingGetModels: number | null
-  onSelectModel: (value: string) => void
+const Tab = ({ text, selected, setSelected }: TabProps) => {
+  return (
+    <button
+      onClick={() => setSelected(text)}
+      className={cn(
+        'relative flex-1 rounded-md p-2 text-sm text-black transition-all',
+      )}
+    >
+      <p
+        className={cn(
+          'relative z-50 text-[14px] font-medium xl:text-[16px]',
+          inter.className,
+        )}
+      >
+        {text}
+      </p>
+      {selected && (
+        <motion.span
+          layoutId="tabs"
+          transition={{ type: 'spring', duration: 0.5 }}
+          className={cn('absolute inset-0 rounded-sm bg-[#CDF138]')}
+        />
+      )}
+    </button>
+  )
 }
 
-const ModelTabs: React.FC<ModelTabsProps> = ({
-  featureModels,
-  selectedModel,
-  loadingGetModels,
-  onSelectModel,
-}) => (
-  <Tabs
-    value={selectedModel}
-    onValueChange={onSelectModel}
-    className="flex rounded-[8px]"
-  >
-    <TabsList className="flex-1 border border-slate-300 bg-white">
-      {featureModels.map((model, index) => (
-        <TabsTrigger
-          key={model.name}
-          className="flex-1 gap-1 rounded-[8px] data-[state=active]:bg-[#CDF138]"
-          value={model.name}
-        >
-          <span>Model {index + 1}</span>
-          {loadingGetModels === index + 1 && (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          )}
-        </TabsTrigger>
+export function NavTabs({
+  tabs,
+  onSelect,
+}: {
+  tabs: string[]
+  onSelect?: (index: number) => void
+}) {
+  const [selected, setSelected] = useState<string>(tabs[0])
+
+  return (
+    <div className="flex flex-wrap items-center rounded-md bg-white p-1">
+      {tabs.map((tab, index) => (
+        <Tab
+          text={tab}
+          selected={selected === tab}
+          setSelected={(value) => {
+            if (value === selected) return
+            setSelected(value)
+            onSelect?.(index)
+          }}
+          key={tab}
+        />
       ))}
-    </TabsList>
-  </Tabs>
-)
+    </div>
+  )
+}
+
 
 /**
  * ModelCarousel component for displaying model carousel on mobile
@@ -1110,8 +1162,8 @@ interface ModelCarouselProps {
 }
 
 const ModelCarousel: React.FC<ModelCarouselProps> = ({ models }) => (
-  <div className="flex justify-center lg:hidden">
-    <Carousel className="w-[259px]">
+  <div className="flex justify-center xl:hidden">
+    <Carousel className="h-[397px] w-[259px]">
       <CarouselContent>
         {models.map((item, index) => (
           <CarouselItem key={index} className="flex justify-center">
@@ -1119,6 +1171,8 @@ const ModelCarousel: React.FC<ModelCarouselProps> = ({ models }) => (
           </CarouselItem>
         ))}
       </CarouselContent>
+      <CarouselPrevious className="text-black" />
+      <CarouselNext className="text-black" />
     </Carousel>
   </div>
 )

@@ -8,8 +8,10 @@ import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Address, Hash, isAddress } from 'viem'
+import { useAccount, useBalance, useClient } from 'wagmi'
 import { zksync } from 'viem/zksync'
 import { useAccount, useBalance, useClient, useSwitchChain } from 'wagmi'
+
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
@@ -313,7 +315,6 @@ export function FeatureModels({ lists }: { lists: any[] }) {
    */
   const onShareTwitter = async () => {
     if (!isMinted) return toast.error('You need to mint the image to NFT first')
-
     const resOfNotifyAfterMintActions = await fetch(
       API_NOTIFY_AFTER_MINT_ACTIONS,
       {
@@ -346,8 +347,6 @@ export function FeatureModels({ lists }: { lists: any[] }) {
   const onMintToNFT = async () => {
     // TODO: Update function, add signatureFreeMint and partnerFreeMint
     if (!account.address) return openConnectModal?.()
-
-    // Switch to zkSync chain
 
     const extractedImageId = extractImageId(info.url)
     const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
@@ -548,6 +547,7 @@ export function FeatureModels({ lists }: { lists: any[] }) {
       }
     }
   }, [models, form])
+
 
   // Switch to zkSync chain
   useEffect(() => {
