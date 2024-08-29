@@ -1,14 +1,13 @@
 import { MoreHorizontal } from 'lucide-react'
 import * as React from 'react'
 import { Inter } from 'next/font/google'
-import Link from 'next/link'
 
 import { ButtonProps, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export function Arrow({ className }: { className?: string; size?: number }) {
+export function Arrow({ className }: { className?: string }) {
   return (
     <svg
       className={className}

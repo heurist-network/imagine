@@ -1,7 +1,6 @@
 'use client'
 
-import Image from 'next/image'
-
+import { Arrow } from '@/components/ui/pagination'
 import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit'
 
 import { Button } from './button'
@@ -45,13 +44,7 @@ export function ConnectButton() {
                     onClick={openConnectModal}
                   >
                     <span>Connect Wallet</span>
-                    <Image
-                      className="transition-transform group-hover:rotate-45"
-                      src="/arrow.svg"
-                      alt="arrow"
-                      width={16}
-                      height={16}
-                    />
+                    <Arrow className="w-[14px] transition-transform group-hover:rotate-45" />
                   </Button>
                 )
               }

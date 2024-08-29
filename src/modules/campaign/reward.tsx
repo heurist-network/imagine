@@ -5,7 +5,7 @@ import toast from 'react-hot-toast'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
 import { ContractFunctionExecutionError, formatEther } from 'viem'
-import { useAccount, useChains, usePublicClient, useWalletClient } from 'wagmi'
+import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
 import { MagicCard } from '@/components/magicui/magic-card'
 import Marquee from '@/components/magicui/marquee'
@@ -394,8 +394,9 @@ export function CampaignReward() {
                   Upload and Share
                 </div>
                 <div className="font-sfMono text-[14px] leading-[1.125] text-white/90 xl:text-[16px]">
-                  Upload the artwork to Gateway Network to prove your ownership, and share on X (Twitter)
-                  to earn additional scores. Share your creation in Heurist Discord to get more exposure.
+                  Upload the artwork to Gateway Network to prove your ownership,
+                  and share on X (Twitter) to earn additional scores. Share your
+                  creation in Heurist Discord to get more exposure.
                 </div>
               </div>
             </div>
