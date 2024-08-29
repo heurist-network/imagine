@@ -12,8 +12,6 @@ import { Providers } from './providers'
 import '@rainbow-me/rainbowkit/styles.css'
 import '../styles/globals.css'
 
-import { cn } from '@/lib/utils'
-
 const title = 'Heurist Imagine'
 const description =
   'Access Stable Diffusion models provided by a decentralized network of GPUs. Create and reproduce IP without limiation. Showcase your creativity and earn crypto.'
