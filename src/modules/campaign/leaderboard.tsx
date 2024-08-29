@@ -87,6 +87,9 @@ export function Leaderboard() {
         >
           Sprint {sprint} Leaderboard
         </div>
+        <div className="mb-4 mt-1.5 text-sm leading-6 text-neutral-500 lg:mb-8">
+          Leaderboard data is refreshed every 5 minutes.
+        </div>
         <div
           className={cn(
             'relative w-full overflow-auto',
@@ -269,7 +272,7 @@ export function LeaderboardRow({
           },
         )}
       >
-        {item.zk_cashback}
+        {item.zk_cashback.toFixed(2)}
       </div>
     </div>
   )

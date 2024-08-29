@@ -72,7 +72,7 @@ function PoolRewardCard({
           'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
         )}
       >
-        {rewards}
+        {rewards} ZK
       </div>
       <div className="flex justify-between">
         <div className="line-clamp-1 rounded-[2px] bg-white px-2">
@@ -378,7 +378,7 @@ export function CampaignReward() {
                 <div className="font-sfMono text-[14px] leading-[1.125] text-white/90 xl:text-[16px]">
                   Mint fee is 0.0006 ETH on ZKsync Era. Partner NFT holders and
                   selected Heurist community members get one chance of free mint
-                  per day.
+                  per day. Gasless free mint is powered by Zyfi.
                 </div>
               </div>
               <div className="group/item flex flex-1 flex-col gap-2">
@@ -394,8 +394,8 @@ export function CampaignReward() {
                   Upload and Share
                 </div>
                 <div className="font-sfMono text-[14px] leading-[1.125] text-white/90 xl:text-[16px]">
-                  Upload the artwork to Gateway Network and share on X (Twitter)
-                  to earn additional scores.
+                  Upload the artwork to Gateway Network to prove your ownership, and share on X (Twitter)
+                  to earn additional scores. Share your creation in Heurist Discord to get more exposure.
                 </div>
               </div>
             </div>
