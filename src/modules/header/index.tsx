@@ -33,7 +33,7 @@ export function Header() {
                   `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
                 )}
               >
-                Create To Earn
+                Campaign
               </span>
               <span className="i-mingcute-right-fill ml-1 text-muted-foreground group-hover:animate-bounce-horizontal" />
             </AnimatedGradientText>
@@ -70,7 +70,7 @@ export function Header() {
                   `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
                 )}
               >
-                Create To Earn
+                Campaign
               </span>
             </AnimatedGradientText>
           </Link>
