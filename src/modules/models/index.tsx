@@ -23,7 +23,8 @@ export async function Models() {
       (item) =>
         item.type === 'sd15' ||
         item.type === 'sdxl10' ||
-        item.type.includes('composite'),
+        item.type.includes('composite') ||
+        item.type.includes('flux'),
     )
 
     if (!lists.length) return null
