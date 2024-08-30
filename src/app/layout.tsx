@@ -108,7 +108,7 @@ export default function RootLayout({
               )}
             />
           </div>
-          <div className="relative flex min-h-screen flex-col bg-background">
+          <div className="relative flex min-h-screen flex-col bg-background pt-14">
             <Header />
             {children}
           </div>
