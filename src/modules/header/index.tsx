@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import AnimatedGradientText from '@/components/magicui/animated-gradient-text'
 import { ConnectButton } from '@/components/ui/connect-button'
 import { cn } from '@/lib/utils'
 
@@ -24,7 +25,19 @@ export function Header() {
             </div>
           </Link>
         </div>
-        <div className="hidden gap-4 md:flex">
+        <div className="hidden items-center gap-4 md:flex">
+          <Link href="/campaign">
+            <AnimatedGradientText>
+              <span
+                className={cn(
+                  `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
+                )}
+              >
+                Create To Earn
+              </span>
+              <span className="i-mingcute-right-fill ml-1 text-muted-foreground group-hover:animate-bounce-horizontal" />
+            </AnimatedGradientText>
+          </Link>
           <nav className="hidden items-center gap-1 md:flex">
             <Link target="_blank" href="https://discord.com/invite/heuristai">
               <div className="inline-flex h-10 w-10 items-center justify-center whitespace-nowrap rounded-md px-0 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
@@ -49,7 +62,18 @@ export function Header() {
             <ConnectButton />
           </div>
         </div>
-        <div className="block md:hidden">
+        <div className="flex gap-2 md:hidden">
+          <Link href="/campaign">
+            <AnimatedGradientText>
+              <span
+                className={cn(
+                  `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
+                )}
+              >
+                Create To Earn
+              </span>
+            </AnimatedGradientText>
+          </Link>
           <div
             className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border"
             onClick={() => {
