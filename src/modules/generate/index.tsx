@@ -63,8 +63,8 @@ const formSchema = z.object({
   neg_prompt: z.string().optional(),
   num_iterations: z.number(),
   guidance_scale: z.number(),
-  width: z.number().min(512).max(1024),
-  height: z.number().min(512).max(1024),
+  width: z.number().min(512).max(2048),
+  height: z.number().min(512).max(2048),
   seed: z.string().optional(),
   model: z.string().optional(),
 })
@@ -482,8 +482,8 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                         if (Number(e.target.value) < 512) {
                           field.onChange(512)
                         }
-                        if (Number(e.target.value) > 1024) {
-                          field.onChange(1024)
+                        if (Number(e.target.value) > 2048) {
+                          field.onChange(2048)
                         }
                       }}
                     />
@@ -509,8 +509,8 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                         if (Number(e.target.value) < 512) {
                           field.onChange(512)
                         }
-                        if (Number(e.target.value) > 1024) {
-                          field.onChange(1024)
+                        if (Number(e.target.value) > 2048) {
+                          field.onChange(2048)
                         }
                       }}
                     />
