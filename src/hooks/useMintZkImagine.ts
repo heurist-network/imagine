@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Abi, Address, encodeFunctionData, keccak256 } from 'viem'
+import {
+  Abi,
+  Address,
+  encodeFunctionData,
+  keccak256,
+  PublicClient,
+  WalletClient,
+} from 'viem'
 import { eip712WalletActions, zksync } from 'viem/zksync'
 import {
   useAccount,
@@ -210,8 +217,11 @@ export const useMintZkImagine = () => {
           nonce,
         }
 
-        const eip712WalletClient = walletClient.extend(eip712WalletActions())
-        const hash = await eip712WalletClient.sendTransaction(txPayload)
+        const hash = await sendAndWaitForTransaction(
+          walletClient,
+          publicClient,
+          txPayload,
+        )
         await publicClient.waitForTransactionReceipt({ hash })
 
         return hash
@@ -288,8 +298,11 @@ export const useMintZkImagine = () => {
           nonce,
         }
 
-        const eip712WalletClient = walletClient.extend(eip712WalletActions())
-        const hash = await eip712WalletClient.sendTransaction(txPayload)
+        const hash = await sendAndWaitForTransaction(
+          walletClient,
+          publicClient,
+          txPayload,
+        )
         await publicClient.waitForTransactionReceipt({ hash })
 
         return hash
@@ -349,4 +362,24 @@ export const useMintZkImagine = () => {
     isLoading,
     canSignatureFreeMint,
   }
+}
+
+const sendAndWaitForTransaction = async (
+  walletClient: WalletClient,
+  publicClient: PublicClient,
+  txPayload: any,
+) => {
+  const eip712WalletClient = walletClient.extend(eip712WalletActions())
+
+  const eip712Request =
+    await eip712WalletClient.prepareTransactionRequest(txPayload)
+  const serializedTransaction = await eip712WalletClient.signTransaction(
+    eip712Request as any,
+  )
+
+  const hash = await publicClient.sendRawTransaction({
+    serializedTransaction,
+  })
+
+  return hash
 }
