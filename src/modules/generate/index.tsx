@@ -58,17 +58,6 @@ interface TooltipProps {
   children: any
 }
 
-const formSchema = z.object({
-  prompt: z.string().optional(),
-  neg_prompt: z.string().optional(),
-  num_iterations: z.number(),
-  guidance_scale: z.number(),
-  width: z.number().min(512).max(1024),
-  height: z.number().min(512).max(1024),
-  seed: z.string().optional(),
-  model: z.string().optional(),
-})
-
 function Tooltip({ content, children }: TooltipProps) {
   return (
     <div className="group relative">
@@ -176,7 +165,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
   const [showRecommend, setShowRecommend] = useState(false)
-  const [modelInfo, setModelInfo] = useState({ recommend: '' })
+  const [modelInfo, setModelInfo] = useState<any>({})
   const [history, setHistory] = useLocalStorage<any[]>('IMAGINE_HISTORY', [])
   const [result, setResult] = useState({
     url: '',
@@ -194,11 +183,23 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
     console.log('model name', model)
   }, [model])
 
+  
+  const formSchema = z.object({
+    prompt: z.string().optional(),
+    neg_prompt: z.string().optional(),
+    num_iterations: z.number(),
+    guidance_scale: z.number(),
+    width: z.number().min(512).max(modelInfo.defaults?.max_width || 1024),
+    height: z.number().min(512).max(modelInfo.defaults?.max_height || 1024),
+    seed: z.string().optional(),
+    model: z.string().optional(),
+  })
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       prompt: '',
-      neg_prompt: '(worst quality: 1.4), bad quality, nsfw',
+      neg_prompt: '',
       num_iterations: 25,
       guidance_scale: 7,
       width: 512,
@@ -311,12 +312,14 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
     } else {
       if (search) form.setValue('prompt', search)
     }
+  
+    form.setValue('width', nowModel.defaults.width);
+    form.setValue('height', nowModel.defaults.height);
+    form.setValue('neg_prompt', nowModel.defaults.neg_prompt);
+    form.setValue('num_iterations', nowModel.defaults.num_inference_steps);
+    form.setValue('guidance_scale', nowModel.defaults.guidance_scale);
+    form.setValue('seed', nowModel.defaults.seed);
   }
-
-  useEffect(() => {
-    form.setValue('width', isPhiland ? 1024 : isXl ? 680 : 512)
-    form.setValue('height', isPhiland ? 1024 : isXl ? 1024 : 768)
-  }, [isPhiland, isXl, form])
 
   useEffect(() => {
     getModelData()
@@ -416,7 +419,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             )}
           />
 
-          <FormField
+          {modelInfo.defaults?.neg_prompt !== null && <FormField
             control={form.control}
             name="neg_prompt"
             render={({ field }) => (
@@ -437,7 +440,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          />}
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             <FormField
@@ -520,8 +523,8 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                         if (Number(e.target.value) < 512) {
                           field.onChange(512)
                         }
-                        if (Number(e.target.value) > 1024) {
-                          field.onChange(1024)
+                        if (Number(e.target.value) > (modelInfo.defaults?.max_width || 1024)) {
+                          field.onChange(modelInfo.defaults?.max_width || 1024)
                         }
                       }}
                     />
@@ -547,8 +550,8 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                         if (Number(e.target.value) < 512) {
                           field.onChange(512)
                         }
-                        if (Number(e.target.value) > 1024) {
-                          field.onChange(1024)
+                        if (Number(e.target.value) > (modelInfo.defaults.max_height || 1024)) {
+                          field.onChange(modelInfo.defaults.max_height || 1024)
                         }
                       }}
                     />
