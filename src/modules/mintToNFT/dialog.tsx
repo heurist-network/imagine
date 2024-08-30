@@ -68,6 +68,7 @@ export function MintToNFT({
   const [isValidReferral, setIsValidReferral] = useState(false)
   const isSignatureNotified = useRef(false)
   const isPartnerNotified = useRef(false)
+  const alreadyMinted = useRef(false)
 
   const balance =
     (useBalance({
@@ -82,12 +83,20 @@ export function MintToNFT({
       toast.error('You cannot signature free mint')
       return
     }
+
+    if (alreadyMinted.current) {
+      toast.error('You have already minted this image.')
+      return
+    }
+
     setIsSignatureFreeMinting(true)
 
     try {
       const txHash = await signatureFreeMint(model, imageId)
       await handleMintingProcess(txHash)
       showSuccessToast('Mint zkImagine NFT successfully!', txHash)
+
+      alreadyMinted.current = true
     } catch (error) {
       console.error('Signature free mint failed', error)
       toast.error(
@@ -107,6 +116,11 @@ export function MintToNFT({
       return
     }
 
+    if (alreadyMinted.current) {
+      toast.error('You have already minted this image.')
+      return
+    }
+
     setIsPartnerFreeMinting(true)
     try {
       const txHash = await partnerFreeMint(
@@ -117,6 +131,8 @@ export function MintToNFT({
       )
       await handleMintingProcess(txHash)
       showSuccessToast('Mint zkImagine NFT successfully!', txHash)
+
+      alreadyMinted.current = true
     } catch (error) {
       console.error('Partner free minting failed:', error)
       toast.error(
@@ -132,6 +148,11 @@ export function MintToNFT({
    */
   const onMintToNFT = async () => {
     if (!account.address) return openConnectModal?.()
+
+    if (alreadyMinted.current) {
+      toast.error('You have already minted this image.')
+      return
+    }
 
     const extractedImageId = extractImageId(url)
     const zeroReferralAddress = '0x0000000000000000000000000000000000000000'
@@ -151,6 +172,8 @@ export function MintToNFT({
       )
       await handleMintingProcess(txHash)
       showSuccessToast('Mint zkImagine NFT successfully!', txHash)
+
+      alreadyMinted.current = true
     } catch (error: unknown) {
       handleMintError(error)
     } finally {
@@ -269,6 +292,10 @@ export function MintToNFT({
       }
     }
   }
+
+  useEffect(() => {
+    alreadyMinted.current = false
+  }, [imageId])
 
   // Show toast when the user can signature free mint
   useEffect(() => {
