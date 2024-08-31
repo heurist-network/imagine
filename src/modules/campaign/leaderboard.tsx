@@ -38,6 +38,7 @@ export function Leaderboard() {
 
     try {
       const response = await getLeaderboard(undefined, currentPage ?? page)
+
       setData(response.items)
       setHasNextPage(response.pageInfo.hasNextPage)
       if (currentPage) setPage(currentPage)
