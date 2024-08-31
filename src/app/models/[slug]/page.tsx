@@ -13,7 +13,7 @@ export const maxDuration = 30
 
 export default async function Models({ params }: { params: { slug: string } }) {
   const { slug } = params
-  const [model] = slug.split('-')
+  const model = slug
   if (!model) return notFound()
 
   try {

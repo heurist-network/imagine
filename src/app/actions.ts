@@ -51,6 +51,7 @@ export async function generateImage(data: any) {
       ...model_input,
     }
 
+    console.log("generate params", params)
     const response = await heurist.images.generate(params)
 
     return { status: 200, data: response }
