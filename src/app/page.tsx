@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <main className="flex-1">
       <NewHero />
-      <div>asfasf</div>
+      <div className="h-[1000px]">asfasf</div>
       {/* <div className="container h-[3000px]">
         <Suspense>
           <Hero />

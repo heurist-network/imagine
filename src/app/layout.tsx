@@ -1,5 +1,5 @@
 import { Toaster } from 'react-hot-toast'
-import { GeistSans } from 'geist/font/sans'
+import { Inter } from 'next/font/google'
 import localFont from 'next/font/local'
 import type { Metadata, Viewport } from 'next'
 
@@ -12,6 +12,8 @@ import { Providers } from './providers'
 
 import '@rainbow-me/rainbowkit/styles.css'
 import '../styles/globals.css'
+
+const inter = Inter({ subsets: ['latin'] })
 
 const title = 'Heurist Imagine'
 const description =
@@ -46,9 +48,6 @@ export const metadata: Metadata = {
       height: 768,
       alt: 'Heurist Imagine',
     },
-  },
-  appleWebApp: {
-    title,
   },
 }
 
@@ -101,7 +100,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={cn(GeistSans.className, SFMono.variable)}>
+    <html lang="en" className={cn(inter.className, SFMono.variable)}>
       {!!(env.UMAMI_URL && env.UMAMI_WEBSITE_ID) && (
         <script
           async
@@ -111,11 +110,11 @@ export default function RootLayout({
       )}
       <body className="min-h-screen">
         <Providers>
-          <div className="relative flex min-h-screen flex-col bg-background">
+          <div className="bg-background flex flex-col min-h-screen relative">
             <NewHeader />
             {children}
           </div>
-          <div className="mask-b pointer-events-none fixed inset-x-0 bottom-0 z-30 h-[80px] w-full select-none backdrop-blur-[1px]" />
+          {/* <div className="h-[80px] w-full inset-x-0 bottom-0 z-30 mask-b pointer-events-none fixed select-none backdrop-blur-[1px]" /> */}
         </Providers>
         <Toaster />
       </body>

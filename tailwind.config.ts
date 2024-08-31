@@ -14,10 +14,7 @@ const config = {
   theme: {
     container: {
       center: true,
-      padding: '2rem',
-      screens: {
-        '2xl': '1440px',
-      },
+      padding: '32px',
     },
     extend: {
       fontFamily: {

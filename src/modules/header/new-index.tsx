@@ -2,10 +2,11 @@
 
 import { useLayoutEffect, useState } from 'react'
 import { motion, useMotionValueEvent, useScroll, Variants } from 'framer-motion'
+import Link from 'next/link'
 import { useDebounceCallback } from 'usehooks-ts'
 
-// import { Arrow } from '@/components/icon'
-// import { Logo } from '@/components/logo'
+import { Logo } from '@/components/Logo'
+import { ConnectButton } from '@/components/ui/connect-button'
 import { cn } from '@/lib/utils'
 
 export function NewHeader() {
@@ -64,7 +65,7 @@ export function NewHeader() {
   }, [])
 
   return (
-    <header className="z-50 h-20 w-full transition-all">
+    <header className="h-20 w-full transition-all z-50">
       <motion.div
         initial="stateA"
         animate={isScrollTop ? 'stateB' : 'stateA'}
@@ -81,24 +82,18 @@ export function NewHeader() {
           maxWidth: { type: 'spring', stiffness: 400, damping: 30 }, // 为宽度设置弹簧动画
         }}
       >
-        <div className="w-[116px] cursor-pointer text-white">
-          {/* <Logo /> */}
+        <Link href="/" className="text-white w-[116px]">
+          <Logo />
+        </Link>
+        <div className="flex flex-1 text-white -tracking-[0.0016em] justify-center">
+          <Link
+            href="/campaign"
+            className="py-2 px-4 transition-colors hover:text-[#CDF138]"
+          >
+            Campaign
+          </Link>
         </div>
-        <div className="flex flex-1 justify-center -tracking-[0.0016em] text-white">
-          <div className="cursor-pointer px-4 py-2 transition-colors hover:text-[#CDF138]">
-            Ecosystem
-          </div>
-          <div className="cursor-pointer px-4 py-2 transition-colors hover:text-[#CDF138]">
-            Developer
-          </div>
-          <div className="cursor-pointer px-4 py-2 transition-colors hover:text-[#CDF138]">
-            Mining
-          </div>
-        </div>
-        <div className="flex h-10 w-[116px] cursor-pointer items-center justify-center gap-2 rounded-full bg-[#CDF138] font-semibold text-black">
-          <div className="-tracking-[0.0016em]">Portal</div>
-          {/* <Arrow className="h-5 w-5 -rotate-45" strokeWidth={4} /> */}
-        </div>
+        <ConnectButton />
       </motion.div>
     </header>
   )
