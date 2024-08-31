@@ -21,7 +21,7 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sfMono: ['var(--font-sf-mono)'],
+        SFMono: ['var(--font-sf-mono)'],
       },
       colors: {
         border: 'hsl(var(--border))',
