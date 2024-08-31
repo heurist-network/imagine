@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import Image from 'next/image'
 
 import { OpacityWrapper } from '@/components/motion/opacityWrapper'
+import { FeatureModels } from '@/modules/featureModels'
 import { Hero } from '@/modules/hero'
 import { NewHero } from '@/modules/hero/new-index'
 import { Models } from '@/modules/models'
@@ -10,6 +11,7 @@ export default function Home() {
   return (
     <main className="flex-1">
       <NewHero />
+      <FeatureModels />
       <div className="h-[1000px]">asfasf</div>
       {/* <div className="container h-[3000px]">
         <Suspense>

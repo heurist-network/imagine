@@ -28,7 +28,6 @@ export const DirectionAwareHover = ({
     if (!ref.current) return
 
     const direction = getDirection(event, ref.current)
-    console.log('direction', direction)
     switch (direction) {
       case 0:
         setDirection('top')
@@ -70,15 +69,15 @@ export const DirectionAwareHover = ({
     >
       <AnimatePresence mode="wait">
         <motion.div
-          className="relative h-full w-full"
+          className="h-full w-full relative"
           initial="initial"
           whileHover={direction}
           exit="exit"
         >
-          <motion.div className="absolute inset-0 z-10 hidden h-full w-full bg-black/40 transition duration-500 group-hover/card:block" />
+          <motion.div className="h-full bg-black/40 w-full inset-0 transition z-10 duration-500 absolute hidden group-hover/card:block" />
           <motion.div
             variants={variants}
-            className="relative h-full w-full bg-gray-50 dark:bg-black"
+            className="h-full bg-gray-50 w-full relative dark:bg-black"
             transition={{
               duration: 0.2,
               ease: 'easeOut',
@@ -93,7 +92,7 @@ export const DirectionAwareHover = ({
               ease: 'easeOut',
             }}
             className={cn(
-              'absolute bottom-4 left-4 z-40 text-white',
+              'absolute bottom-6 left-6 right-6 z-40 text-white',
               childrenClassName,
             )}
           >
@@ -132,7 +131,7 @@ const textVariants = {
   initial: {
     y: 0,
     x: 0,
-    opacity: 1,
+    opacity: 0,
   },
   exit: {
     y: 0,

@@ -23,13 +23,13 @@ export async function NewHero() {
     <div className="h-screen bg-gray-900 -mt-20 min-h-[880px] relative">
       <Bg />
       <TrailingImage lists={lists} />
-      <div className="container flex h-full z-50 pointer-events-none relative items-center lg:items-end">
+      <div className="container flex h-full z-20 pointer-events-none relative items-center lg:items-end">
         <div className="flex flex-col flex-1 gap-10 justify-between lg:flex-row lg:pb-[8.33%] lg:gap-0">
           <div className="flex flex-col gap-2">
             <div className="flex">
               <div
                 className={cn(
-                  'flex items-center justify-center gap-2 rounded-full bg-[#32322F] px-3 py-2 font-medium -tracking-[0.03em] text-[#CDF138]',
+                  'pointer-events-auto flex items-center justify-center gap-2 rounded-full bg-[#32322F] px-3 py-2 font-medium -tracking-[0.03em] text-[#CDF138]',
                   'text-[16px] leading-[1.2] md:text-[17px] lg:text-[18px] xl:text-[19px] 2xl:text-[20px]',
                 )}
               >
@@ -39,7 +39,7 @@ export async function NewHero() {
             </div>
             <div
               className={cn(
-                'font-semibold -tracking-[0.012em] text-white',
+                'pointer-events-auto font-semibold -tracking-[0.012em] text-white',
                 'text-[40px] leading-[1.2] md:text-[53px] lg:text-[66px] lg:leading-[1] xl:text-[79px] 2xl:text-[92px]',
               )}
             >
