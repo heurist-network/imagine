@@ -80,7 +80,7 @@ export function MintToNFT({
    */
   const onSignatureFreeMint = async () => {
     if (!canSignatureFreeMint) {
-      toast.error('You cannot signature free mint')
+      toast.error('You are not in the free mint whitelist')
       return
     }
 

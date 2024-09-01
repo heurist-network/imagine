@@ -266,7 +266,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
    * Uploads the generated image to the Gateway
    */
   const onUpload = async () => {
-    if (!isMinted) return toast.error('You need to mint the image to NFT first')
+    if (!isMinted) return toast.error('You need to mint NFT first to earn scores')
     if (!account.address) return openConnectModal?.()
 
     setTransactionId('')
@@ -315,7 +315,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
    * Opens a new window with the Twitter intent URL.
    */
   const onShareTwitter = async () => {
-    if (!isMinted) return toast.error('You need to mint the image to NFT first')
+    if (!isMinted) return toast.error('You need to mint NFT first to earn scores')
 
     const resOfNotifyAfterMintActions = await fetch(
       API_NOTIFY_AFTER_MINT_ACTIONS,
@@ -377,7 +377,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
       }
 
       await handleMintingProcess()
-      showSuccessToast('Mint zkImagine NFT successfully!', txHash)
+      showSuccessToast('Mint successful! Score +1 ', txHash)
 
       setLoading(false)
       setReferralAddress('')
