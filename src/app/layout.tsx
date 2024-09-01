@@ -5,6 +5,7 @@ import type { Metadata, Viewport } from 'next'
 
 import { env } from '@/env.mjs'
 import { cn } from '@/lib/utils'
+import { Footer } from '@/modules/footer'
 import { Header } from '@/modules/header'
 import { NewHeader } from '@/modules/header/new-index'
 
@@ -110,9 +111,10 @@ export default function RootLayout({
       )}
       <body className="min-h-screen">
         <Providers>
-          <div className="bg-background flex flex-col min-h-screen relative">
+          <div className="relative flex min-h-screen flex-col bg-background">
             <NewHeader />
             {children}
+            <Footer />
           </div>
           {/* <div className="h-[80px] w-full inset-x-0 bottom-0 z-30 mask-b pointer-events-none fixed select-none backdrop-blur-[1px]" /> */}
         </Providers>
