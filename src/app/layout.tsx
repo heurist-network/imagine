@@ -1,6 +1,7 @@
 import { Toaster } from 'react-hot-toast'
 import { Inter } from 'next/font/google'
 import localFont from 'next/font/local'
+import Link from 'next/link'
 import type { Metadata, Viewport } from 'next'
 
 import { env } from '@/env.mjs'
@@ -110,6 +111,14 @@ export default function RootLayout({
       )}
       <body className="min-h-screen">
         <Providers>
+          <div className="bg-[#CDF138]">
+            <div className="mx-auto flex h-10 max-w-5xl flex-nowrap items-center justify-center gap-0.5 truncate px-6 text-xs font-medium text-gray-950 md:max-w-[1440px] md:text-sm">
+              <span>🎉 Join ZK Fest: Create AI Art and Earn ZK Tokens.</span>
+              <Link className="underline" href="" target="_blank">
+                Read more here
+              </Link>
+            </div>
+          </div>
           <div className="relative flex min-h-screen flex-col bg-background">
             <Header />
             {children}
