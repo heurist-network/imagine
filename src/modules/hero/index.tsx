@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import { ArrowIcon, PlusIcon } from '@/components/icon'
 import BlurIn from '@/components/magicui/blur-in'
 import SwapText from '@/components/magicui/swap-text'
@@ -23,7 +25,7 @@ export async function Hero() {
   )
 
   return (
-    <div className="h-screen bg-gray-900 -mt-20 relative md:min-h-[880px]">
+    <div className="relative -mt-20 h-screen bg-gray-900 md:min-h-[880px]">
       <Bg />
       <TrailingImage lists={lists} />
       <div
@@ -32,7 +34,7 @@ export async function Hero() {
           'mx-auto max-w-5xl px-6 md:max-w-[1440px]',
         )}
       >
-        <div className="flex flex-col flex-1 gap-14 justify-between lg:flex-row lg:pb-[8.33%] lg:gap-0">
+        <div className="flex flex-1 flex-col justify-between gap-14 lg:flex-row lg:gap-0 lg:pb-[8.33%]">
           <div className="flex flex-col gap-[20px] md:gap-[29px] lg:gap-[38px] xl:gap-[47px] 2xl:gap-[56px]">
             <BlurIn className="flex" delay={1.1}>
               <div
@@ -58,28 +60,30 @@ export async function Hero() {
             />
           </div>
           <div className="flex items-end justify-end lg:justify-start">
-            <BlurIn
-              className="cursor-pointer flex gap-2.5 group pointer-events-auto items-center"
-              delay={1.1}
-            >
-              <SwapText
-                initialText="Join Create-to-Earn Event"
-                finalText="Join Create-to-Earn Event"
-                supportsHover
-                textClassName={cn(
-                  'font-medium text-white transition-colors hover:text-[#CDF138] duration-100',
-                  'text-[16px] leading-[1.33] md:text-[18px] lg:text-[20px] xl:text-[22px] 2xl:text-[24px]',
-                )}
-              />
-              <div
-                className={cn(
-                  'flex aspect-square flex-shrink-0 items-center justify-center rounded-full bg-[#CDF138] transition-transform group-hover:rotate-45',
-                  'w-[40px] md:w-[46px] lg:w-[52px] xl:w-[58px] 2xl:w-[64px]',
-                )}
+            <Link href="/campaign">
+              <BlurIn
+                className="group pointer-events-auto flex cursor-pointer items-center gap-2.5"
+                delay={1.1}
               >
-                <ArrowIcon className="w-9" />
-              </div>
-            </BlurIn>
+                <SwapText
+                  initialText="Join Create-to-Earn Event"
+                  finalText="Join Create-to-Earn Event"
+                  supportsHover
+                  textClassName={cn(
+                    'font-medium text-white transition-colors hover:text-[#CDF138] duration-100',
+                    'text-[16px] leading-[1.33] md:text-[18px] lg:text-[20px] xl:text-[22px] 2xl:text-[24px]',
+                  )}
+                />
+                <div
+                  className={cn(
+                    'flex aspect-square flex-shrink-0 items-center justify-center rounded-full bg-[#CDF138] transition-transform group-hover:rotate-45',
+                    'w-[40px] md:w-[46px] lg:w-[52px] xl:w-[58px] 2xl:w-[64px]',
+                  )}
+                >
+                  <ArrowIcon className="w-9" />
+                </div>
+              </BlurIn>
+            </Link>
           </div>
         </div>
       </div>
