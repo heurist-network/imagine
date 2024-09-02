@@ -90,7 +90,7 @@ export function Header() {
           <Link
             href="/"
             className={cn(
-              'w-[116px]',
+              'w-[250px]',
               isHomePage || isScrollTop ? 'text-white' : 'text-[#0c0c0c]',
             )}
           >
@@ -112,7 +112,7 @@ export function Header() {
             </div>
           )}
 
-          <div className="hidden lg:block">
+          <div className="w-[250px] hidden justify-end lg:flex">
             <ConnectButton />
           </div>
           <div className="block lg:hidden">
