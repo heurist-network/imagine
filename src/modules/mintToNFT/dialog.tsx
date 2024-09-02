@@ -140,6 +140,7 @@ export function MintToNFT({
       )
     } finally {
       setIsPartnerFreeMinting(false)
+      refreshPartnerNFTs()
     }
   }
 

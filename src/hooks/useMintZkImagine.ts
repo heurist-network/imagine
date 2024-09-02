@@ -28,7 +28,8 @@ export const useMintZkImagine = () => {
     chainId: walletClient?.chain.id,
   })
 
-  const { signatureData, canSignatureFreeMint } = useSignatureFreeMint()
+  const { signatureData, canSignatureFreeMint, refreshSignatureData } =
+    useSignatureFreeMint()
 
   const [mintFee, setMintFee] = useState<bigint | null>(null)
   const [discountedFee, setDiscountedFee] = useState<{
@@ -36,6 +37,9 @@ export const useMintZkImagine = () => {
     discount: bigint
   } | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [globalTimeThreshold, setGlobalTimeThreshold] = useState<bigint | null>(
+    null,
+  )
 
   const currentMarket = chain
     ? Object.values(MarketConfig).find((m) => m.chain.id === chain.id)
@@ -75,6 +79,23 @@ export const useMintZkImagine = () => {
     }
   }, [publicClient, currentMarket])
 
+  const readGlobalTimeThreshold = useCallback(async () => {
+    if (!publicClient || !currentMarket) return
+
+    try {
+      const threshold = await publicClient.readContract({
+        address: currentMarket.addresses.ZkImagine,
+        abi: ZkImagineABI,
+        functionName: 'globalTimeThreshold',
+      })
+
+      setGlobalTimeThreshold(threshold as bigint)
+      return threshold as bigint
+    } catch (error) {
+      console.error('Error reading globalTimeThreshold:', error)
+    }
+  }, [publicClient, currentMarket])
+
   useEffect(() => {
     if (chain && chain.id !== zksync.id) {
       switchChain({ chainId: zksync.id })
@@ -85,8 +106,15 @@ export const useMintZkImagine = () => {
     if (publicClient && currentMarket) {
       readMintFee().catch(console.error)
       readDiscountedMintFee().catch(console.error)
+      readGlobalTimeThreshold().catch(console.error)
     }
-  }, [publicClient, currentMarket, readMintFee, readDiscountedMintFee])
+  }, [
+    publicClient,
+    currentMarket,
+    readMintFee,
+    readDiscountedMintFee,
+    readGlobalTimeThreshold,
+  ])
 
   // @dev getSponsoredPaymasterParams is used for partnerFreeMint with zyfi paymaster.
   const getSponsoredPaymasterParams = useCallback(async (txRequest: any) => {
@@ -308,6 +336,7 @@ export const useMintZkImagine = () => {
         return hash
       } finally {
         setIsLoading(false)
+        refreshSignatureData()
       }
     },
     [
@@ -361,6 +390,8 @@ export const useMintZkImagine = () => {
     readDiscountedMintFee,
     isLoading,
     canSignatureFreeMint,
+    globalTimeThreshold,
+    readGlobalTimeThreshold,
   }
 }
 

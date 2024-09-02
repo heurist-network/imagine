@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Address, Hash, isAddress } from 'viem'
+import { Address, formatEther, Hash, isAddress } from 'viem'
 import { zksync } from 'viem/chains'
 import { useAccount, useBalance, useClient, useSwitchChain } from 'wagmi'
 import { z } from 'zod'
@@ -102,12 +102,31 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     setReferralAddress,
     loading: loadingMintNFT,
   } = useMintToNFT()
-  const { mint, mintFee, signatureFreeMint, partnerFreeMint } =
-    useMintZkImagine()
+
+  const {
+    mint,
+    mintFee,
+    discountedFee,
+    signatureFreeMint,
+    partnerFreeMint,
+    globalTimeThreshold,
+  } = useMintZkImagine()
+  const {
+    canSignatureFreeMint,
+    isLoading: loadingSignatureFreeMint,
+    error: signatureFreeMintError,
+  } = useSignatureFreeMint()
+
+  const {
+    availableNFT,
+    isLoading: loadingPartnerFreeMint,
+    error: partnerFreeMintError,
+    refreshPartnerNFTs,
+  } = usePartnerFreeMint()
+
   const featureModels = lists.slice(0, 4)
 
   const [open, setOpen] = useState(false)
-
   const [loadingGetModels, setLoadingGetModels] = useState(true)
   const [loadingGenerate, setLoadingGenerate] = useState(false)
   const [mintType, setMintType] = useState<'quick' | 'advanced'>('quick')
@@ -130,19 +149,6 @@ export function FeatureModel({ lists }: { lists: any[] }) {
   const [isMinted, setIsMinted] = useState(false)
   const [isUploaded, setIsUploaded] = useState(false)
   const [loadingMint, setLoadingMint] = useState(false)
-
-  const {
-    canSignatureFreeMint,
-    isLoading: loadingSignatureFreeMint,
-    error: signatureFreeMintError,
-  } = useSignatureFreeMint()
-
-  const {
-    availableNFT,
-    isLoading: loadingPartnerFreeMint,
-    error: partnerFreeMintError,
-    refreshPartnerNFTs,
-  } = usePartnerFreeMint()
 
   const balance =
     (useBalance({
@@ -370,6 +376,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     } finally {
       setLoading(false)
       setReferralAddress('')
+      refreshPartnerNFTs()
     }
   }
 
@@ -557,7 +564,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
         >
           Featured Models of the Day
         </div>
-        <div className="font-SFMono mt-1.5 text-[14px] text-neutral-500 leading-[1.5] lg:text-[16px]">
+        <div className="font-SFMono mt-1.5 text-[14px] leading-[1.5] text-neutral-500 lg:text-[16px]">
           Select a model from today's curated collection to generate and mint.
         </div>
 
@@ -586,8 +593,8 @@ export function FeatureModel({ lists }: { lists: any[] }) {
             <div className="hidden xl:block">
               {loadingGetModels ? (
                 <div className="flex h-[392px] items-center justify-center">
-                  <Loader2 className="h-8 text-white animate-spin w-8" />
-                  <span className="text-white ml-2">Loading models...</span>
+                  <Loader2 className="h-8 w-8 animate-spin text-white" />
+                  <span className="ml-2 text-white">Loading models...</span>
                 </div>
               ) : (
                 <div className="flex items-center justify-center">
@@ -611,14 +618,14 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                             src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
                             alt="model"
                           />
-                          <span className="h-5 right-1 bottom-1 text-gray-300 w-5 i-ri-information-line absolute md:h-6 md:right-2 md:bottom-2 md:w-6" />
+                          <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
                         </div>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle>Prompt</AlertDialogTitle>
                           <AlertDialogDescription asChild>
-                            <div className="text-left whitespace-pre-wrap">
+                            <div className="whitespace-pre-wrap text-left">
                               {JSON.stringify(item.data, null, 2)}
                             </div>
                           </AlertDialogDescription>
@@ -656,11 +663,11 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                 </div>
               )}
 
-              <div className="flex flex-col mt-8 items-center justify-center">
-                <div className="font-semibold text-lg text-neutral-300">
+              <div className="mt-8 flex flex-col items-center justify-center">
+                <div className="text-lg font-semibold text-neutral-300">
                   {findActiveModel?.name}
                 </div>
-                <div className="font-semibold text-lg text-neutral-500">
+                <div className="text-lg font-semibold text-neutral-500">
                   Created by{' '}
                   <span className="text-neutral-300">
                     {findActiveModel?.author}
@@ -677,10 +684,10 @@ export function FeatureModel({ lists }: { lists: any[] }) {
           >
             {mintType === 'quick' ? (
               <div className="flex-1">
-                <div className="font-semibold text-[18px] leading-[1.56]">
+                <div className="text-[18px] font-semibold leading-[1.56]">
                   Quick Generate and Mint
                 </div>
-                <div className="font-SFMono mt-1.5 text-sm mb-4 text-neutral-400 leading-6">
+                <div className="font-SFMono mb-4 mt-1.5 text-sm leading-6 text-neutral-400">
                   Generate an image instantly with a pre-filled prompt. For more
                   customization options, use Advanced Mint.
                 </div>
@@ -706,20 +713,20 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                     )}
                   />
                 </Form>
-                <div className="flex mt-4 gap-2 items-center">
+                <div className="mt-4 flex items-center gap-2">
                   <Button
                     className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
                     onClick={onGenerate}
                     disabled={loadingGenerate || loadingGetModels}
                   >
                     {(loadingGenerate || loadingGetModels) && (
-                      <Loader2 className="h-4 mr-2 animate-spin w-4" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Generate and Mint
                   </Button>
 
                   <Button
-                    className="bg-transparent rounded-full text-neutral-300 underline hover:bg-transparent"
+                    className="rounded-full bg-transparent text-neutral-300 underline hover:bg-transparent"
                     onClick={() => {
                       setMintType('advanced')
                     }}
@@ -730,8 +737,8 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col flex-1 gap-4">
-                <div className="font-semibold text-lg">
+              <div className="flex flex-1 flex-col gap-4">
+                <div className="text-lg font-semibold">
                   Advanced Generate and Mint
                 </div>
                 <Form {...form}>
@@ -780,7 +787,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                       control={form.control}
                       name="num_iterations"
                       render={({ field }) => (
-                        <FormItem className="space-y-4 flex-1">
+                        <FormItem className="flex-1 space-y-4">
                           <FormLabel className="flex items-center">
                             Sampling Steps ({field.value})
                           </FormLabel>
@@ -811,7 +818,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                       control={form.control}
                       name="guidance_scale"
                       render={({ field }) => (
-                        <FormItem className="space-y-4 flex-1">
+                        <FormItem className="flex-1 space-y-4">
                           <FormLabel className="flex items-center">
                             Guidance Scale ({field.value})
                           </FormLabel>
@@ -912,7 +919,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                     />
                   </div>
                 </Form>
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-2">
                   <Button
                     className="rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
                     onClick={onGenerate}
@@ -921,7 +928,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                   </Button>
                   <Button
                     variant="ghost"
-                    className="bg-transparent rounded-full text-neutral-300 underline hover:bg-transparent"
+                    className="rounded-full bg-transparent text-neutral-300 underline hover:bg-transparent"
                     onClick={() => {
                       setMintType('quick')
                     }}
@@ -954,18 +961,18 @@ export function FeatureModel({ lists }: { lists: any[] }) {
         <DialogContent className="w-[804px]">
           <DialogTitle className="hidden" />
           <DialogDescription className="hidden" />
-          <div className="flex flex-col gap-6 items-center md:flex-row">
-            <div className="flex bg-[#877DFF]/50 rounded-[10px] flex-1 w-full overflow-hidden">
+          <div className="flex flex-col items-center gap-6 md:flex-row">
+            <div className="flex w-full flex-1 overflow-hidden rounded-[10px] bg-[#877DFF]/50">
               {(loadingGenerate || !mintUrl) && (
-                <div className="flex flex-1 text-white min-h-[300px] items-center justify-center md:h-[616px]">
-                  <Loader2 className="h-4 mr-2 animate-spin w-4" />
+                <div className="flex min-h-[300px] flex-1 items-center justify-center text-white md:h-[616px]">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Generating...
                 </div>
               )}
               {!!mintUrl && (
-                <div className="flex flex-1 min-h-[300px] relative md:h-[616px]">
+                <div className="relative flex min-h-[300px] flex-1 md:h-[616px]">
                   <Image
-                    className="inset-0 absolute"
+                    className="absolute inset-0"
                     src={mintUrl}
                     alt="mint"
                     objectFit="cover"
@@ -988,23 +995,23 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                   </Link>
 
                   <Button
-                    className="rounded-full gap-1.5"
+                    className="gap-1.5 rounded-full"
                     variant="outline"
                     onClick={onShareTwitter}
                   >
                     <span>Share on</span>
-                    <span className="h-4 w-4 i-ri-twitter-x-fill" />
+                    <span className="i-ri-twitter-x-fill h-4 w-4" />
                   </Button>
 
                   {!isUploaded && (
                     <Button
-                      className="rounded-full gap-1.5"
+                      className="gap-1.5 rounded-full"
                       variant="outline"
                       disabled={loadingUpload}
                       onClick={onUpload}
                     >
                       {loadingUpload ? (
-                        <Loader2 className="h-4 mr-1 animate-spin w-4" />
+                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
                       ) : (
                         <Image
                           src="/gateway.svg"
@@ -1021,7 +1028,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                 {!!transactionId && (
                   <div className="mt-2">
                     <Button
-                      className="rounded-full gap-1.5"
+                      className="gap-1.5 rounded-full"
                       variant="outline"
                       onClick={() =>
                         window.open(
@@ -1042,14 +1049,14 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                 )}
                 <Separator className="my-4" />
                 <Button
-                  className="rounded-full bg-[#CDF138] text-black w-full hover:bg-[#CDF138]/90"
+                  className="w-full rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
                   onClick={onMintToNFT}
                   disabled={loadingMint}
                 >
                   {(loadingMintNFT ||
-                    loadingSignatureFreeMint ||
-                    loadingPartnerFreeMint) && (
-                    <Loader2 className="h-4 mr-2 animate-spin w-4" />
+                    loadingPartnerFreeMint ||
+                    loadingSignatureFreeMint) && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
                   ✨ Mint zkImagine NFT{' '}
                   {canSignatureFreeMint || availableNFT
@@ -1057,7 +1064,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                     : ''}
                 </Button>
                 {!canSignatureFreeMint && !availableNFT && (
-                  <div className="flex flex-col space-y-2 mt-4">
+                  <div className="mt-4 flex flex-col space-y-2">
                     <Label htmlFor="address">Referral Address</Label>
                     <Input
                       id="address"
@@ -1068,6 +1075,36 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                         setReferralAddress(e.target.value as Address)
                       }
                     />
+                  </div>
+                )}
+                <Separator className="my-4" />
+                {!canSignatureFreeMint && !availableNFT && (
+                  <div className="text-sm text-gray-500">
+                    <div>
+                      <Label>{`⬆️ Input referral address to get a discount!`}</Label>
+                    </div>
+                    <div>
+                      Normal Mint: {mintFee ? formatEther(mintFee) : '-'} ETH
+                    </div>
+                    <div>
+                      After Discount:{' '}
+                      {discountedFee ? formatEther(discountedFee.fee) : '-'} ETH
+                    </div>
+                  </div>
+                )}
+
+                <Separator className="my-4" />
+                {globalTimeThreshold && (
+                  <div className="text-sm text-gray-500">
+                    <Label>Free Mint Refresh at:</Label>
+                    <p>
+                      {new Date(
+                        Number(globalTimeThreshold) * 1000,
+                      ).toLocaleString(undefined, {
+                        timeZone:
+                          Intl.DateTimeFormat().resolvedOptions().timeZone,
+                      })}
+                    </p>
                   </div>
                 )}
               </div>
@@ -1116,7 +1153,7 @@ export function NavTabs({
   const [selected, setSelected] = useState<string>(tabs[0])
 
   return (
-    <div className="bg-white rounded-md flex flex-wrap p-1 items-center">
+    <div className="flex flex-wrap items-center rounded-md bg-white p-1">
       {tabs.map((tab, index) => (
         <Tab
           text={tab}
@@ -1171,9 +1208,9 @@ interface ModelCardProps {
 
 const ModelCard: React.FC<ModelCardProps> = ({ item }) => (
   <Card className="flex flex-1">
-    <CardContent className="cursor-pointer flex-1 p-6 relative items-center justify-center">
+    <CardContent className="relative flex-1 cursor-pointer items-center justify-center p-6">
       <Image
-        className="rounded-lg inset-0 absolute"
+        className="absolute inset-0 rounded-lg"
         unoptimized
         priority
         src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
@@ -1181,7 +1218,7 @@ const ModelCard: React.FC<ModelCardProps> = ({ item }) => (
         objectFit="cover"
         layout="fill"
       />
-      <span className="h-5 right-1 bottom-1 text-gray-300 w-5 i-ri-information-line absolute md:h-6 md:right-2 md:bottom-2 md:w-6" />
+      <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
     </CardContent>
   </Card>
 )

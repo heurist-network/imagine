@@ -24,6 +24,9 @@ export const useSignatureFreeMint = () => {
   const [error, setError] = useState<string | null>(null)
   const [canSignatureFreeMint, setCanSignatureFreeMint] = useState(false)
 
+  /**
+   * Fetches the signature data for the connected wallet address.
+   */
   const fetchSignatureData = useCallback(async () => {
     if (!address) return
 
@@ -32,18 +35,15 @@ export const useSignatureFreeMint = () => {
 
     try {
       const response = await fetch(SIGNATURE_DATA_URL)
-
       const data: SignatureData[] = await response.json()
 
       const userSignatureData = data.find(
         (item) => item.walletAddress.toLowerCase() === address.toLowerCase(),
       )
 
-      if (userSignatureData) {
-        setSignatureData(userSignatureData)
-      } else {
-        setSignatureData(null)
-      }
+      setSignatureData(userSignatureData || null)
+
+      await checkSignature()
     } catch (error) {
       console.error('Error fetching signature data:', error)
       setError('Failed to fetch signature data')
@@ -52,65 +52,51 @@ export const useSignatureFreeMint = () => {
     }
   }, [address])
 
-  // const canSignatureFreeMint = useCallback(async () => {
-  //   if (signatureData !== null && publicClient) {
-  //     const currentMarket = Object.values(MarketConfig).find(
-  //       (m) => m.chain.id === publicClient.chain.id,
-  //     )
-  //     const contractAddress = currentMarket?.addresses.ZkImagine
-  //     if (!contractAddress) {
-  //       throw new Error('Contract address not found for the current chain')
-  //     }
-  //     // read contract: canMintForSignature
-  //     const result = (await publicClient.readContract({
-  //       address: contractAddress,
-  //       abi: ZkImagineABI,
-  //       functionName: 'canMintForSignature',
-  //       args: [signatureData.hash, signatureData.signature],
-  //     })) as { canMint: boolean; reason: string }
-
-  //     return result.canMint
-  //   }
-  // }, [signatureData, publicClient])
-
-  useEffect(() => {
-    async function checkSignature() {
-      if (signatureData !== null && publicClient) {
-        const currentMarket = Object.values(MarketConfig).find(
-          (m) => m.chain.id === publicClient.chain.id,
-        )
-        const contractAddress = currentMarket?.addresses.ZkImagine
-        if (!contractAddress) {
-          setCanSignatureFreeMint(false)
-          throw new Error('Contract address not found for the current chain')
-        }
-
-        try {
-          // read contract: canMintForSignature
-          const result = (await publicClient.readContract({
-            address: contractAddress,
-            abi: ZkImagineABI,
-            functionName: 'canMintForSignature',
-            args: [signatureData.hash, signatureData.signature, address],
-          })) as { canMint: boolean; reason: string }
-
-          setCanSignatureFreeMint(!!result.canMint)
-        } catch (error) {
-          setCanSignatureFreeMint(false)
-        }
-      } else {
+  /**
+   * Checks if the signature data is valid for the connected wallet address.
+   */
+  const checkSignature = useCallback(async () => {
+    if (signatureData && publicClient) {
+      const currentMarket = Object.values(MarketConfig).find(
+        (m) => m.chain.id === publicClient.chain.id,
+      )
+      const contractAddress = currentMarket?.addresses.ZkImagine
+      if (!contractAddress) {
         setCanSignatureFreeMint(false)
+        setError('Contract address not found for the current chain')
+        return
       }
+
+      try {
+        // read contract: canMintForSignature
+        const result = (await publicClient.readContract({
+          address: contractAddress,
+          abi: ZkImagineABI,
+          functionName: 'canMintForSignature',
+          args: [signatureData.hash, signatureData.signature, address],
+        })) as { canMint: boolean; reason: string }
+
+        setCanSignatureFreeMint(!!result.canMint)
+      } catch (error) {
+        console.error('Error reading contract:', error)
+        setCanSignatureFreeMint(false)
+        setError('Failed to read contract')
+      }
+    } else {
+      setCanSignatureFreeMint(false)
     }
+  }, [signatureData, publicClient, address])
 
-    checkSignature()
-  }, [signatureData, publicClient])
-
+  /**
+   * Fetches the signature data and checks if the signature is valid when the component mounts.
+   */
   useEffect(() => {
     fetchSignatureData()
   }, [fetchSignatureData])
 
-  // Auto refresh signature data when webpage loads
+  /**
+   * Automatically refreshes the signature data every minute.
+   */
   useEffect(() => {
     const refreshInterval = setInterval(() => {
       fetchSignatureData()

@@ -86,6 +86,7 @@ export const usePartnerFreeMint = () => {
   }, [findUsablePartnerNFT])
 
   // Function to manually trigger NFT fetch and usable NFT check
+  //@dev This function allows the component to refresh the list of owned NFTs and find any that are eligible for partner free minting, updating the UI accordingly.
   const refreshPartnerNFTs = useCallback(async () => {
     await fetchNFTsForOwner()
   }, [fetchNFTsForOwner])
