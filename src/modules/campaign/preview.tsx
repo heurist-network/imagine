@@ -79,11 +79,11 @@ export function CampaignPreview() {
     <div
       className={cn(
         'flex h-[calc(100vh-56px)] items-center bg-campaign-preview bg-cover',
-        'min-h-[800px] md:min-h-[1100px] lg:min-h-[1200px] xl:min-h-[1100px] 2xl:min-h-[900px]',
+        'min-h-[800px] md:min-h-[1100px] lg:min-h-[1200px] xl:min-h-[1100px]',
       )}
     >
       <div className="container">
-        <div className="flex flex-col justify-between gap-6 2xl:flex-row 2xl:gap-12">
+        <div className="flex flex-col justify-between gap-6 xl:flex-row xl:gap-12">
           <div className="flex flex-col justify-between 2xl:h-[293px]">
             <div className="2xl:w-[682px]">
               <FadeText

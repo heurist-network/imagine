@@ -66,7 +66,7 @@ export function Header() {
 
   return (
     <>
-      <header className="z-50 h-20 w-full transition-all">
+      <header className="fixed left-0 top-5 z-50 h-20 w-full transition-all">
         <motion.div
           initial="stateA"
           animate={isScrollTop ? 'stateB' : 'stateA'}
@@ -96,7 +96,10 @@ export function Header() {
           >
             <Logo />
           </Link>
-          <div className="hidden flex-1 justify-center lg:flex">
+          <div
+            // className="hidden flex-1 justify-center lg:flex"
+            className={`hidden flex-1 justify-center ${pathname === '/campaign' ? 'hidden' : 'lg:flex'}`}
+          >
             <Link href="/campaign">
               <SwapText
                 initialText="Campaign"
