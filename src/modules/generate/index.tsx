@@ -16,8 +16,6 @@ import { generateImage, issueToGateway } from '@/app/actions'
 import FlipCard, { FlipCards } from '@/components/animate/flip-card'
 import EmergingImage from '@/components/emergingImage/EmergingImage'
 import Scene from '@/components/emergingImage/Scene'
-import { PartnerFreeMintButton } from '@/components/PartnerFreeMintButton'
-import { SignatureFreeMintButton } from '@/components/SignatureFreeMintButton'
 import {
   AlertDialog,
   AlertDialogAction,
