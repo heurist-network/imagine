@@ -12,6 +12,7 @@ interface BlurIntProps {
     visible: { filter: string; opacity: number }
   }
   duration?: number
+  delay?: number
   onClick?: () => void
 }
 const BlurIn = ({
@@ -19,18 +20,19 @@ const BlurIn = ({
   className,
   variant,
   duration = 1,
+  delay = 0.6,
   onClick,
 }: BlurIntProps) => {
   const defaultVariants: Variants = {
     hidden: {
       filter: 'blur(30px)',
       opacity: 0,
-      transition: { delay: 0.6, duration: 0.8 },
+      transition: { delay, duration: 0.8 },
     },
     visible: {
       filter: 'blur(0px)',
       opacity: 1,
-      transition: { delay: 0.6, duration: 0.8 },
+      transition: { delay, duration: 0.8 },
     },
   }
   const combinedVariants = variant || defaultVariants

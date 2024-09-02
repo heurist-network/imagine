@@ -14,14 +14,11 @@ const config = {
   theme: {
     container: {
       center: true,
-      padding: '2rem',
-      screens: {
-        '2xl': '1440px',
-      },
+      padding: '32px',
     },
     extend: {
       fontFamily: {
-        sfMono: ['var(--font-sf-mono)'],
+        SFMono: ['var(--font-sf-mono)'],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -74,6 +71,8 @@ const config = {
           'linear-gradient(91deg,#474747 20.12%,#000 55.27%,#474747 82.61%)',
         'campaign-preview': "url('/campaign/preview-bg.png')",
         'campaign-reward-work': "url('/campaign/reward-work-bg.png')",
+        'new-label':
+          'linear-gradient(180deg,#CDF138,#23a4ff 37.88%,#FEDF17 75%)',
       },
       borderRadius: {
         lg: 'var(--radius)',

@@ -1,6 +1,6 @@
 'use client'
 
-import { Arrow } from '@/components/ui/pagination'
+import { ArrowIcon } from '@/components/icon'
 import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit'
 
 import { Button } from './button'
@@ -40,18 +40,21 @@ export function ConnectButton() {
               if (!connected) {
                 return (
                   <Button
-                    className="group flex touch-manipulation gap-2 rounded-full bg-[#CDF138] font-semibold text-black transition-all hover:bg-[#CDF138]/90 active:translate-y-0.5"
+                    className="rounded-full flex font-semibold bg-[#CDF138] text-black transition-all gap-2 group touch-manipulation hover:bg-[#CDF138]/90 active:translate-y-0.5"
                     onClick={openConnectModal}
                   >
                     <span>Connect Wallet</span>
-                    <Arrow className="w-[14px] transition-transform group-hover:rotate-45" />
+                    <ArrowIcon
+                      className="transition-transform w-[14px] group-hover:rotate-45"
+                      strokeWidth={4}
+                    />
                   </Button>
                 )
               }
               if (chain.unsupported) {
                 return (
                   <Button
-                    className="group flex touch-manipulation gap-2 rounded-full bg-[#CDF138] font-semibold text-black transition-all hover:bg-[#CDF138]/90"
+                    className="rounded-full flex font-semibold bg-[#CDF138] text-black transition-all gap-2 group touch-manipulation hover:bg-[#CDF138]/90"
                     onClick={openChainModal}
                   >
                     Wrong network
@@ -61,7 +64,7 @@ export function ConnectButton() {
               return (
                 <div style={{ display: 'flex', gap: 12 }}>
                   <Button
-                    className="gap-1 rounded-full bg-[#CDF138] font-semibold text-black transition-all hover:bg-[#CDF138]/90 active:translate-y-0.5"
+                    className="rounded-full font-semibold bg-[#CDF138] text-black transition-all gap-1 hover:bg-[#CDF138]/90 active:translate-y-0.5"
                     onClick={openChainModal}
                     style={{ display: 'flex', alignItems: 'center' }}
                     type="button"
@@ -89,7 +92,7 @@ export function ConnectButton() {
                     {chain.name}
                   </Button>
                   <Button
-                    className="flex gap-2 rounded-full bg-[#CDF138] font-semibold text-black transition-all hover:bg-[#CDF138]/90 active:translate-y-0.5"
+                    className="rounded-full flex font-semibold bg-[#CDF138] text-black transition-all gap-2 hover:bg-[#CDF138]/90 active:translate-y-0.5"
                     onClick={openAccountModal}
                     type="button"
                   >

@@ -148,7 +148,7 @@ export function CampaignPreview() {
               <div className="flex h-[148px] flex-col items-center justify-center bg-[#1D1D1B] md:h-[293px]">
                 <div
                   className={cn(
-                    'font-sfMono text-white',
+                    'font-SFMono text-white',
                     'text-[14px] leading-[1.3] md:text-[18px] lg:text-[20px] xl:text-[22px] 2xl:text-[24px]',
                   )}
                 >
@@ -156,7 +156,7 @@ export function CampaignPreview() {
                 </div>
                 <div
                   className={cn(
-                    'font-sfMono font-bold',
+                    'font-SFMono font-bold',
                     'text-[40px] leading-[1.1875] md:text-[56px] lg:text-[64px] xl:text-[72px] 2xl:text-[80px]',
                   )}
                 >
@@ -167,7 +167,7 @@ export function CampaignPreview() {
                 </div>
                 <div
                   className={cn(
-                    'font-sfMono font-light text-[#cdf138]',
+                    'font-SFMono font-light text-[#cdf138]',
                     'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
                   )}
                 >
@@ -177,7 +177,7 @@ export function CampaignPreview() {
               <div className="flex h-[148px] flex-col items-center justify-center bg-[#1D1D1B] md:h-[293px]">
                 <div
                   className={cn(
-                    'font-sfMono text-white',
+                    'font-SFMono text-white',
                     'text-[14px] leading-[1.3] md:text-[18px] lg:text-[20px] xl:text-[22px] 2xl:text-[24px]',
                   )}
                 >
@@ -185,7 +185,7 @@ export function CampaignPreview() {
                 </div>
                 <div
                   className={cn(
-                    'font-sfMono font-bold',
+                    'font-SFMono font-bold',
                     'text-[40px] leading-[1.1875] md:text-[56px] lg:text-[64px] xl:text-[72px] 2xl:text-[80px]',
                   )}
                 >
@@ -196,7 +196,7 @@ export function CampaignPreview() {
                 </div>
                 <div
                   className={cn(
-                    'font-sfMono font-light text-[#cdf138]',
+                    'font-SFMono font-light text-[#cdf138]',
                     'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
                   )}
                 >
@@ -206,7 +206,7 @@ export function CampaignPreview() {
               <div className="flex h-[148px] flex-col items-center justify-center bg-[#1D1D1B] md:h-[293px]">
                 <div
                   className={cn(
-                    'font-sfMono text-white',
+                    'font-SFMono text-white',
                     'text-[14px] leading-[1.3] md:text-[18px] lg:text-[20px] xl:text-[22px] 2xl:text-[24px]',
                   )}
                 >
@@ -214,7 +214,7 @@ export function CampaignPreview() {
                 </div>
                 <div
                   className={cn(
-                    'font-sfMono font-bold',
+                    'font-SFMono font-bold',
                     'text-[40px] leading-[1.1875] md:text-[56px] lg:text-[64px] xl:text-[72px] 2xl:text-[80px]',
                   )}
                 >
@@ -225,7 +225,7 @@ export function CampaignPreview() {
                 </div>
                 <div
                   className={cn(
-                    'font-sfMono font-light text-[#cdf138]',
+                    'font-SFMono font-light text-[#cdf138]',
                     'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
                   )}
                 >
@@ -260,7 +260,7 @@ export function CampaignPreview() {
             </div>
             <div
               className={cn(
-                'flex gap-4 font-sfMono font-bold',
+                'flex gap-4 font-SFMono font-bold',
                 'text-[34px] leading-[1.19] md:text-[42px] lg:text-[52px] xl:text-[62px] 2xl:text-[72px]',
               )}
             >
@@ -288,7 +288,7 @@ export function CampaignPreview() {
             </div>
             <div
               className={cn(
-                'flex gap-4 font-sfMono font-bold',
+                'flex gap-4 font-SFMono font-bold',
                 'text-[34px] leading-[1.19] md:text-[42px] lg:text-[52px] xl:text-[62px] 2xl:text-[72px]',
               )}
             >
@@ -301,7 +301,7 @@ export function CampaignPreview() {
         </div>
 
         <div className="mt-[24px] flex md:mt-[32px] lg:mt-[38px] xl:mt-[44px] 2xl:mt-[50px]">
-          <div className="relative max-w-[750px] bg-white py-3 pl-14 pr-6 font-sfMono text-base leading-[19px] -tracking-[0.0075em]">
+          <div className="relative max-w-[750px] bg-white py-3 pl-14 pr-6 font-SFMono text-base leading-[19px] -tracking-[0.0075em]">
             <Image
               className="absolute left-6 top-3"
               src="/icon/plus.svg"

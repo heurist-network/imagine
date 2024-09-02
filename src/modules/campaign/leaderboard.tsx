@@ -224,7 +224,7 @@ export function LeaderboardRow({
   return (
     <div
       className={cn(
-        'table-row font-sfMono font-semibold text-[#171717]',
+        'font-SFMono table-row font-semibold text-[#171717]',
         'text-[16px] leading-[1.2] lg:text-[20px]',
       )}
     >

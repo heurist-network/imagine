@@ -1,97 +1,92 @@
-'use client'
-
-import { useEffect } from 'react'
-import { motion, Variants } from 'framer-motion'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
 
-import AnimatedGradientText from '@/components/magicui/animated-gradient-text'
-import { Separator } from '@/components/ui/separator'
+import { ArrowIcon, PlusIcon } from '@/components/icon'
+import BlurIn from '@/components/magicui/blur-in'
+import SwapText from '@/components/magicui/swap-text'
+import { TextGenerateEffect } from '@/components/magicui/text-generate-effect'
+import TrailingImage from '@/components/magicui/trailing-image'
 import { cn } from '@/lib/utils'
-import { useMintToNFT } from '@/modules/mintToNFT'
 
-const VARIANTS: Variants = {
-  hidden: { opacity: 0, y: -10 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring' } },
-}
+import { Bg } from './bg'
 
-export function Hero() {
-  const searchParams = useSearchParams()
-  const { setReferralAddress } = useMintToNFT()
+export async function Hero() {
+  const res: any[] = await fetch(
+    'https://raw.githubusercontent.com/heurist-network/heurist-models/main/models.json',
+    {
+      next: { revalidate: 3600 },
+    },
+  ).then((res) => res.json())
 
-  useEffect(() => {
-    const search = searchParams.get('ref')
-
-    if (search) {
-      setReferralAddress(search)
-    }
-  }, [])
+  const lists = res.filter(
+    (item) =>
+      item.type === 'sd15' ||
+      item.type === 'sdxl10' ||
+      item.type.includes('composite'),
+  )
 
   return (
-    <motion.div
-      className="flex"
-      initial="hidden"
-      animate="show"
-      viewport={{ once: true }}
-      variants={{
-        hidden: {},
-        show: { transition: { staggerChildren: 0.15 } },
-      }}
-    >
-      <section className="mx-auto flex max-w-[980px] flex-col items-center gap-3 py-8 md:py-12 md:pb-8 lg:py-16 lg:pb-4">
-        <motion.p className="mb-2 leading-7" variants={VARIANTS}>
-          Welcome to <b>Heurist Imagine</b>
-        </motion.p>
-        <motion.h1
-          className="scroll-m-20 text-center text-4xl font-bold tracking-tight lg:text-5xl"
-          variants={VARIANTS}
-        >
-          Best Stable Diffusion models on
-        </motion.h1>
-        <motion.h1
-          className="scroll-m-20 bg-section-title bg-clip-text text-center text-4xl font-bold tracking-tight text-transparent lg:text-5xl"
-          variants={VARIANTS}
-        >
-          a decentralized network of GPUs
-        </motion.h1>
-        <motion.div
-          variants={VARIANTS}
-          className="mt-8 hidden items-center gap-4 md:flex"
-        >
-          <div className="flex h-6 items-center justify-center rounded-full bg-[#d4f7f0] px-2.5 text-xs text-[#067a6e]">
-            New
-          </div>
-          <div className="mr-2 text-muted-foreground">
-            🎁 Create-to-earn campaign is here!
-          </div>
-          <Link href="/campaign">
-            <AnimatedGradientText>
-              ✨ <hr className="mx-2 h-4 w-[1px] shrink-0 bg-gray-300" />{' '}
-              <span
+    <div className="relative -mt-20 h-screen bg-gray-900 md:min-h-[880px]">
+      <Bg />
+      <TrailingImage lists={lists} />
+      <div
+        className={cn(
+          'pointer-events-none relative z-20 flex h-full items-center',
+          'mx-auto max-w-5xl px-6 md:max-w-[1440px]',
+        )}
+      >
+        <div className="flex flex-1 flex-col justify-between gap-14 lg:flex-row lg:gap-0 lg:pb-[8.33%]">
+          <div className="flex flex-col gap-[20px] md:gap-[29px] lg:gap-[38px] xl:gap-[47px] 2xl:gap-[56px]">
+            <BlurIn className="flex" delay={1.1}>
+              <div
                 className={cn(
-                  `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
+                  'pointer-events-auto flex items-center justify-center gap-2 rounded-full bg-[#32322F] px-3 py-2 font-medium -tracking-[0.03em] text-[#CDF138]',
+                  'text-[16px] leading-[1.2] md:text-[17px] lg:text-[18px] xl:text-[19px] 2xl:text-[20px]',
                 )}
               >
-                Join
-              </span>
-              <span className="i-mingcute-right-fill ml-1 text-muted-foreground group-hover:animate-bounce-horizontal" />
-            </AnimatedGradientText>
-          </Link>
-        </motion.div>
-        <Link className="flex md:hidden" href="/nft">
-          <AnimatedGradientText>
-            🎁 <hr className="mx-2 h-4 w-[1px] shrink-0 bg-gray-300" />{' '}
-            <span
+                <PlusIcon className="w-4" />
+                <span>Imagine Studio</span>
+              </div>
+            </BlurIn>
+
+            <TextGenerateEffect
               className={cn(
-                `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
+                'pointer-events-auto font-semibold -tracking-[0.012em] text-white',
+                'text-[40px] leading-[1.2] md:text-[53px] lg:text-[66px] lg:leading-[1] xl:text-[79px] 2xl:text-[92px]',
               )}
-            >
-              Imaginaries NFT Airdrop is here!
-            </span>
-            <span className="i-mingcute-right-fill ml-1 text-muted-foreground group-hover:animate-bounce-horizontal" />
-          </AnimatedGradientText>
-        </Link>
-      </section>
-    </motion.div>
+              words1="Best Stable"
+              words2="Diffusion models"
+              words3="on a decentralized"
+              words4="network of GPUs"
+            />
+          </div>
+          <div className="flex items-end justify-end lg:justify-start">
+            <Link href="/campaign">
+              <BlurIn
+                className="group pointer-events-auto flex cursor-pointer items-center gap-2.5"
+                delay={1.1}
+              >
+                <SwapText
+                  initialText="Join Create-to-Earn Event"
+                  finalText="Join Create-to-Earn Event"
+                  supportsHover
+                  textClassName={cn(
+                    'font-medium text-white transition-colors hover:text-[#CDF138] duration-100',
+                    'text-[16px] leading-[1.33] md:text-[18px] lg:text-[20px] xl:text-[22px] 2xl:text-[24px]',
+                  )}
+                />
+                <div
+                  className={cn(
+                    'flex aspect-square flex-shrink-0 items-center justify-center rounded-full bg-[#CDF138] transition-transform group-hover:rotate-45',
+                    'w-[40px] md:w-[46px] lg:w-[52px] xl:w-[58px] 2xl:w-[64px]',
+                  )}
+                >
+                  <ArrowIcon className="w-9" />
+                </div>
+              </BlurIn>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

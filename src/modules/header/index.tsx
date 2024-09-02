@@ -1,212 +1,172 @@
 'use client'
 
-import { useState } from 'react'
-import Image from 'next/image'
+import { useLayoutEffect, useState } from 'react'
+import { motion, useMotionValueEvent, useScroll, Variants } from 'framer-motion'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useDebounceCallback } from 'usehooks-ts'
 
+import { Logo } from '@/components/Logo'
 import AnimatedGradientText from '@/components/magicui/animated-gradient-text'
+import SwapText from '@/components/magicui/swap-text'
 import { ConnectButton } from '@/components/ui/connect-button'
 import { cn } from '@/lib/utils'
 
 export function Header() {
+  const pathname = usePathname()
+  const { scrollY } = useScroll()
+  const [isScrollTop, setIsScrollTop] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [maxWidth, setMaxWidth] = useState<string | undefined>()
+  const isHomePage = pathname === '/'
+
+  // 定义滚动阈值
+  const threshold = 28
+
+  const debounced = useDebounceCallback((latest) => {
+    setIsScrollTop(latest > threshold)
+  }, 200)
+
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    debounced(latest)
+  })
+
+  const variants: Variants = {
+    stateA: {
+      backgroundColor: '#40404000',
+      top: 0,
+      maxWidth,
+    },
+    stateB: {
+      backgroundColor: '#40404099',
+      top: 24,
+      maxWidth: '800px',
+    },
+  }
+
+  const calcMaxWidth = () => {
+    const clientWidth = window.innerWidth
+
+    if (clientWidth >= 768) {
+      setMaxWidth('1440px')
+    } else if (clientWidth >= 640) {
+      setMaxWidth('1024px')
+    } else {
+      setMaxWidth(undefined)
+    }
+  }
+
+  useLayoutEffect(() => {
+    window.addEventListener('resize', calcMaxWidth)
+
+    return () => {
+      window.removeEventListener('resize', calcMaxWidth)
+    }
+  }, [])
 
   return (
-    <div className="fixed top-0 z-50 w-full border-b border-border/40 bg-background/90 backdrop-blur-lg supports-[backdrop-filter]:bg-background/90">
-      <div className="container flex h-14 items-center justify-between">
-        <div className="flex flex-1">
+    <>
+      <header className="z-50 h-20 w-full transition-all">
+        <motion.div
+          initial="stateA"
+          animate={isScrollTop ? 'stateB' : 'stateA'}
+          className={cn(
+            'sticky top-0 z-10 flex h-20 items-center justify-between',
+            'mx-auto max-w-5xl px-6 md:max-w-[1440px]',
+            {
+              'fixed left-6 right-6 h-16 rounded-full border-[0.5px] border-neutral-600 px-6 shadow-md backdrop-blur-md':
+                isScrollTop,
+            },
+          )}
+          variants={variants}
+          transition={{
+            duration: 0.5, // 过渡持续时间
+            ease: 'easeInOut', // 过渡缓动函数
+            backgroundColor: { type: 'spring', stiffness: 400, damping: 30 }, // 为宽度设置弹簧动画
+            top: { type: 'spring', stiffness: 400, damping: 30 }, // 为宽度设置弹簧动画
+            maxWidth: { type: 'spring', stiffness: 400, damping: 30 }, // 为宽度设置弹簧动画
+          }}
+        >
           <Link
             href="/"
-            className="flex cursor-pointer select-none items-center gap-1"
+            className={cn(
+              'w-[116px]',
+              isHomePage || isScrollTop ? 'text-white' : 'text-[#0c0c0c]',
+            )}
           >
-            <Image src="/logo.svg" alt="logo" width={30} height={30} />
-            <div className="flex animate-flow items-center bg-logo bg-[size:400%] bg-clip-text text-2xl font-extrabold text-transparent">
-              Imagine
-            </div>
+            <Logo />
           </Link>
-        </div>
-        <div className="hidden items-center gap-4 md:flex">
-          <Link href="/campaign">
-            <AnimatedGradientText>
-              <span
-                className={cn(
-                  `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
+          <div className="hidden flex-1 justify-center lg:flex">
+            <Link href="/campaign">
+              <SwapText
+                initialText="Campaign"
+                finalText="Campaign"
+                supportsHover
+                textClassName={cn(
+                  '-tracking-[0.0016em] transition-colors hover:text-[#CDF138] duration-100 text-[16px] leading-[1.5]',
+                  isHomePage || isScrollTop ? 'text-white' : 'text-[#0c0c0c]',
                 )}
-              >
-                Campaign
-              </span>
-              <span className="i-mingcute-right-fill ml-1 text-muted-foreground group-hover:animate-bounce-horizontal" />
-            </AnimatedGradientText>
-          </Link>
-          <nav className="hidden items-center gap-1 md:flex">
-            <Link target="_blank" href="https://discord.com/invite/heuristai">
-              <div className="inline-flex h-10 w-10 items-center justify-center whitespace-nowrap rounded-md px-0 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
-                <span className="i-ri-discord-fill h-6 w-6" />
-                <span className="sr-only">Discord</span>
-              </div>
+              />
             </Link>
-            <Link target="_blank" href="https://twitter.com/heurist_ai">
-              <div className="inline-flex h-10 w-10 items-center justify-center whitespace-nowrap rounded-md px-0 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
-                <span className="i-ri-twitter-x-fill h-[18px] w-[18px]" />
-                <span className="sr-only">X</span>
-              </div>
-            </Link>
-            <Link target="_blank" href="https://github.com/heurist-network">
-              <div className="inline-flex h-10 w-10 items-center justify-center whitespace-nowrap rounded-md px-0 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
-                <span className="i-ri-github-fill h-6 w-6" />
-                <span className="sr-only">GitHub</span>
-              </div>
-            </Link>
-          </nav>
-          <div className="text-sm">
+          </div>
+          <div className="hidden lg:block">
             <ConnectButton />
           </div>
-        </div>
-        <div className="flex gap-2 md:hidden">
-          <Link href="/campaign">
-            <AnimatedGradientText>
-              <span
-                className={cn(
-                  `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
-                )}
-              >
-                Campaign
-              </span>
-            </AnimatedGradientText>
-          </Link>
-          <div
-            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border"
-            onClick={() => {
-              setIsExpanded(!isExpanded)
-            }}
-          >
-            {isExpanded ? (
-              <span className="i-mingcute-close-line" />
-            ) : (
-              <span className="i-mingcute-menu-line" />
-            )}
+          <div className="block lg:hidden">
+            <div
+              className={cn(
+                'flex h-10 w-10 cursor-pointer items-center justify-center',
+                isHomePage || isScrollTop ? 'text-white' : 'text-[#0c0c0c]',
+              )}
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? (
+                <span className="i-mingcute-close-line h-7 w-7" />
+              ) : (
+                <span className="i-mingcute-menu-line h-7 w-7" />
+              )}
+            </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </header>
       <div
         className={cn(
-          'block h-[calc(100dvh-56px)] max-h-0 overflow-y-hidden px-8 transition-all md:hidden',
+          'fixed left-0 top-0 h-[calc(100dvh+24px)] max-h-0 w-full transform-cpu overflow-y-hidden bg-white/80 px-6 text-black opacity-0 backdrop-blur-lg transition-all lg:hidden',
           {
-            'max-h-[calc(100dvh-56px)]': isExpanded,
+            'z-[100] max-h-[calc(100dvh+24px)] opacity-100': isExpanded,
           },
         )}
       >
+        <div className="flex h-20 items-center justify-end">
+          <div
+            className="flex h-10 w-10 cursor-pointer items-center justify-center text-black"
+            onClick={() => setIsExpanded(false)}
+          >
+            <span className="i-mingcute-close-line h-7 w-7" />
+          </div>
+        </div>
         <Link
-          className="mt-4 flex h-12 items-center gap-4 border-b"
-          target="_blank"
-          href="https://discord.com/invite/heuristai"
+          className="flex h-12 items-center gap-2 border-y border-y-[rgba(0,0,0,0.1)]"
+          href="/campaign"
+          onClick={() => setIsExpanded(false)}
         >
-          <span className="i-ri-discord-fill h-6 w-6" />
-          <span className="sr-only1">Discord</span>
-        </Link>
-        <Link
-          className="flex h-12 items-center gap-4 border-b"
-          target="_blank"
-          href="https://twitter.com/heurist_ai"
-        >
-          <span className="i-ri-twitter-x-fill h-6 w-6" />
-          <span className="sr-only1">X</span>
-        </Link>
-        <Link
-          className="flex h-12 items-center gap-4 border-b"
-          target="_blank"
-          href="https://github.com/heurist-network"
-        >
-          <span className="i-ri-github-fill h-6 w-6" />
-          <span className="sr-only1">GitHub</span>
+          <span>Campaign</span>
+          <div className="flex">
+            <AnimatedGradientText className="px-2 py-1 text-[10px] leading-[12px]">
+              <span
+                className={cn(
+                  `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
+                )}
+              >
+                NEW
+              </span>
+            </AnimatedGradientText>
+          </div>
         </Link>
         <div className="mt-4 text-sm">
           <ConnectButton />
         </div>
       </div>
-    </div>
+    </>
   )
-  // return (
-  //   <div className="border-b bg-background/95 border-border/40 w-full top-0 z-50 sticky backdrop-blur supports-[backdrop-filter]:bg-background/60">
-  //     <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
-  //       <Link
-  //         href="/"
-  //         className="cursor-pointer flex gap-1 select-none items-center"
-  //       >
-  //         <Image src="/logo.svg" alt="logo" width={30} height={30} />
-  //         <div className="bg-logo bg-clip-text flex font-extrabold bg-[size:400%] text-transparent animate-flow text-2xl items-center">
-  //           Imagine
-  //         </div>
-  //       </Link>
-  //       <div className="flex gap-3 items-center">
-  //         <nav className="gap-1 hidden items-center md:flex">
-  //           <Link target="_blank" href="https://discord.com/invite/heuristai">
-  //             <div className="rounded-md font-medium h-10 text-sm py-2 px-0 transition-colors w-10 inline-flex items-center justify-center whitespace-nowrap hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-ring focus-visible:ring-1 disabled:opacity-50 disabled:pointer-events-none">
-  //               <span className="h-6 w-6 i-ri-discord-fill" />
-  //               <span className="sr-only">Discord</span>
-  //             </div>
-  //           </Link>
-  //           <Link target="_blank" href="https://twitter.com/heurist_ai">
-  //             <div className="rounded-md font-medium h-10 text-sm py-2 px-0 transition-colors w-10 inline-flex items-center justify-center whitespace-nowrap hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-ring focus-visible:ring-1 disabled:opacity-50 disabled:pointer-events-none">
-  //               <span className="h-[18px] w-[18px] i-ri-twitter-x-fill" />
-  //               <span className="sr-only">X</span>
-  //             </div>
-  //           </Link>
-  //           <Link target="_blank" href="https://github.com/heurist-network">
-  //             <div className="rounded-md font-medium h-10 text-sm py-2 px-0 transition-colors w-10 inline-flex items-center justify-center whitespace-nowrap hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-ring focus-visible:ring-1 disabled:opacity-50 disabled:pointer-events-none">
-  //               <span className="h-6 w-6 i-ri-github-fill" />
-  //               <span className="sr-only">GitHub</span>
-  //             </div>
-  //           </Link>
-  //         </nav>
-  //         <div className="text-sm">
-  //           <ConnectButton />
-  //         </div>
-  //         <div className="-mr-2 block md:hidden">
-  //           <DropdownMenu>
-  //             <DropdownMenuTrigger asChild>
-  //               <Button variant="outline" size="icon" className="rounded-full">
-  //                 <span className="h-4 text-[hsl(0,0%,40%)] w-4 i-ri-menu-line" />
-  //               </Button>
-  //             </DropdownMenuTrigger>
-  //             <DropdownMenuContent>
-  //               <DropdownMenuItem asChild>
-  //                 <Link
-  //                   className="flex gap-2"
-  //                   target="_blank"
-  //                   href="https://discord.gg/Ch6Y7mYMdr"
-  //                 >
-  //                   <span className="h-6 w-6 i-ri-discord-fill" />
-  //                   <span>Discord</span>
-  //                 </Link>
-  //               </DropdownMenuItem>
-  //               <DropdownMenuItem asChild>
-  //                 <Link
-  //                   className="flex gap-2"
-  //                   target="_blank"
-  //                   href="https://twitter.com/heurist_ai"
-  //                 >
-  //                   <div className="flex h-6 w-6 items-center justify-center">
-  //                     <span className="h-[18px] w-[18px] i-ri-twitter-x-fill" />
-  //                   </div>
-  //                   <span>X</span>
-  //                 </Link>
-  //               </DropdownMenuItem>
-  //               <DropdownMenuItem asChild>
-  //                 <Link
-  //                   className="flex gap-2"
-  //                   target="_blank"
-  //                   href="https://github.com/heurist-network"
-  //                 >
-  //                   <span className="h-6 w-6 i-ri-github-fill" />
-  //                   <span>GitHub</span>
-  //                 </Link>
-  //               </DropdownMenuItem>
-  //             </DropdownMenuContent>
-  //           </DropdownMenu>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   </div>
-  // )
 }

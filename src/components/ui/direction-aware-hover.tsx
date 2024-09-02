@@ -28,7 +28,6 @@ export const DirectionAwareHover = ({
     if (!ref.current) return
 
     const direction = getDirection(event, ref.current)
-    console.log('direction', direction)
     switch (direction) {
       case 0:
         setDirection('top')
@@ -64,7 +63,7 @@ export const DirectionAwareHover = ({
       onMouseEnter={handleMouseEnter}
       ref={ref}
       className={cn(
-        'group/card relative overflow-hidden rounded-lg bg-transparent',
+        'group/card relative hidden overflow-hidden rounded-lg bg-transparent md:block',
         className,
       )}
     >
@@ -93,7 +92,7 @@ export const DirectionAwareHover = ({
               ease: 'easeOut',
             }}
             className={cn(
-              'absolute bottom-4 left-4 z-40 text-white',
+              'absolute bottom-6 left-6 right-6 z-40 text-white',
               childrenClassName,
             )}
           >
@@ -132,7 +131,7 @@ const textVariants = {
   initial: {
     y: 0,
     x: 0,
-    opacity: 1,
+    opacity: 0,
   },
   exit: {
     y: 0,

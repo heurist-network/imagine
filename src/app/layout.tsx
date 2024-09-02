@@ -1,16 +1,20 @@
 import { Toaster } from 'react-hot-toast'
-import { GeistSans } from 'geist/font/sans'
+import { Inter } from 'next/font/google'
 import localFont from 'next/font/local'
+import Link from 'next/link'
 import type { Metadata, Viewport } from 'next'
 
 import { env } from '@/env.mjs'
 import { cn } from '@/lib/utils'
+import { Footer } from '@/modules/footer'
 import { Header } from '@/modules/header'
 
 import { Providers } from './providers'
 
 import '@rainbow-me/rainbowkit/styles.css'
 import '../styles/globals.css'
+
+const inter = Inter({ subsets: ['latin'] })
 
 const title = 'Heurist Imagine'
 const description =
@@ -46,9 +50,6 @@ export const metadata: Metadata = {
       alt: 'Heurist Imagine',
     },
   },
-  appleWebApp: {
-    title,
-  },
 }
 
 export const viewport: Viewport = {
@@ -60,26 +61,36 @@ export const viewport: Viewport = {
   userScalable: false,
 }
 
-const sfMono = localFont({
+const SFMono = localFont({
   src: [
     {
-      path: '../../public/font/SFMono-Light.otf',
+      path: '../../public/font/SFMono-Light-3.otf',
       weight: '300',
       style: 'normal',
     },
     {
-      path: '../../public/font/SFMono-Regular.otf',
+      path: '../../public/font/SFMono-Regular-4.otf',
       weight: '400',
       style: 'normal',
     },
     {
-      path: '../../public/font/SFMono-Semibold.otf',
+      path: '../../public/font/SFMono-Medium-5.otf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../../public/font/SFMono-Semibold-6.otf',
       weight: '600',
       style: 'normal',
     },
     {
-      path: '../../public/font/SFMono-Bold.otf',
+      path: '../../public/font/SFMono-Bold-7.otf',
       weight: '700',
+      style: 'normal',
+    },
+    {
+      path: '../../public/font/SFMono-Heavy-8.otf',
+      weight: '800',
       style: 'normal',
     },
   ],
@@ -90,7 +101,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={cn(GeistSans.className, sfMono.variable)}>
+    <html lang="en" className={cn(inter.className, SFMono.variable)}>
       {!!(env.UMAMI_URL && env.UMAMI_WEBSITE_ID) && (
         <script
           async
@@ -98,21 +109,22 @@ export default function RootLayout({
           data-website-id={env.UMAMI_WEBSITE_ID}
         />
       )}
-      <body className="min-h-screen bg-background">
+      <body className="min-h-screen">
         <Providers>
-          <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
-            <div
-              className={cn(
-                `after:animate-aurora absolute -inset-[10px] opacity-30 blur-[10px] invert filter will-change-transform [--aurora:repeating-linear-gradient(100deg,var(--blue-500)_10%,var(--indigo-300)_15%,var(--blue-300)_20%,var(--violet-200)_25%,var(--blue-400)_30%)] [--dark-gradient:repeating-linear-gradient(100deg,var(--black)_0%,var(--black)_7%,var(--transparent)_10%,var(--transparent)_12%,var(--black)_16%)] [--white-gradient:repeating-linear-gradient(100deg,var(--white)_0%,var(--white)_7%,var(--transparent)_10%,var(--transparent)_12%,var(--white)_16%)] [background-image:var(--white-gradient),var(--aurora)] [background-position:50%_50%,50%_50%] [background-size:300%,_200%] after:absolute after:inset-0 after:mix-blend-difference after:content-[""] after:[background-attachment:fixed] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_100%] dark:invert-0 dark:[background-image:var(--dark-gradient),var(--aurora)] after:dark:[background-image:var(--dark-gradient),var(--aurora)]`,
-                `[mask-image:radial-gradient(ellipse_at_100%_0%,black_10%,var(--transparent)_70%)]`,
-              )}
-            />
+          <div className="bg-[#CDF138]">
+            <div className="mx-auto flex h-10 max-w-5xl flex-nowrap items-center justify-center gap-0.5 truncate px-6 text-xs font-medium text-gray-950 md:max-w-[1440px] md:text-sm">
+              <span>🎉 Join ZK Fest: Create AI Art and Earn ZK Tokens.</span>
+              <Link className="underline" href="" target="_blank">
+                Read more here
+              </Link>
+            </div>
           </div>
-          <div className="relative flex min-h-screen flex-col bg-background pt-14">
+          <div className="relative flex min-h-screen flex-col bg-background">
             <Header />
             {children}
+            <Footer />
           </div>
-          <div className="mask-b pointer-events-none fixed inset-x-0 bottom-0 z-30 h-[80px] w-full select-none backdrop-blur-[1px]" />
+          {/* <div className="h-[80px] w-full inset-x-0 bottom-0 z-30 mask-b pointer-events-none fixed select-none backdrop-blur-[1px]" /> */}
         </Providers>
         <Toaster />
       </body>

@@ -68,14 +68,14 @@ function PoolRewardCard({
       </div>
       <div
         className={cn(
-          'font-sfMono font-bold text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]',
+          'font-SFMono font-bold text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]',
           'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
         )}
       >
         {rewards} ZK
       </div>
       <div className="flex justify-between">
-        <div className="line-clamp-1 rounded-[2px] bg-white px-2">
+        <div className="bg-white rounded-[2px] px-2 line-clamp-1">
           Claimable:{' '}
           <span className="font-bold">{formatEther(claimableRewards)} ZK</span>
         </div>
@@ -158,8 +158,8 @@ export function CampaignReward() {
   }
 
   return (
-    <div className="relative min-h-[1040px]">
-      <div className="absolute inset-0 flex flex-col gap-[55px] overflow-y-hidden bg-white pt-[76px]">
+    <div className="min-h-[1040px] relative">
+      <div className="bg-white flex flex-col pt-[76px] inset-0 gap-[55px] absolute overflow-y-hidden">
         <Marquee className="[--duration:32s] [--gap:100px]">
           <Image
             className="h-[129px] -translate-x-[250px]"
@@ -225,8 +225,8 @@ export function CampaignReward() {
           />
         </Marquee>
       </div>
-      <div className="container relative z-10 flex flex-col gap-5 py-[32px] md:py-[100px] lg:py-[163px] xl:flex-row xl:py-[233px]">
-        <div className="flex flex-col justify-between gap-5 xl:gap-0">
+      <div className="container flex flex-col py-[32px] z-10 gap-5 relative md:py-[100px] lg:py-[163px] xl:flex-row xl:py-[233px]">
+        <div className="flex flex-col gap-5 justify-between xl:gap-0">
           <div
             className={cn(
               'group flex flex-col justify-between rounded-2xl bg-[#CDF138] py-[33px] transition-colors hover:bg-black xl:w-[466px]',
@@ -258,7 +258,7 @@ export function CampaignReward() {
             <div className="flex justify-between">
               <div
                 className={cn(
-                  'font-sfMono font-bold text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]',
+                  'font-SFMono font-bold text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]',
                   'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
                 )}
               >
@@ -266,7 +266,7 @@ export function CampaignReward() {
               </div>
               <div
                 className={cn(
-                  'font-sfMono font-bold text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]',
+                  'font-SFMono font-bold text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]',
                   'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
                 )}
               >
@@ -326,7 +326,7 @@ export function CampaignReward() {
             )}
           >
             <div className="flex flex-col gap-6 md:flex-row">
-              <div className="group/item flex flex-1 flex-col gap-2">
+              <div className="flex flex-col flex-1 gap-2 group/item">
                 <div
                   className={cn(
                     'transition-all group-hover/item:translate-x-1 group-hover/item:text-[#CDF138]',
@@ -335,15 +335,15 @@ export function CampaignReward() {
                 >
                   Step 1
                 </div>
-                <div className="text-[16px] font-semibold leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
+                <div className="font-semibold text-[16px] leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
                   Choose a Model
                 </div>
-                <div className="font-sfMono text-[14px] leading-[1.125] text-white/90 xl:text-[16px]">
+                <div className="font-SFMono text-[14px] text-white/90 leading-[1.125] xl:text-[16px]">
                   Some models are general-purpose and some models excel at
                   creating a specific visual style.
                 </div>
               </div>
-              <div className="group/item flex flex-1 flex-col gap-2">
+              <div className="flex flex-col flex-1 gap-2 group/item">
                 <div
                   className={cn(
                     'transition-all group-hover/item:translate-x-1 group-hover/item:text-[#CDF138]',
@@ -352,18 +352,18 @@ export function CampaignReward() {
                 >
                   Step 2
                 </div>
-                <div className="text-[16px] font-semibold leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
+                <div className="font-semibold text-[16px] leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
                   Write a Prompt
                 </div>
-                <div className="font-sfMono text-[14px] leading-[1.125] text-white/90 xl:text-[16px]">
+                <div className="font-SFMono text-[14px] text-white/90 leading-[1.125] xl:text-[16px]">
                   Describe the image using natural language to convey your
                   wishes. It's recommended to use keywords separated by commas.
                   Click on the preset images to get inspired.
                 </div>
               </div>
             </div>
-            <div className="mt-6 flex flex-col gap-6 md:flex-row lg:mt-10 xl:mt-0">
-              <div className="group/item flex flex-1 flex-col gap-2">
+            <div className="flex flex-col mt-6 gap-6 md:flex-row lg:mt-10 xl:mt-0">
+              <div className="flex flex-col flex-1 gap-2 group/item">
                 <div
                   className={cn(
                     'transition-all group-hover/item:translate-x-1 group-hover/item:text-[#CDF138]',
@@ -372,16 +372,16 @@ export function CampaignReward() {
                 >
                   Step 3
                 </div>
-                <div className="text-[16px] font-semibold leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
+                <div className="font-semibold text-[16px] leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
                   Generate and Mint
                 </div>
-                <div className="font-sfMono text-[14px] leading-[1.125] text-white/90 xl:text-[16px]">
+                <div className="font-SFMono text-[14px] text-white/90 leading-[1.125] xl:text-[16px]">
                   Mint fee is 0.0006 ETH on ZKsync Era. Partner NFT holders and
                   selected Heurist community members get one chance of free mint
                   per day. Gasless free mint is powered by Zyfi.
                 </div>
               </div>
-              <div className="group/item flex flex-1 flex-col gap-2">
+              <div className="flex flex-col flex-1 gap-2 group/item">
                 <div
                   className={cn(
                     'transition-all group-hover/item:translate-x-1 group-hover/item:text-[#CDF138]',
@@ -390,10 +390,10 @@ export function CampaignReward() {
                 >
                   Step 4
                 </div>
-                <div className="text-[16px] font-semibold leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
+                <div className="font-semibold text-[16px] leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
                   Upload and Share
                 </div>
-                <div className="font-sfMono text-[14px] leading-[1.125] text-white/90 xl:text-[16px]">
+                <div className="font-SFMono text-[14px] text-white/90 leading-[1.125] xl:text-[16px]">
                   Upload the artwork to Gateway Network to prove your ownership,
                   and share on X (Twitter) to earn additional scores. Share your
                   creation in Heurist Discord to get more exposure.
