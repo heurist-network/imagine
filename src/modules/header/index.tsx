@@ -114,7 +114,10 @@ export function Header() {
           </div>
           <div className="block lg:hidden">
             <div
-              className="flex h-10 w-10 cursor-pointer items-center justify-center text-white"
+              className={cn(
+                'flex h-10 w-10 cursor-pointer items-center justify-center',
+                isHomePage || isScrollTop ? 'text-white' : 'text-[#0c0c0c]',
+              )}
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (
