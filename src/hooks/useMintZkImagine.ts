@@ -28,7 +28,8 @@ export const useMintZkImagine = () => {
     chainId: walletClient?.chain.id,
   })
 
-  const { signatureData, canSignatureFreeMint } = useSignatureFreeMint()
+  const { signatureData, canSignatureFreeMint, refreshSignatureData } =
+    useSignatureFreeMint()
 
   const [mintFee, setMintFee] = useState<bigint | null>(null)
   const [discountedFee, setDiscountedFee] = useState<{
@@ -308,6 +309,7 @@ export const useMintZkImagine = () => {
         return hash
       } finally {
         setIsLoading(false)
+        refreshSignatureData()
       }
     },
     [
