@@ -41,6 +41,10 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
+import {
+  API_NOTIFY_AFTER_MINT_ACTIONS,
+  postNotifyAfterMintActions,
+} from '@/lib/endpoints'
 import { shareOnX } from '@/lib/share'
 import { cn, extractImageId } from '@/lib/utils'
 import { MintToNFT } from '@/modules/mintToNFT'
@@ -183,14 +187,19 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
     console.log('model name', model)
   }, [model])
 
-  
   const formSchema = z.object({
     prompt: z.string().optional(),
     neg_prompt: z.string().optional(),
     num_iterations: z.number(),
     guidance_scale: z.number(),
-    width: z.number().min(512).max(modelInfo.defaults?.max_width || 1024),
-    height: z.number().min(512).max(modelInfo.defaults?.max_height || 1024),
+    width: z
+      .number()
+      .min(512)
+      .max(modelInfo.defaults?.max_width || 1024),
+    height: z
+      .number()
+      .min(512)
+      .max(modelInfo.defaults?.max_height || 1024),
     seed: z.string().optional(),
     model: z.string().optional(),
   })
@@ -234,6 +243,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
 
       const item = {
         id: extractImageId(data.url),
+        model: model,
         url,
         prompt: data.prompt,
         neg_prompt: data.neg_prompt,
@@ -285,8 +295,33 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       setTransactionId(res.data?.transactionId!)
 
       toast.success('Issue to Gateway successfully.')
+
+      console.log('info', info)
+
+      await postNotifyAfterMintActions({
+        modelId: info.model,
+        imageId: info.id,
+        actionType: 'GATEWAY_UPLOAD',
+      })
     } finally {
       setLoadingUpload(false)
+    }
+  }
+
+  const onShareTwitter = async () => {
+    if (!info) return
+
+    try {
+      shareOnX(model, info.prompt)
+
+      toast.success('Share on Twitter successfully.')
+      await postNotifyAfterMintActions({
+        modelId: info.model,
+        imageId: info.id,
+        actionType: 'TWITTER_SHARE',
+      })
+    } catch (error) {
+      console.error('Error sharing on Twitter:', error)
     }
   }
 
@@ -312,13 +347,13 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
     } else {
       if (search) form.setValue('prompt', search)
     }
-  
-    form.setValue('width', nowModel.defaults.width);
-    form.setValue('height', nowModel.defaults.height);
-    form.setValue('neg_prompt', nowModel.defaults.neg_prompt);
-    form.setValue('num_iterations', nowModel.defaults.num_inference_steps);
-    form.setValue('guidance_scale', nowModel.defaults.guidance_scale);
-    form.setValue('seed', nowModel.defaults.seed);
+
+    form.setValue('width', nowModel.defaults.width)
+    form.setValue('height', nowModel.defaults.height)
+    form.setValue('neg_prompt', nowModel.defaults.neg_prompt)
+    form.setValue('num_iterations', nowModel.defaults.num_inference_steps)
+    form.setValue('guidance_scale', nowModel.defaults.guidance_scale)
+    form.setValue('seed', nowModel.defaults.seed)
   }
 
   useEffect(() => {
@@ -419,28 +454,30 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             )}
           />
 
-          {modelInfo.defaults?.neg_prompt !== null && <FormField
-            control={form.control}
-            name="neg_prompt"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center">
-                  Negative Prompt
-                  <Tooltip content="Enter elements you don't want in the generated image">
-                    <Info className="ml-2 h-4 w-4 cursor-help" />
-                  </Tooltip>
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Negative Prompt"
-                    autoComplete="off"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />}
+          {modelInfo.defaults?.neg_prompt !== null && (
+            <FormField
+              control={form.control}
+              name="neg_prompt"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center">
+                    Negative Prompt
+                    <Tooltip content="Enter elements you don't want in the generated image">
+                      <Info className="ml-2 h-4 w-4 cursor-help" />
+                    </Tooltip>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Negative Prompt"
+                      autoComplete="off"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             <FormField
@@ -523,7 +560,10 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                         if (Number(e.target.value) < 512) {
                           field.onChange(512)
                         }
-                        if (Number(e.target.value) > (modelInfo.defaults?.max_width || 1024)) {
+                        if (
+                          Number(e.target.value) >
+                          (modelInfo.defaults?.max_width || 1024)
+                        ) {
                           field.onChange(modelInfo.defaults?.max_width || 1024)
                         }
                       }}
@@ -550,7 +590,10 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                         if (Number(e.target.value) < 512) {
                           field.onChange(512)
                         }
-                        if (Number(e.target.value) > (modelInfo.defaults.max_height || 1024)) {
+                        if (
+                          Number(e.target.value) >
+                          (modelInfo.defaults.max_height || 1024)
+                        ) {
                           field.onChange(modelInfo.defaults.max_height || 1024)
                         }
                       }}
@@ -641,15 +684,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                     type="button"
                     variant="outline"
                     className="gap-1.5"
-                    onClick={() => {
-                      const name = result.url
-                        .split('/')
-                        .slice(-1)[0]
-                        .split('?')[0]
-                        .split('.')[0]
-
-                      shareOnX(name, form.getValues().prompt || '')
-                    }}
+                    onClick={onShareTwitter}
                   >
                     <span>Share on</span>
                     <span className="i-ri-twitter-x-fill h-4 w-4" />

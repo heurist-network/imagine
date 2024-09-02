@@ -16,6 +16,25 @@ Payload:
 export const API_NOTIFY_AFTER_MINT_ACTIONS =
   'https://fkosy3nlq8.execute-api.us-east-1.amazonaws.com/prod/notify-after-mint-actions'
 
+export const postNotifyAfterMintActions = async (data: {
+  modelId: string
+  imageId: string
+  actionType: 'GATEWAY_UPLOAD' | 'TWITTER_SHARE'
+}) => {
+  try {
+    const response = await fetch(API_NOTIFY_AFTER_MINT_ACTIONS, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    return response.json()
+  } catch (error) {
+    console.error('Error fetching user rewards:', error)
+  }
+}
+
 /**
  * >> API endpoint for fetching epoch rewards.
  */
