@@ -44,7 +44,7 @@ export async function Hero() {
                 )}
               >
                 <PlusIcon className="w-4" />
-                <span>Imagine Studio</span>
+                <span>Heurist Imagine</span>
               </div>
             </BlurIn>
 
@@ -53,10 +53,10 @@ export async function Hero() {
                 'pointer-events-auto font-semibold -tracking-[0.012em] text-white',
                 'text-[40px] leading-[1.2] md:text-[53px] lg:text-[66px] lg:leading-[1] xl:text-[79px] 2xl:text-[92px]',
               )}
-              words1="Best Stable"
-              words2="Diffusion models"
-              words3="on a decentralized"
-              words4="network of GPUs"
+              words1="Create Images"
+              words2="with AI"
+              words3="on a Distributed"
+              words4="GPU Network"
             />
           </div>
           <div className="flex items-end justify-end lg:justify-start">
@@ -66,8 +66,8 @@ export async function Hero() {
                 delay={1.1}
               >
                 <SwapText
-                  initialText="Join Create-to-Earn Event"
-                  finalText="Join Create-to-Earn Event"
+                  initialText="Join Create-to-Earn Campaign"
+                  finalText="Join Create-to-Earn Campaign"
                   supportsHover
                   textClassName={cn(
                     'font-medium text-white transition-colors hover:text-[#CDF138] duration-100',

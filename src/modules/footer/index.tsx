@@ -10,12 +10,20 @@ export function Footer() {
           <div className="flex basis-2/3">
             <div className="flex basis-1/2 flex-col gap-4 font-SFMono">
               <div className="text-[16px] leading-[1.5] -tracking-[0.01em] text-[#696963]">
-                Community
+                About Heurist
               </div>
               <div className="flex">
                 <Link
                   className="flex text-white transition-colors hover:text-[#CDF138]"
-                  href=""
+                  href="https://heurist.ai"
+                >
+                  Protocol
+                </Link>
+              </div>
+              <div className="flex">
+                <Link
+                  className="flex text-white transition-colors hover:text-[#CDF138]"
+                  href="https://heurist.ai/ecosystem"
                 >
                   Ecosystem
                 </Link>
@@ -23,17 +31,17 @@ export function Footer() {
               <div className="flex">
                 <Link
                   className="flex text-white transition-colors hover:text-[#CDF138]"
-                  href=""
+                  href="https://heurist.ai/portal"
                 >
-                  Developer
+                  Mining
                 </Link>
               </div>
               <div className="flex">
                 <Link
                   className="flex text-white transition-colors hover:text-[#CDF138]"
-                  href=""
+                  href="https://docs.heurist.ai/"
                 >
-                  Mining
+                  Docs
                 </Link>
               </div>
             </div>
@@ -62,8 +70,8 @@ export function Footer() {
             </div>
           </div>
           <div className="basis-1/3 text-[16px] leading-[1.5] -tracking-[0.0016em] text-[#FFFFFF] lg:text-right">
-            Serverless Access To A World Of Open-SourceAI Models Powered By A ZK
-            Layer-2 Network
+            Enjoy seamless access to a world of open source AI models
+            Brought to you by Heurist
           </div>
         </div>
         <HeuristIcon className="mt-16 w-full" />

@@ -23,7 +23,7 @@ export async function FeatureModels() {
 
   const getModelTag = (type: string): string => {
     if (type === 'sd15') return 'SD1.5'
-    if (type === 'sdxl') return 'SDXL'
+    if (type === 'sdxl10') return 'SDXL'
     if (type === 'composite15') return 'SD1.5 LoRA'
     if (type === 'compositexl') return 'SDXL LoRA'
     if (type === 'flux-dev' || type === 'flux-schnell') return 'Flux'
