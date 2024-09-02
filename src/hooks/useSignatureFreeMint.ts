@@ -92,7 +92,7 @@ export const useSignatureFreeMint = () => {
    */
   useEffect(() => {
     fetchSignatureData()
-  }, [fetchSignatureData, checkSignature])
+  }, [fetchSignatureData])
 
   /**
    * Automatically refreshes the signature data every minute.
