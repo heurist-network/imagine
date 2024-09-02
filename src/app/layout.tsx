@@ -7,7 +7,6 @@ import { env } from '@/env.mjs'
 import { cn } from '@/lib/utils'
 import { Footer } from '@/modules/footer'
 import { Header } from '@/modules/header'
-import { NewHeader } from '@/modules/header/new-index'
 
 import { Providers } from './providers'
 
@@ -112,7 +111,7 @@ export default function RootLayout({
       <body className="min-h-screen">
         <Providers>
           <div className="relative flex min-h-screen flex-col bg-background">
-            <NewHeader />
+            <Header />
             {children}
             <Footer />
           </div>

@@ -63,21 +63,21 @@ export const DirectionAwareHover = ({
       onMouseEnter={handleMouseEnter}
       ref={ref}
       className={cn(
-        'group/card relative overflow-hidden rounded-lg bg-transparent',
+        'group/card relative hidden overflow-hidden rounded-lg bg-transparent md:block',
         className,
       )}
     >
       <AnimatePresence mode="wait">
         <motion.div
-          className="h-full w-full relative"
+          className="relative h-full w-full"
           initial="initial"
           whileHover={direction}
           exit="exit"
         >
-          <motion.div className="h-full bg-black/40 w-full inset-0 transition z-10 duration-500 absolute hidden group-hover/card:block" />
+          <motion.div className="absolute inset-0 z-10 hidden h-full w-full bg-black/40 transition duration-500 group-hover/card:block" />
           <motion.div
             variants={variants}
-            className="h-full bg-gray-50 w-full relative dark:bg-black"
+            className="relative h-full w-full bg-gray-50 dark:bg-black"
             transition={{
               duration: 0.2,
               ease: 'easeOut',

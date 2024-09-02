@@ -71,6 +71,8 @@ const config = {
           'linear-gradient(91deg,#474747 20.12%,#000 55.27%,#474747 82.61%)',
         'campaign-preview': "url('/campaign/preview-bg.png')",
         'campaign-reward-work': "url('/campaign/reward-work-bg.png')",
+        'new-label':
+          'linear-gradient(180deg,#CDF138,#23a4ff 37.88%,#FEDF17 75%)',
       },
       borderRadius: {
         lg: 'var(--radius)',
