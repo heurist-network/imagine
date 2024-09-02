@@ -112,14 +112,18 @@ export default function RootLayout({
       <body className="min-h-screen">
         <Providers>
           <div className="bg-[#CDF138]">
-            <div className="mx-auto flex h-10 max-w-5xl flex-nowrap items-center justify-center gap-0.5 truncate px-6 text-xs font-medium text-gray-950 md:max-w-[1440px] md:text-sm">
+            <div className="flex flex-nowrap font-medium mx-auto h-10 text-xs max-w-5xl px-6 text-gray-950 gap-0.5 items-center justify-center truncate md:text-sm md:max-w-[1440px]">
               <span>🎉 Join ZK Fest: Create AI Art and Earn ZK Tokens.</span>
-              <Link className="underline" href="" target="_blank">
+              <Link
+                className="underline"
+                href="https://heuristai.medium.com/heurist-x-zk-fest-presents-where-blockchain-meets-imagination-ed6d86248eb6"
+                target="_blank"
+              >
                 Read more here
               </Link>
             </div>
           </div>
-          <div className="relative flex min-h-screen flex-col bg-background">
+          <div className="bg-background flex flex-col min-h-screen relative">
             <Header />
             {children}
             <Footer />

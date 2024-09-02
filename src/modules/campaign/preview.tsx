@@ -78,12 +78,12 @@ export function CampaignPreview() {
   return (
     <div
       className={cn(
-        'flex h-[calc(100vh-56px)] items-center bg-campaign-preview bg-cover',
-        'min-h-[800px] md:min-h-[1100px] lg:min-h-[1200px] xl:min-h-[1100px] 2xl:min-h-[900px]',
+        '-mt-20 flex h-[calc(100vh+24px)] items-center bg-campaign-preview bg-cover',
+        'min-h-[1000px] md:min-h-[1100px] lg:min-h-[1200px] xl:min-h-[1100px] 2xl:min-h-[900px]',
       )}
     >
       <div className="container">
-        <div className="flex flex-col justify-between gap-6 2xl:flex-row 2xl:gap-12">
+        <div className="flex flex-col gap-6 justify-between 2xl:flex-row 2xl:gap-12">
           <div className="flex flex-col justify-between 2xl:h-[293px]">
             <div className="2xl:w-[682px]">
               <FadeText
@@ -114,7 +114,7 @@ export function CampaignPreview() {
             </div>
             <div className="flex md:justify-end">
               <BlurIn
-                className="group mt-6 flex cursor-pointer items-center gap-4 2xl:mt-0"
+                className="cursor-pointer flex mt-6 gap-4 group items-center 2xl:mt-0"
                 onClick={() => {
                   document.getElementById('featured-models')?.scrollIntoView({
                     behavior: 'smooth',
@@ -144,8 +144,8 @@ export function CampaignPreview() {
             </div>
           </div>
           <div className="flex flex-1 justify-center">
-            <div className="grid max-w-[709px] flex-1 grid-cols-3 justify-between gap-5">
-              <div className="flex h-[148px] flex-col items-center justify-center bg-[#1D1D1B] md:h-[293px]">
+            <div className="flex-1 max-w-[709px] grid gap-5 grid-cols-3 justify-between">
+              <div className="flex flex-col bg-[#1D1D1B] h-[148px] items-center justify-center md:h-[293px]">
                 <div
                   className={cn(
                     'font-SFMono text-white',
@@ -174,7 +174,7 @@ export function CampaignPreview() {
                   DAY
                 </div>
               </div>
-              <div className="flex h-[148px] flex-col items-center justify-center bg-[#1D1D1B] md:h-[293px]">
+              <div className="flex flex-col bg-[#1D1D1B] h-[148px] items-center justify-center md:h-[293px]">
                 <div
                   className={cn(
                     'font-SFMono text-white',
@@ -203,7 +203,7 @@ export function CampaignPreview() {
                   HRS
                 </div>
               </div>
-              <div className="flex h-[148px] flex-col items-center justify-center bg-[#1D1D1B] md:h-[293px]">
+              <div className="flex flex-col bg-[#1D1D1B] h-[148px] items-center justify-center md:h-[293px]">
                 <div
                   className={cn(
                     'font-SFMono text-white',
@@ -300,10 +300,10 @@ export function CampaignPreview() {
           </div>
         </div>
 
-        <div className="mt-[24px] flex md:mt-[32px] lg:mt-[38px] xl:mt-[44px] 2xl:mt-[50px]">
-          <div className="relative max-w-[750px] bg-white py-3 pl-14 pr-6 font-SFMono text-base leading-[19px] -tracking-[0.0075em]">
+        <div className="flex mt-[24px] md:mt-[32px] lg:mt-[38px] xl:mt-[44px] 2xl:mt-[50px]">
+          <div className="bg-white font-SFMono text-base max-w-[750px] py-3 pr-6 pl-14 leading-[19px] -tracking-[0.0075em] relative">
             <Image
-              className="absolute left-6 top-3"
+              className="top-3 left-6 absolute"
               src="/icon/plus.svg"
               alt="plus"
               width={16}
