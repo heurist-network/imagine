@@ -31,19 +31,19 @@ export async function FeatureModels() {
 
   return (
     <div className="min-h-screen bg-[#F6F8FC] py-[160px]">
-      <div className="container">
+      <div className="mx-auto max-w-5xl px-6 md:max-w-[1440px]">
         <div className="flex gap-4">
-          <div className="font-semibold text-[40px] text-[#1D1D1B] leading-[1.2] -tracking-[0.012em]">
+          <div className="text-[40px] font-semibold leading-[1.2] -tracking-[0.012em] text-[#1D1D1B]">
             Featured Models
           </div>
           <ArrowIcon className="w-8 rotate-90" strokeWidth={4} />
         </div>
-        <div className="mt-14 grid gap-6 grid-cols-4">
+        <div className="mt-14 grid grid-cols-4 gap-6">
           {lists.map((item, index) => (
             <BlurFade key={item.name} delay={0.25 + index * 0.05} inView>
               <Link
                 href={`/models/${item.name}`}
-                className="bg-fuchsia-300 relative"
+                className="relative bg-fuchsia-300"
               >
                 <DirectionAwareHover
                   className="cursor-pointer"
@@ -60,23 +60,23 @@ export async function FeatureModels() {
                     </div>
                   }
                 >
-                  <div className="pr-20 relative">
-                    <div className="font-semibold text-[24px] text-[#F7F7F6] leading-[1.33] tracking-[0.0064em] truncate">
+                  <div className="relative pr-20">
+                    <div className="truncate text-[24px] font-semibold leading-[1.33] tracking-[0.0064em] text-[#F7F7F6]">
                       {item.name}
                     </div>
-                    <div className="font-bold text-[13px] text-[#F7F7F6] leading-[1.3] -tracking-[0.01em]">
+                    <div className="text-[13px] font-bold leading-[1.3] -tracking-[0.01em] text-[#F7F7F6]">
                       {item.author}
                     </div>
-                    <div className="rounded-full flex bg-[#CDF138] h-16 top-1/2 right-0 w-16 -translate-y-1/2 group absolute items-center justify-center">
+                    <div className="group absolute right-0 top-1/2 flex h-16 w-16 -translate-y-1/2 items-center justify-center rounded-full bg-[#CDF138]">
                       <ArrowIcon
-                        className="transition-transform text-gray-950 w-9 group-hover:rotate-45"
+                        className="w-9 text-gray-950 transition-transform group-hover:rotate-45"
                         strokeWidth={2}
                       />
                     </div>
                   </div>
                 </DirectionAwareHover>
                 {!!getModelTag(item.type) && (
-                  <div className="font-semibold bg-white/80 rounded-[5px] py-[3px] px-2 top-6 left-6 text-[14px] text-[#1D1D1B] leading-[1.57] tracking-[0.0016em] z-10 pointer-events-none absolute backdrop-blur-md">
+                  <div className="pointer-events-none absolute left-6 top-6 z-10 rounded-[5px] bg-white/80 px-2 py-[3px] text-[14px] font-semibold leading-[1.57] tracking-[0.0016em] text-[#1D1D1B] backdrop-blur-md">
                     {getModelTag(item.type)}
                   </div>
                 )}

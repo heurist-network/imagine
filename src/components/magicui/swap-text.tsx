@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 
 import { cn } from '@/lib/utils'
@@ -73,7 +75,7 @@ export default function SwapText({
           {
             /* Trick to make sure it can always fit all available words after transition as the second word is set to absolute*/
             Boolean(longWord?.length) && (
-              <span className="invisible h-0">{longWord}</span>
+              <span className="h-0 invisible">{longWord}</span>
             )
           }
         </span>

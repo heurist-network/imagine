@@ -102,7 +102,7 @@ const AnimatedImage = forwardRef<AnimatedImageRef, { src: string }>(
         animate={controls}
         src={src}
         alt="trail element"
-        className="object-cover h-56 w-44 pointer-events-none absolute"
+        className="rounded-md object-cover h-56 w-44 pointer-events-none absolute"
       />
     )
   },
@@ -173,7 +173,7 @@ const TrailingImage = ({ lists }: { lists: any[] }) => {
   return (
     <div
       ref={containerRef}
-      className="flex h-full min-h-96 w-full opacity-60 top-0 left-0 z-10 storybook-fix absolute select-none"
+      className="flex h-full min-h-96 w-full opacity-60 top-0 left-0 z-10 storybook-fix absolute select-none overflow-hidden"
     >
       {trailsRef.current.map((ref, index) => (
         <AnimatedImage

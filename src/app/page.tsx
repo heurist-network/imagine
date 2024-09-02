@@ -7,6 +7,13 @@ import { Hero } from '@/modules/hero'
 import { NewHero } from '@/modules/hero/new-index'
 import { Models } from '@/modules/models'
 
+// export default function Home() {
+//   return (
+//     <div className="mx-auto w-full max-w-5xl bg-fuchsia-400 md:max-w-[1440px]">
+//       asfasf
+//     </div>
+//   )
+// }
 export default function Home() {
   return (
     <main className="flex-1">

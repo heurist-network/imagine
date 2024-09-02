@@ -5,7 +5,7 @@ import { HeuristIcon } from '@/components/icon'
 export function Footer() {
   return (
     <div className="bg-[#1d1d1c]">
-      <div className="container pb-16 pt-[120px]">
+      <div className="mx-auto max-w-5xl px-6 pb-16 pt-[120px] md:max-w-[1440px]">
         <div className="flex w-full">
           <div className="flex basis-1/3 flex-col gap-4 font-SFMono">
             <div className="text-[16px] leading-[1.5] -tracking-[0.01em] text-[#696963]">
