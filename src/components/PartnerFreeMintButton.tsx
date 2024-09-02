@@ -65,14 +65,14 @@ export const PartnerFreeMintButton: React.FC<PartnerFreeMintButtonProps> = ({
         BigInt(availableNFT.tokenId),
       )
       onSuccess?.(hash)
-      toast.success('Partner free minting successful!')
+      toast.success('Free mint successful! Score +1')
     } catch (error) {
       console.error('Partner free minting failed:', error)
       onError?.(
         error instanceof Error ? error : new Error('Unknown error occurred'),
       )
       toast.error(
-        'Partner free minting failed. Please make sure you have a partner NFT available.',
+        'Free minting failed. Please make sure you hold an eligible partner NFT.',
       )
     } finally {
       setIsMinting(false)

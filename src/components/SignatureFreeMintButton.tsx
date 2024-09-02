@@ -31,7 +31,7 @@ export const SignatureFreeMintButton: React.FC<
   // Show toast when the user can signature free mint
   useEffect(() => {
     if (canSignatureFreeMint != null && !isNotified) {
-      toast.success('You can do the signature free mint!')
+      toast.success('You are in the free mint whitelist!')
       setIsNotified(true)
     } else if (canSignatureFreeMint == null && !isNotified) {
       setIsNotified(true)
@@ -41,7 +41,7 @@ export const SignatureFreeMintButton: React.FC<
 
   const handlePartnerFreeMint = async () => {
     if (!canSignatureFreeMint) {
-      toast.error('You cannot signature free mint')
+      toast.error('You are not eligible for free mint')
       return
     }
     setIsMinting(true)
@@ -49,14 +49,14 @@ export const SignatureFreeMintButton: React.FC<
     try {
       const hash = await signatureFreeMint(modelId, imageId)
       onSuccess?.(hash)
-      toast.success('Signature free mint successful')
+      toast.success('Free mint successful! Score +1')
     } catch (error) {
       console.error('Signature free mint failed', error)
       onError?.(
         error instanceof Error ? error : new Error('Unknown error occurred'),
       )
       toast.error(
-        'Signature free minting failed. Please make sure you are in the list',
+        'Free minting failed. Please make sure you are in the list',
       )
     } finally {
       setIsMinting(false)
