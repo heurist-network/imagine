@@ -3,6 +3,7 @@
 import { useLayoutEffect, useState } from 'react'
 import { motion, useMotionValueEvent, useScroll, Variants } from 'framer-motion'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useDebounceCallback } from 'usehooks-ts'
 
 import { Logo } from '@/components/Logo'
@@ -12,10 +13,12 @@ import { ConnectButton } from '@/components/ui/connect-button'
 import { cn } from '@/lib/utils'
 
 export function Header() {
+  const pathname = usePathname()
   const { scrollY } = useScroll()
   const [isScrollTop, setIsScrollTop] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [maxWidth, setMaxWidth] = useState<string | undefined>()
+  const isHomePage = pathname === '/'
 
   // 定义滚动阈值
   const threshold = 28
@@ -84,7 +87,13 @@ export function Header() {
             maxWidth: { type: 'spring', stiffness: 400, damping: 30 }, // 为宽度设置弹簧动画
           }}
         >
-          <Link href="/" className="w-[116px] text-white">
+          <Link
+            href="/"
+            className={cn(
+              'w-[116px]',
+              isHomePage || isScrollTop ? 'text-white' : 'text-[#0c0c0c]',
+            )}
+          >
             <Logo />
           </Link>
           <div className="hidden flex-1 justify-center lg:flex">
@@ -93,7 +102,10 @@ export function Header() {
                 initialText="Campaign"
                 finalText="Campaign"
                 supportsHover
-                textClassName="text-white -tracking-[0.0016em] transition-colors hover:text-[#CDF138] duration-100 text-[16px] leading-[1.5]"
+                textClassName={cn(
+                  '-tracking-[0.0016em] transition-colors hover:text-[#CDF138] duration-100 text-[16px] leading-[1.5]',
+                  isHomePage || isScrollTop ? 'text-white' : 'text-[#0c0c0c]',
+                )}
               />
             </Link>
           </div>

@@ -52,8 +52,8 @@ export default async function Models({ params }: { params: { slug: string } }) {
     ]
 
     return (
-      <main className="flex-1">
-        <div className="container pb-20 pt-8">
+      <main className="-mt-20 flex-1 pt-20">
+        <div className="mx-auto max-w-5xl px-6 pb-20 pt-8 md:max-w-[1440px]">
           <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
             {model}
           </h2>
