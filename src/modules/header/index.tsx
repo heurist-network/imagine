@@ -96,19 +96,22 @@ export function Header() {
           >
             <Logo />
           </Link>
-          <div className="flex-1 hidden justify-center lg:flex">
-            <Link href="/campaign">
-              <SwapText
-                initialText="Campaign"
-                finalText="Campaign"
-                supportsHover
-                textClassName={cn(
-                  '-tracking-[0.0016em] transition-colors hover:text-[#CDF138] duration-100 text-[16px] leading-[1.5]',
-                  isHomePage || isScrollTop ? 'text-white' : 'text-[#0c0c0c]',
-                )}
-              />
-            </Link>
-          </div>
+          {pathname !== '/campaign' && (
+            <div className="flex-1 hidden justify-center lg:flex">
+              <Link href="/campaign">
+                <SwapText
+                  initialText="Campaign"
+                  finalText="Campaign"
+                  supportsHover
+                  textClassName={cn(
+                    '-tracking-[0.0016em] transition-colors hover:text-[#CDF138] duration-100 text-[16px] leading-[1.5]',
+                    isHomePage || isScrollTop ? 'text-white' : 'text-[#0c0c0c]',
+                  )}
+                />
+              </Link>
+            </div>
+          )}
+
           <div className="hidden lg:block">
             <ConnectButton />
           </div>
