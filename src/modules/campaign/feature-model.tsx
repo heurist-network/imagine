@@ -1078,10 +1078,10 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                   </div>
                 )}
                 <Separator className="my-4" />
-                {(!canSignatureFreeMint || !availableNFT) && (
+                {!canSignatureFreeMint && !availableNFT && (
                   <div className="text-sm text-gray-500">
                     <div>
-                      <Label>{`Input referral address to get a discount!`}</Label>
+                      <Label>{`⬆️ Input referral address to get a discount!`}</Label>
                     </div>
                     <div>
                       Normal Mint: {mintFee ? formatEther(mintFee) : '-'} ETH
