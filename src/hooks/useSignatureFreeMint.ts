@@ -42,6 +42,8 @@ export const useSignatureFreeMint = () => {
       )
 
       setSignatureData(userSignatureData || null)
+
+      await checkSignature()
     } catch (error) {
       console.error('Error fetching signature data:', error)
       setError('Failed to fetch signature data')
@@ -89,7 +91,7 @@ export const useSignatureFreeMint = () => {
    * Fetches the signature data and checks if the signature is valid when the component mounts.
    */
   useEffect(() => {
-    fetchSignatureData().then(checkSignature)
+    fetchSignatureData()
   }, [fetchSignatureData, checkSignature])
 
   /**
