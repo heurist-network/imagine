@@ -58,6 +58,7 @@ import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
 import {
   API_NOTIFY_AFTER_MINT_ACTIONS,
   API_NOTIFY_IMAGE_GEN,
+  postNotifyAfterMintActions,
 } from '@/lib/endpoints'
 import { cn, extractImageId } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -266,7 +267,8 @@ export function FeatureModel({ lists }: { lists: any[] }) {
    * Uploads the generated image to the Gateway
    */
   const onUpload = async () => {
-    if (!isMinted) return toast.error('You need to mint NFT first to earn scores')
+    if (!isMinted)
+      return toast.error('You need to mint NFT first to earn scores')
     if (!account.address) return openConnectModal?.()
 
     setTransactionId('')
@@ -286,21 +288,11 @@ export function FeatureModel({ lists }: { lists: any[] }) {
 
       setTransactionId(res.data?.transactionId!)
 
-      const resOfNotifyAfterMintActions = await fetch(
-        API_NOTIFY_AFTER_MINT_ACTIONS,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            modelId: info.model,
-            imageId: info.id,
-            actionType: 'GATEWAY_UPLOAD',
-          }),
-        },
-      ).catch(handleFetchError)
-      handleApiResponse(resOfNotifyAfterMintActions)
+      await postNotifyAfterMintActions({
+        modelId: info.model,
+        imageId: info.id,
+        actionType: 'GATEWAY_UPLOAD',
+      })
 
       toast.success('Image uploaded to Gateway successfully!')
     } finally {
@@ -315,23 +307,14 @@ export function FeatureModel({ lists }: { lists: any[] }) {
    * Opens a new window with the Twitter intent URL.
    */
   const onShareTwitter = async () => {
-    if (!isMinted) return toast.error('You need to mint NFT first to earn scores')
+    if (!isMinted)
+      return toast.error('You need to mint NFT first to earn scores')
 
-    const resOfNotifyAfterMintActions = await fetch(
-      API_NOTIFY_AFTER_MINT_ACTIONS,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          modelId: info.model,
-          imageId: info.id,
-          actionType: 'TWITTER_SHARE',
-        }),
-      },
-    ).catch(handleFetchError)
-    handleApiResponse(resOfNotifyAfterMintActions)
+    await postNotifyAfterMintActions({
+      modelId: info.model,
+      imageId: info.id,
+      actionType: 'TWITTER_SHARE',
+    })
 
     const path = mintUrl.split('/')
     const name = path[path.length - 1].split('.')[0]

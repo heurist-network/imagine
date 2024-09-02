@@ -23,7 +23,7 @@ export async function FeatureModels() {
 
   const getModelTag = (type: string): string => {
     if (type === 'sd15') return 'SD1.5'
-    if (type === 'sdxl') return 'SDXL'
+    if (type === 'sdxl10') return 'SDXL'
     if (type === 'composite15') return 'SD1.5 LoRA'
     if (type === 'compositexl') return 'SDXL LoRA'
     if (type === 'flux-dev' || type === 'flux-schnell') return 'Flux'
@@ -31,7 +31,7 @@ export async function FeatureModels() {
   }
 
   return (
-    <div className="group min-h-screen bg-[#F6F8FC] py-[80px] md:py-[100px] lg:py-[120px] xl:py-[140px] 2xl:py-[160px]">
+    <div className="min-h-screen bg-[#F6F8FC] py-[80px] group md:py-[100px] lg:py-[120px] xl:py-[140px] 2xl:py-[160px]">
       <div className="mx-auto max-w-5xl px-6 md:max-w-[1440px]">
         <div className="flex gap-4">
           <div
@@ -43,7 +43,7 @@ export async function FeatureModels() {
             Featured Models
           </div>
           <ArrowIcon
-            className="w-8 rotate-45 transition-transform group-hover:rotate-90"
+            className="transition-transform w-8 rotate-45 group-hover:rotate-90"
             strokeWidth={4}
           />
         </div>
@@ -56,7 +56,7 @@ export async function FeatureModels() {
           {lists.map((item, index) => (
             <BlurFade key={item.name} delay={0.25 + index * 0.05} inView>
               <Link href={`/models/${item.name}`} className="relative block">
-                <div className="relative block overflow-hidden rounded-lg bg-transparent md:hidden">
+                <div className="bg-transparent rounded-lg relative block overflow-hidden md:hidden">
                   <div className="relative aspect-[464/696]">
                     <Image
                       unoptimized
@@ -68,17 +68,17 @@ export async function FeatureModels() {
                     />
                   </div>
 
-                  <div className="absolute bottom-6 left-6 right-6 z-40 text-white">
-                    <div className="relative pr-20">
-                      <div className="truncate text-[24px] font-semibold leading-[1.33] tracking-[0.0064em] text-[#F7F7F6]">
+                  <div className="text-white right-6 bottom-6 left-6 z-40 absolute">
+                    <div className="pr-20 relative">
+                      <div className="font-semibold text-[24px] text-[#F7F7F6] leading-[1.33] tracking-[0.0064em] truncate">
                         {item.name}
                       </div>
-                      <div className="text-[13px] font-bold leading-[1.3] -tracking-[0.01em] text-[#F7F7F6]">
+                      <div className="font-bold text-[13px] text-[#F7F7F6] leading-[1.3] -tracking-[0.01em]">
                         {item.author}
                       </div>
-                      <div className="absolute right-0 top-1/2 flex h-16 w-16 -translate-y-1/2 items-center justify-center rounded-full bg-[#CDF138]">
+                      <div className="rounded-full flex bg-[#CDF138] h-16 top-1/2 right-0 w-16 -translate-y-1/2 absolute items-center justify-center">
                         <ArrowIcon
-                          className="w-9 text-gray-950 transition-transform"
+                          className="transition-transform text-gray-950 w-9"
                           strokeWidth={2}
                         />
                       </div>
@@ -100,23 +100,23 @@ export async function FeatureModels() {
                     </div>
                   }
                 >
-                  <div className="relative pr-20">
-                    <div className="truncate text-[24px] font-semibold leading-[1.33] tracking-[0.0064em] text-[#F7F7F6]">
+                  <div className="pr-20 relative">
+                    <div className="font-semibold text-[24px] text-[#F7F7F6] leading-[1.33] tracking-[0.0064em] truncate">
                       {item.name}
                     </div>
-                    <div className="text-[13px] font-bold leading-[1.3] -tracking-[0.01em] text-[#F7F7F6]">
+                    <div className="font-bold text-[13px] text-[#F7F7F6] leading-[1.3] -tracking-[0.01em]">
                       {item.author}
                     </div>
-                    <div className="absolute right-0 top-1/2 flex h-16 w-16 -translate-y-1/2 items-center justify-center rounded-full bg-[#CDF138]">
+                    <div className="rounded-full flex bg-[#CDF138] h-16 top-1/2 right-0 w-16 -translate-y-1/2 absolute items-center justify-center">
                       <ArrowIcon
-                        className="w-9 text-gray-950 transition-transform"
+                        className="transition-transform text-gray-950 w-9"
                         strokeWidth={2}
                       />
                     </div>
                   </div>
                 </DirectionAwareHover>
                 {!!getModelTag(item.type) && (
-                  <div className="pointer-events-none absolute left-6 top-6 z-20 rounded-[5px] bg-white/80 px-2 py-[3px] text-[14px] font-semibold leading-[1.57] tracking-[0.0016em] text-[#1D1D1B] backdrop-blur-md">
+                  <div className="font-semibold bg-white/80 rounded-[5px] py-[3px] px-2 top-6 left-6 text-[14px] text-[#1D1D1B] leading-[1.57] tracking-[0.0016em] z-20 pointer-events-none absolute backdrop-blur-md">
                     {getModelTag(item.type)}
                   </div>
                 )}

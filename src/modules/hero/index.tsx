@@ -25,7 +25,7 @@ export async function Hero() {
   )
 
   return (
-    <div className="relative -mt-20 h-screen bg-gray-900 md:min-h-[880px]">
+    <div className="h-screen bg-gray-900 -mt-20 relative md:min-h-[880px]">
       <Bg />
       <TrailingImage lists={lists} />
       <div
@@ -34,7 +34,7 @@ export async function Hero() {
           'mx-auto max-w-5xl px-6 md:max-w-[1440px]',
         )}
       >
-        <div className="flex flex-1 flex-col justify-between gap-14 lg:flex-row lg:gap-0 lg:pb-[8.33%]">
+        <div className="flex flex-col flex-1 gap-14 justify-between lg:flex-row lg:pb-[8.33%] lg:gap-0">
           <div className="flex flex-col gap-[20px] md:gap-[29px] lg:gap-[38px] xl:gap-[47px] 2xl:gap-[56px]">
             <BlurIn className="flex" delay={1.1}>
               <div
@@ -44,7 +44,7 @@ export async function Hero() {
                 )}
               >
                 <PlusIcon className="w-4" />
-                <span>Imagine Studio</span>
+                <span>Heurist Imagine</span>
               </div>
             </BlurIn>
 
@@ -53,21 +53,21 @@ export async function Hero() {
                 'pointer-events-auto font-semibold -tracking-[0.012em] text-white',
                 'text-[40px] leading-[1.2] md:text-[53px] lg:text-[66px] lg:leading-[1] xl:text-[79px] 2xl:text-[92px]',
               )}
-              words1="Best Stable"
-              words2="Diffusion models"
-              words3="on a decentralized"
-              words4="network of GPUs"
+              words1="Create Images"
+              words2="with AI"
+              words3="on a Distributed"
+              words4="GPU Network"
             />
           </div>
           <div className="flex items-end justify-end lg:justify-start">
             <Link href="/campaign">
               <BlurIn
-                className="group pointer-events-auto flex cursor-pointer items-center gap-2.5"
+                className="cursor-pointer flex gap-2.5 group pointer-events-auto items-center"
                 delay={1.1}
               >
                 <SwapText
-                  initialText="Join Create-to-Earn Event"
-                  finalText="Join Create-to-Earn Event"
+                  initialText="Join Create-to-Earn Campaign"
+                  finalText="Join Create-to-Earn Campaign"
                   supportsHover
                   textClassName={cn(
                     'font-medium text-white transition-colors hover:text-[#CDF138] duration-100',

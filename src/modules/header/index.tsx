@@ -66,7 +66,7 @@ export function Header() {
 
   return (
     <>
-      <header className="z-50 h-20 w-full transition-all">
+      <header className="h-20 w-full transition-all z-50">
         <motion.div
           initial="stateA"
           animate={isScrollTop ? 'stateB' : 'stateA'}
@@ -96,7 +96,7 @@ export function Header() {
           >
             <Logo />
           </Link>
-          <div className="hidden flex-1 justify-center lg:flex">
+          <div className="flex-1 hidden justify-center lg:flex">
             <Link href="/campaign">
               <SwapText
                 initialText="Campaign"
@@ -121,9 +121,9 @@ export function Header() {
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (
-                <span className="i-mingcute-close-line h-7 w-7" />
+                <span className="h-7 w-7 i-mingcute-close-line" />
               ) : (
-                <span className="i-mingcute-menu-line h-7 w-7" />
+                <span className="h-7 w-7 i-mingcute-menu-line" />
               )}
             </div>
           </div>
@@ -139,20 +139,20 @@ export function Header() {
       >
         <div className="flex h-20 items-center justify-end">
           <div
-            className="flex h-10 w-10 cursor-pointer items-center justify-center text-black"
+            className="cursor-pointer flex h-10 text-black w-10 items-center justify-center"
             onClick={() => setIsExpanded(false)}
           >
-            <span className="i-mingcute-close-line h-7 w-7" />
+            <span className="h-7 w-7 i-mingcute-close-line" />
           </div>
         </div>
         <Link
-          className="flex h-12 items-center gap-2 border-y border-y-[rgba(0,0,0,0.1)]"
+          className="border-y flex border-y-[rgba(0,0,0,0.1)] h-12 gap-2 items-center"
           href="/campaign"
           onClick={() => setIsExpanded(false)}
         >
           <span>Campaign</span>
           <div className="flex">
-            <AnimatedGradientText className="px-2 py-1 text-[10px] leading-[12px]">
+            <AnimatedGradientText className="py-1 px-2 text-[10px] leading-[12px]">
               <span
                 className={cn(
                   `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
