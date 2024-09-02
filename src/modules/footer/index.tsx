@@ -44,7 +44,8 @@ export function Footer() {
               <div className="flex">
                 <Link
                   className="flex text-white transition-colors hover:text-[#CDF138]"
-                  href=""
+                  href="https://discord.com/invite/heuristai"
+                  target="_blank"
                 >
                   Discord
                 </Link>
@@ -52,9 +53,10 @@ export function Footer() {
               <div className="flex">
                 <Link
                   className="flex text-white transition-colors hover:text-[#CDF138]"
-                  href=""
+                  href="https://twitter.com/heurist_ai"
+                  target="_blank"
                 >
-                  Twitter
+                  Twitter/X
                 </Link>
               </div>
             </div>
