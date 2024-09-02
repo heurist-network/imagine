@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Address, Hash, isAddress } from 'viem'
+import { Address, formatEther, Hash, isAddress } from 'viem'
 import { zksync } from 'viem/chains'
 import { useAccount, useBalance, useClient, useSwitchChain } from 'wagmi'
 import { z } from 'zod'
@@ -102,12 +102,31 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     setReferralAddress,
     loading: loadingMintNFT,
   } = useMintToNFT()
-  const { mint, mintFee, signatureFreeMint, partnerFreeMint } =
-    useMintZkImagine()
+
+  const {
+    mint,
+    mintFee,
+    discountedFee,
+    signatureFreeMint,
+    partnerFreeMint,
+    globalTimeThreshold,
+  } = useMintZkImagine()
+  const {
+    canSignatureFreeMint,
+    isLoading: loadingSignatureFreeMint,
+    error: signatureFreeMintError,
+  } = useSignatureFreeMint()
+
+  const {
+    availableNFT,
+    isLoading: loadingPartnerFreeMint,
+    error: partnerFreeMintError,
+    refreshPartnerNFTs,
+  } = usePartnerFreeMint()
+
   const featureModels = lists.slice(0, 4)
 
   const [open, setOpen] = useState(false)
-
   const [loadingGetModels, setLoadingGetModels] = useState(true)
   const [loadingGenerate, setLoadingGenerate] = useState(false)
   const [mintType, setMintType] = useState<'quick' | 'advanced'>('quick')
@@ -130,19 +149,6 @@ export function FeatureModel({ lists }: { lists: any[] }) {
   const [isMinted, setIsMinted] = useState(false)
   const [isUploaded, setIsUploaded] = useState(false)
   const [loadingMint, setLoadingMint] = useState(false)
-
-  const {
-    canSignatureFreeMint,
-    isLoading: loadingSignatureFreeMint,
-    error: signatureFreeMintError,
-  } = useSignatureFreeMint()
-
-  const {
-    availableNFT,
-    isLoading: loadingPartnerFreeMint,
-    error: partnerFreeMintError,
-    refreshPartnerNFTs,
-  } = usePartnerFreeMint()
 
   const balance =
     (useBalance({
@@ -1048,8 +1054,8 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                   disabled={loadingMint}
                 >
                   {(loadingMintNFT ||
-                    loadingSignatureFreeMint ||
-                    loadingPartnerFreeMint) && (
+                    loadingPartnerFreeMint ||
+                    loadingSignatureFreeMint) && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
                   ✨ Mint zkImagine NFT{' '}
@@ -1069,6 +1075,36 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                         setReferralAddress(e.target.value as Address)
                       }
                     />
+                  </div>
+                )}
+                <Separator className="my-4" />
+                {(!canSignatureFreeMint || !availableNFT) && (
+                  <div className="text-sm text-gray-500">
+                    <div>
+                      <Label>{`Input referral address to get a discount!`}</Label>
+                    </div>
+                    <div>
+                      Normal Mint: {mintFee ? formatEther(mintFee) : '-'} ETH
+                    </div>
+                    <div>
+                      After Discount:{' '}
+                      {discountedFee ? formatEther(discountedFee.fee) : '-'} ETH
+                    </div>
+                  </div>
+                )}
+
+                <Separator className="my-4" />
+                {globalTimeThreshold && (
+                  <div className="text-sm text-gray-500">
+                    <Label>Free Mint Refresh at:</Label>
+                    <p>
+                      {new Date(
+                        Number(globalTimeThreshold) * 1000,
+                      ).toLocaleString(undefined, {
+                        timeZone:
+                          Intl.DateTimeFormat().resolvedOptions().timeZone,
+                      })}
+                    </p>
                   </div>
                 )}
               </div>
