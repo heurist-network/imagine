@@ -55,7 +55,7 @@ export async function FeatureModels() {
         >
           {lists.map((item, index) => (
             <BlurFade key={item.name} delay={0.25 + index * 0.05} inView>
-              <Link href={`/models/${item.name}`} className="relative">
+              <Link href={`/models/${item.name}`} className="relative block">
                 <div className="relative block overflow-hidden rounded-lg bg-transparent md:hidden">
                   <div className="relative aspect-[464/696]">
                     <Image
