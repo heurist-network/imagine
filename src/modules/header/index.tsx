@@ -66,7 +66,9 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed left-0 top-5 z-50 h-20 w-full transition-all">
+      <header
+        className={`fixed left-0 top-0 z-50 h-20 w-full transition-all ${pathname === '/campaign' ? 'top-5' : ''}`}
+      >
         <motion.div
           initial="stateA"
           animate={isScrollTop ? 'stateB' : 'stateA'}
@@ -87,15 +89,16 @@ export function Header() {
             maxWidth: { type: 'spring', stiffness: 400, damping: 30 }, // 为宽度设置弹簧动画
           }}
         >
-          <Link
-            href="/"
-            className={cn(
-              'w-[116px]',
-              isHomePage || isScrollTop ? 'text-white' : 'text-[#0c0c0c]',
-            )}
-          >
-            <Logo />
-          </Link>
+          <div className="w-[200px]">
+            <Link
+              href="/"
+              className={cn(
+                isHomePage || isScrollTop ? 'text-white' : 'text-[#0c0c0c]',
+              )}
+            >
+              <Logo />
+            </Link>
+          </div>
           <div
             // className="hidden flex-1 justify-center lg:flex"
             className={`hidden flex-1 justify-center ${pathname === '/campaign' ? 'hidden' : 'lg:flex'}`}
@@ -112,10 +115,10 @@ export function Header() {
               />
             </Link>
           </div>
-          <div className="hidden lg:block">
+          <div className="hidden w-[200px] lg:block">
             <ConnectButton />
           </div>
-          <div className="block lg:hidden">
+          <div className="block w-[200px] lg:hidden">
             <div
               className={cn(
                 'flex h-10 w-10 cursor-pointer items-center justify-center',
