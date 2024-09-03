@@ -100,11 +100,20 @@ export const getUserRewards = async (
     const checksumAddress = getAddress(address)
     params.set('address', checksumAddress)
     if (epoch) params.append('epoch', epoch)
+
     const response = await fetch(`${API_USER_REWARDS}?${params}`)
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     const data: UserRewardsData = await response.json()
+
+    // TODO: check the data.address is match with the checksumAddress.
+    if (getAddress(data.address) !== checksumAddress) {
+      console.error('API returned wrong data')
+      throw new Error('API returned wrong data')
+    }
+
     return data
   } catch (error) {
     console.error('Error fetching user rewards:', error)
