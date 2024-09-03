@@ -96,9 +96,9 @@ export const getUserRewards = async (
 ): Promise<UserRewardsData> => {
   try {
     const params = new URLSearchParams({ address })
-    const lowerCaseAddress = address.toLowerCase()
-
-    params.set('address', lowerCaseAddress)
+    // const lowerCaseAddress = address.toLowerCase()
+    const checksumAddress = getAddress(address)
+    params.set('address', checksumAddress)
     if (epoch) params.append('epoch', epoch)
     const response = await fetch(`${API_USER_REWARDS}?${params}`)
     if (!response.ok) {
