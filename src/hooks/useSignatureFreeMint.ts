@@ -22,7 +22,7 @@ export const useSignatureFreeMint = () => {
   const [signatureData, setSignatureData] = useState<SignatureData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [canSignatureFreeMint, setCanSignatureFreeMint] = useState()
+  const [canSignatureFreeMint, setCanSignatureFreeMint] = useState(false)
 
   /**
    * Fetches the signature data for the connected wallet address and checks if it's valid.
