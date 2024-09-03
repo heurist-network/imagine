@@ -115,6 +115,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     canSignatureFreeMint,
     isLoading: loadingSignatureFreeMint,
     error: signatureFreeMintError,
+    refreshSignatureData,
   } = useSignatureFreeMint()
 
   const {
@@ -266,6 +267,13 @@ export function FeatureModel({ lists }: { lists: any[] }) {
       setOpen(false)
     } finally {
       setLoadingGenerate(false)
+      console.log(
+        'Refreshed partner NFTs and signature data successfully. Result:',
+        {
+          availableNFT: availableNFT,
+          canSignatureFreeMint: canSignatureFreeMint,
+        },
+      )
     }
   }
 
@@ -341,12 +349,21 @@ export function FeatureModel({ lists }: { lists: any[] }) {
 
     setLoading(true)
 
+    console.log('Mint config:', {
+      accountAddress: account.address,
+      canSignatureFreeMint,
+      availableNFT,
+      referralAddress,
+    })
+
     try {
       // Signature Free Mint  - Partner Free Mint - Mint
       let txHash: Hash
       if (canSignatureFreeMint) {
+        console.log('Calling Signature Free Mint function')
         txHash = await signatureFreeMint(info.model, extractedImageId)
       } else if (availableNFT) {
+        console.log('Calling Partner Free Mint function')
         txHash = await partnerFreeMint(
           info.model,
           extractedImageId,
@@ -358,6 +375,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
           toast.error('Insufficient ETH balance to mint NFT.')
           return
         }
+        console.log('Calling Mint function')
         txHash = await mint(
           isAddress(referralAddress) ? referralAddress : zeroReferralAddress,
           info.model,
@@ -506,8 +524,13 @@ export function FeatureModel({ lists }: { lists: any[] }) {
 
   // Refresh partner NFTs when the component mounts
   useEffect(() => {
-    refreshPartnerNFTs()
-  }, [refreshPartnerNFTs])
+    const refreshData = async () => {
+      await refreshPartnerNFTs()
+      await refreshSignatureData()
+    }
+
+    refreshData()
+  }, [refreshPartnerNFTs, refreshSignatureData])
 
   useEffect(() => {
     if (
@@ -564,7 +587,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
         >
           Featured Models of the Day
         </div>
-        <div className="font-SFMono mt-1.5 text-[14px] leading-[1.5] text-neutral-500 lg:text-[16px]">
+        <div className="mt-1.5 font-SFMono text-[14px] leading-[1.5] text-neutral-500 lg:text-[16px]">
           Select a model from today's curated collection to generate and mint.
         </div>
 
@@ -687,7 +710,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                 <div className="text-[18px] font-semibold leading-[1.56]">
                   Quick Generate and Mint
                 </div>
-                <div className="font-SFMono mb-4 mt-1.5 text-sm leading-6 text-neutral-400">
+                <div className="mb-4 mt-1.5 font-SFMono text-sm leading-6 text-neutral-400">
                   Generate an image instantly with a pre-filled prompt. For more
                   customization options, use Advanced Mint.
                 </div>
