@@ -96,22 +96,25 @@ export const getUserRewards = async (
 ): Promise<UserRewardsData> => {
   try {
     const params = new URLSearchParams({ address })
-    // const lowerCaseAddress = address.toLowerCase()
     const checksumAddress = getAddress(address)
     params.set('address', checksumAddress)
     if (epoch) params.append('epoch', epoch)
 
+    // @dev fetch the data from the API
     const response = await fetch(`${API_USER_REWARDS}?${params}`)
-
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     const data: UserRewardsData = await response.json()
 
-    // TODO: check the data.address is match with the checksumAddress.
+    // @dev check the data.address is match with the checksumAddress.
     if (getAddress(data.address) !== checksumAddress) {
-      console.error('API returned wrong data')
-      throw new Error('API returned wrong data')
+      console.error(
+        'API returned wrong data. Please refresh the page or try again later.',
+      )
+      throw new Error(
+        'API returned wrong data. Please refresh the page or try again later.',
+      )
     }
 
     return data

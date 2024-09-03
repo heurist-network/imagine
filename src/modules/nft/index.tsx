@@ -108,9 +108,9 @@ export function NFTModule() {
             throw new Error('Image not found')
           }
 
-          // load the hash and signature from the signatures.json file
+          // Load the hash and signature from the signatures.json file
           const claimant = signatures.find(
-            (claimant) => claimant.address === walletAddress,
+            (claimant) => claimant.walletAddress === walletAddress,
           ) // already lowercased
 
           if (!claimant) {
