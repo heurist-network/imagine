@@ -312,7 +312,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                   width={512}
                   height={768}
                   priority
-                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
+                  src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.jpg`}
                   alt="model"
                 />
                 <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
