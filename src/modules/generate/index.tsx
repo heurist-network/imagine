@@ -367,7 +367,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
             <AlertDialogTrigger asChild>
               <div className="relative cursor-pointer">
                 <FlipCards
-                  url={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
+                  url={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.jpg`}
                   back={
                     <div className="flex flex-col gap-2">
                       <div className="text-sm font-bold">Prompt</div>
