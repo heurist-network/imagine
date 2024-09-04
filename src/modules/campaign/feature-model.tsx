@@ -638,7 +638,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                             width={512}
                             height={768}
                             priority
-                            src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
+                            src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.jpg`}
                             alt="model"
                           />
                           <span className="i-ri-information-line absolute bottom-1 right-1 h-5 w-5 text-gray-300 md:bottom-2 md:right-2 md:h-6 md:w-6" />
@@ -1236,7 +1236,7 @@ const ModelCard: React.FC<ModelCardProps> = ({ item }) => (
         className="absolute inset-0 rounded-lg"
         unoptimized
         priority
-        src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.png`}
+        src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.label}.jpg`}
         alt="model"
         objectFit="cover"
         layout="fill"

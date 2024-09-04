@@ -63,7 +63,7 @@ export async function FeatureModels() {
                       priority
                       layout="fill"
                       className="scale-[1.15]"
-                      src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.name}.png`}
+                      src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.name}.jpg`}
                       alt="models image"
                     />
                   </div>
@@ -94,7 +94,7 @@ export async function FeatureModels() {
                         priority
                         layout="fill"
                         className="scale-[1.15]"
-                        src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.name}.png`}
+                        src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.name}.jpg`}
                         alt="models image"
                       />
                     </div>

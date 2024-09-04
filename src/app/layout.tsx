@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     url: 'https://imagine.heurist.ai',
     type: 'article',
     images: {
-      url: 'https://imagine.heurist.ai/BlazingDrive.png',
+      url: 'https://imagine.heurist.ai/BlazingDrive.jpg',
       width: 512,
       height: 768,
       alt: 'Heurist Imagine',
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     title,
     description,
     images: {
-      url: 'https://imagine.heurist.ai/BlazingDrive.png',
+      url: 'https://imagine.heurist.ai/BlazingDrive.jpg',
       width: 512,
       height: 768,
       alt: 'Heurist Imagine',

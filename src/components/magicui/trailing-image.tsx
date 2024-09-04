@@ -113,7 +113,7 @@ AnimatedImage.displayName = 'AnimatedImage'
 const TrailingImage = ({ lists }: { lists: any[] }) => {
   const images = lists.map(
     (item) =>
-      `https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.name}.png`,
+      `https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.name}.jpg`,
   )
 
   const containerRef = useRef<HTMLDivElement>(null)
