@@ -15,9 +15,9 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
+import { useZkImagine } from '@/hooks/useZkImagine'
 import { API_NOTIFY_IMAGE_GEN } from '@/lib/endpoints'
 import { extractImageId } from '@/lib/utils'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
@@ -62,7 +62,7 @@ export function MintToNFT({
   const [isPartnerFreeMinting, setIsPartnerFreeMinting] = useState(false)
 
   const { mint, mintFee, discountedFee, signatureFreeMint, partnerFreeMint } =
-    useMintZkImagine()
+    useZkImagine()
 
   const [open, setOpen] = useState(false)
   const [isValidReferral, setIsValidReferral] = useState(false)

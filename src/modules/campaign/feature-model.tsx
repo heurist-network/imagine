@@ -52,9 +52,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
-import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
+import { useZkImagine } from '@/hooks/useZkImagine'
 import {
   API_NOTIFY_AFTER_MINT_ACTIONS,
   API_NOTIFY_IMAGE_GEN,
@@ -110,7 +110,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     signatureFreeMint,
     partnerFreeMint,
     globalTimeThreshold,
-  } = useMintZkImagine()
+  } = useZkImagine()
   const {
     canSignatureFreeMint,
     isLoading: loadingSignatureFreeMint,

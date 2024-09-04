@@ -20,7 +20,7 @@ import { MarketConfig } from '@/constants/MarketConfig'
 
 import { useSignatureFreeMint } from './useSignatureFreeMint'
 
-export const useMintZkImagine = () => {
+export const useZkImagine = () => {
   const { address, chain } = useAccount()
   const { data: walletClient } = useWalletClient()
   const { switchChain } = useSwitchChain()
