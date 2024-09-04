@@ -12,6 +12,7 @@ import Marquee from '@/components/magicui/marquee'
 import { showSuccessToast } from '@/components/SuccessToast'
 import { Market } from '@/constants/MarketConfig'
 import { RewardType, useChestRewards } from '@/hooks/useChestRewards'
+import { useZkImagine } from '@/hooks/useZkImagine'
 import { getUserRewards, UserRewardsData } from '@/lib/endpoints'
 import { cn } from '@/lib/utils'
 
@@ -104,14 +105,12 @@ function ReferralRewardCard({
   title,
   rewards,
   rewardToken,
-  claimableRewards,
   onClaim,
   onCopy,
 }: {
   title: string
   rewards: string
   rewardToken: string
-  claimableRewards: bigint
   onClaim: () => void
   onCopy: () => void
 }) {
@@ -144,9 +143,7 @@ function ReferralRewardCard({
       <div className="flex justify-between">
         <div
           className={`flex cursor-pointer items-center gap-2 transition-colors group-hover:text-[#CDF138] ${
-            claimableRewards === BigInt(0)
-              ? 'pointer-events-none opacity-50'
-              : ''
+            rewards === '0' ? 'pointer-events-none opacity-50' : ''
           }`}
           onClick={onClaim}
         >
@@ -173,14 +170,21 @@ export function CampaignReward() {
   })
 
   const [userRewards, setUserRewards] = useState<UserRewardsData | null>(null)
+  const [referralFeesEarned, setReferralFeesEarned] = useState<
+    bigint | undefined
+  >(undefined)
+  const { getReferralFeesEarned } = useZkImagine()
   const { rewards, claimRewards } = useChestRewards(Market.zksync)
 
   useEffect(() => {
-    const fetchUserRewards = async () => {
+    const fetchChestAndReferralRewards = async () => {
       if (address) {
         try {
           const rewards = await getUserRewards(address)
           setUserRewards(rewards)
+
+          const referralFees = await getReferralFeesEarned(address)
+          setReferralFeesEarned(referralFees ?? BigInt(0))
         } catch (error) {
           console.error('Error fetching user rewards:', error)
         }
@@ -189,7 +193,7 @@ export function CampaignReward() {
       }
     }
 
-    fetchUserRewards()
+    fetchChestAndReferralRewards()
   }, [address])
 
   const handleClaimRewards = async (poolType: RewardType) => {
@@ -383,9 +387,12 @@ export function CampaignReward() {
 
           <ReferralRewardCard
             title="My Referral Rewards"
-            rewards={'---'}
+            rewards={
+              referralFeesEarned !== undefined
+                ? formatEther(referralFeesEarned)
+                : '---'
+            }
             rewardToken="ETH"
-            claimableRewards={BigInt(0)}
             onClaim={() => {
               console.log('claim referral rewards')
             }}

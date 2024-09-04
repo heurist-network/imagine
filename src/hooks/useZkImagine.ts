@@ -350,6 +350,51 @@ export const useZkImagine = () => {
     ],
   )
 
+  //@dev call to zkImagine contract to claim referral fee.
+  const claimReferralFee = useCallback(async () => {
+    if (!currentMarket || !walletClient || !publicClient || !address) {
+      throw new Error('Wallet not connected or unsupported chain')
+    }
+
+    setIsLoading(true)
+    try {
+      const { request } = await publicClient.simulateContract({
+        address: currentMarket.addresses.ZkImagine,
+        abi: ZkImagineABI,
+        functionName: 'claimReferralFee',
+        account: address,
+      })
+
+      const hash = await walletClient.writeContract(request)
+      await publicClient.waitForTransactionReceipt({ hash })
+
+      return hash
+    } finally {
+      setIsLoading(false)
+    }
+  }, [address, currentMarket, walletClient, publicClient])
+
+  //@dev call to zkImagine contract to get referral fees earned.
+  const getReferralFeesEarned = useCallback(
+    async (address: Address) => {
+      if (!publicClient || !currentMarket || !address) return BigInt(0)
+
+      try {
+        const feesEarned = await publicClient.readContract({
+          address: currentMarket.addresses.ZkImagine,
+          abi: ZkImagineABI,
+          functionName: 'referralFeesEarned',
+          args: [address],
+        })
+
+        return feesEarned as bigint
+      } catch (error) {
+        console.error('Error reading referral fees earned:', error)
+      }
+    },
+    [publicClient, currentMarket, address],
+  )
+
   if (!chain || !address || !publicClient) {
     return {
       mint: async () => {
@@ -377,6 +422,14 @@ export const useZkImagine = () => {
       },
       isLoading: false,
       canSignatureFreeMint: () => false,
+      globalTimeThreshold: null,
+      readGlobalTimeThreshold: async () => {
+        throw new Error('Public client not available')
+      },
+      claimReferralFee: async () => {
+        throw new Error('Wallet not connected or unsupported chain')
+      },
+      getReferralFeesEarned: async () => BigInt(0),
     }
   }
 
@@ -392,6 +445,8 @@ export const useZkImagine = () => {
     canSignatureFreeMint,
     globalTimeThreshold,
     readGlobalTimeThreshold,
+    claimReferralFee,
+    getReferralFeesEarned,
   }
 }
 
