@@ -43,7 +43,7 @@ export async function Models() {
                     width={280}
                     height={400}
                     priority
-                    src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.name}.png`}
+                    src={`https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/${item.name}.jpg`}
                     alt="models image"
                   />
                 }
