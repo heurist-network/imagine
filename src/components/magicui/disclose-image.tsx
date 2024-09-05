@@ -17,6 +17,8 @@ export default function DiscloseImage({
   src,
   width,
   height,
+  objectFit,
+  layout,
   // ...props
 }: ImgHTMLAttributes<HTMLImageElement> & {
   /**
@@ -30,6 +32,10 @@ export default function DiscloseImage({
    * If true, the doors will slide vertically.
    */
   vertical?: boolean
+
+  objectFit?: string | undefined
+
+  layout?: string | undefined
 }) {
   const [imageLoaded, setImageLoaded] = useState(false)
   const baseClassName =
@@ -56,6 +62,8 @@ export default function DiscloseImage({
           imageLoaded ? 'opacity-100' : 'opacity-0',
           imgClassName,
         )}
+        objectFit={objectFit}
+        layout={layout}
       />
 
       {imageLoaded && (

@@ -15,6 +15,7 @@ import { useAccount, useBalance, useClient, useSwitchChain } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
+import DiscloseImage from '@/components/magicui/disclose-image'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -1009,10 +1010,12 @@ export function FeatureModel({ lists }: { lists: any[] }) {
               )}
               {!!mintUrl && (
                 <div className="relative flex min-h-[300px] flex-1 md:h-[616px]">
-                  <Image
-                    className="absolute inset-0"
+                  <DiscloseImage
+                    doorClassName="bg-[#CDF138]"
+                    className="absolute inset-0 bg-[#CDF138]"
                     src={mintUrl}
                     alt="mint"
+                    imgClassName="inset-0 absolute"
                     objectFit="cover"
                     layout="fill"
                   />
