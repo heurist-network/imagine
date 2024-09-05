@@ -615,7 +615,13 @@ export function FeatureModel({ lists }: { lists: any[] }) {
         isAddress(data.referral_address) ? data.referral_address : '',
       )
 
-      if (
+      if (!account.address) {
+        setReferralCode(code)
+        toast.success(
+          '🎉 Congrats! You have successfully used the referral code to enjoy a discount mint! Please connect your wallet!',
+        )
+        return
+      } else if (
         account &&
         getAddress(account.address as string) ===
           getAddress(data.referral_address)
