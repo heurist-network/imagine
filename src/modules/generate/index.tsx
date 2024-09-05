@@ -13,9 +13,8 @@ import { useAccount } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
-import FlipCard, { FlipCards } from '@/components/animate/flip-card'
-import EmergingImage from '@/components/emergingImage/EmergingImage'
-import Scene from '@/components/emergingImage/Scene'
+import { FlipCards } from '@/components/animate/flip-card'
+import DiscloseImage from '@/components/magicui/disclose-image'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,10 +38,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
-import {
-  API_NOTIFY_AFTER_MINT_ACTIONS,
-  postNotifyAfterMintActions,
-} from '@/lib/endpoints'
+import { postNotifyAfterMintActions } from '@/lib/endpoints'
 import { shareOnX } from '@/lib/share'
 import { cn, extractImageId } from '@/lib/utils'
 import { MintToNFT } from '@/modules/mintToNFT'
@@ -71,98 +67,10 @@ function Tooltip({ content, children }: TooltipProps) {
   )
 }
 
-interface PixelatedImageProps {
-  src: string
-  pixelSize?: number
-}
-
-interface PixelatedImageProps {
-  src: string
-  pixelSize?: number
-}
-
-const PixelatedImage: React.FC<PixelatedImageProps> = ({
-  src,
-  pixelSize = 16,
-}) => {
-  const [pixelatedSrc, setPixelatedSrc] = useState<string>('')
-
-  useEffect(() => {
-    const canvas = document.createElement('canvas')
-    canvas.width = pixelSize
-    canvas.height = pixelSize
-    const ctx = canvas.getContext('2d')
-
-    if (ctx) {
-      const img = document.createElement('img')
-      img.crossOrigin = 'Anonymous'
-      img.onload = () => {
-        // Calculate aspect ratio
-        const aspectRatio = img.width / img.height
-        let drawWidth = pixelSize
-        let drawHeight = pixelSize
-
-        if (aspectRatio > 1) {
-          drawHeight = pixelSize / aspectRatio
-        } else {
-          drawWidth = pixelSize * aspectRatio
-        }
-
-        // Draw small
-        ctx.drawImage(img, 0, 0, drawWidth, drawHeight)
-
-        // Get the pixel data
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-        ctx.putImageData(imageData, 0, 0)
-
-        // Create a new canvas for the final image
-        const finalCanvas = document.createElement('canvas')
-        finalCanvas.width = 512
-        finalCanvas.height = 512
-        const finalCtx = finalCanvas.getContext('2d')
-
-        if (finalCtx) {
-          // Disable image smoothing
-          finalCtx.imageSmoothingEnabled = false
-
-          // Scale up the pixelated image
-          finalCtx.drawImage(
-            canvas,
-            0,
-            0,
-            canvas.width,
-            canvas.height,
-            0,
-            0,
-            512,
-            512,
-          )
-
-          setPixelatedSrc(finalCanvas.toDataURL())
-        }
-      }
-      img.src = src
-    }
-  }, [src, pixelSize])
-
-  return (
-    <Image
-      className="rounded-lg shadow-xl"
-      unoptimized
-      width={512}
-      height={512}
-      priority
-      src={pixelatedSrc || src}
-      alt="pixelated image result"
-    />
-  )
-}
-
 export default function Generate({ model, models, isXl }: GenerateProps) {
   const account = useAccount()
   const { openConnectModal } = useConnectModal()
   const searchParams = useSearchParams()
-  const [loadingGenerate, setLoadingGenerate] = useState(false)
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
@@ -174,7 +82,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
     width: 0,
     height: 0,
   })
-  const [resultLoaded, setResultLoaded] = useState(false)
   const [info, setInfo] = useState<any>(null)
   const [transactionId, setTransactionId] = useState('')
 
@@ -360,7 +267,6 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
 
   return (
     <div>
-      <Scene />
       <div className="md:3/4 grid w-full grid-cols-3 gap-4 py-4 md:grid-cols-4 lg:w-4/5">
         {models.map((item) => (
           <AlertDialog key={item.label}>
@@ -720,44 +626,22 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {isPhiland && (
-            <div className="flex w-full justify-center">
-              <PixelatedImage src={result.url} />
-            </div>
-          )}
-          <div className="relative flex w-full justify-center">
-            <div
-              className="flex border"
-              style={{ width: result.width, height: result.height }}
-            >
-              {resultLoaded && (
-                <EmergingImage
-                  type={1}
-                  url={result.url}
-                  width={result.width}
-                  height={result.height}
-                  style={{
-                    flex: 1,
-                    borderRadius: 16,
-                    overflow: 'hidden',
-                  }}
-                />
-              )}
-            </div>
-
-            <Image
-              className="absolute opacity-0"
-              unoptimized
-              priority
-              src={result.url}
-              alt="image result"
-              width={result.width}
-              height={result.height}
-              onLoad={() => {
-                setResultLoaded(true)
-              }}
-            />
-          </div>
+          <Image
+            className="absolute opacity-0"
+            unoptimized
+            priority
+            src={result.url}
+            alt="image result"
+            width={result.width}
+            height={result.height}
+          />
+          <DiscloseImage
+            alt="image"
+            doorClassName="bg-[#CDF138]"
+            src={result.url}
+            width={result.width}
+            height={result.height}
+          />
         </motion.div>
       )}
     </div>

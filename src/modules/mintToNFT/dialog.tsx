@@ -15,10 +15,10 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
-import { API_NOTIFY_IMAGE_GEN } from '@/lib/endpoints'
+import { useZkImagine } from '@/hooks/useZkImagine'
+import { API_NOTIFY_IMAGE_GEN, postImageGen } from '@/lib/endpoints'
 import { extractImageId } from '@/lib/utils'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
@@ -46,6 +46,8 @@ export function MintToNFT({
     loading: loadingMintNFT,
   } = useMintToNFT()
 
+  // TODO: Replace referralAddress with referralCode.
+
   const {
     canSignatureFreeMint,
     isLoading: loadingSignatureFreeMint,
@@ -62,7 +64,7 @@ export function MintToNFT({
   const [isPartnerFreeMinting, setIsPartnerFreeMinting] = useState(false)
 
   const { mint, mintFee, discountedFee, signatureFreeMint, partnerFreeMint } =
-    useMintZkImagine()
+    useZkImagine()
 
   const [open, setOpen] = useState(false)
   const [isValidReferral, setIsValidReferral] = useState(false)
@@ -93,7 +95,7 @@ export function MintToNFT({
 
     try {
       const txHash = await signatureFreeMint(model, imageId)
-      await handleMintingProcess(txHash)
+      await handleMintingProcess()
       showSuccessToast('Mint zkImagine NFT successfully!', txHash)
 
       alreadyMinted.current = true
@@ -129,7 +131,7 @@ export function MintToNFT({
         availableNFT.address,
         BigInt(availableNFT.tokenId),
       )
-      await handleMintingProcess(txHash)
+      await handleMintingProcess()
       showSuccessToast('Mint zkImagine NFT successfully!', txHash)
 
       alreadyMinted.current = true
@@ -171,7 +173,7 @@ export function MintToNFT({
         model,
         extractedImageId,
       )
-      await handleMintingProcess(txHash)
+      await handleMintingProcess()
       showSuccessToast('Mint zkImagine NFT successfully!', txHash)
 
       alreadyMinted.current = true
@@ -187,12 +189,19 @@ export function MintToNFT({
    * Handles the common minting process after a transaction is initiated.
    * @param txHash - The transaction hash
    */
-  const handleMintingProcess = async (txHash: Hash) => {
+  const handleMintingProcess = async () => {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 20000)
 
     try {
-      await postMintingData(txHash, controller.signal)
+      await postImageGen(
+        {
+          modelId: model,
+          imageId: imageId,
+          url: url,
+        },
+        controller.signal,
+      )
     } catch (error) {
       console.error('Error in minting process:', error)
     } finally {

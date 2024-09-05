@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { Inter } from 'next/font/google'
 import localFont from 'next/font/local'
@@ -112,7 +113,7 @@ export default function RootLayout({
       <body className="min-h-screen">
         <Providers>
           <div className="bg-[#CDF138]">
-            <div className="flex flex-nowrap font-medium mx-auto h-10 text-xs max-w-5xl px-6 text-gray-950 gap-0.5 items-center justify-center truncate md:text-sm md:max-w-[1440px]">
+            <div className="mx-auto flex h-10 max-w-5xl flex-nowrap items-center justify-center gap-0.5 truncate px-6 text-xs font-medium text-gray-950 md:max-w-[1440px] md:text-sm">
               <span>🎉 Join ZK Fest: Create AI Art and Earn ZK Tokens.</span>
               <Link
                 className="underline"
@@ -123,8 +124,10 @@ export default function RootLayout({
               </Link>
             </div>
           </div>
-          <div className="bg-background flex flex-col min-h-screen relative">
-            <Header />
+          <div className="relative flex min-h-screen flex-col bg-background">
+            <Suspense>
+              <Header />
+            </Suspense>
             {children}
             <Footer />
           </div>

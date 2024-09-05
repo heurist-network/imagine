@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
-import { ContractFunctionExecutionError, formatEther } from 'viem'
+import { Address, ContractFunctionExecutionError, formatEther } from 'viem'
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
 import { MagicCard } from '@/components/magicui/magic-card'
@@ -12,7 +12,12 @@ import Marquee from '@/components/magicui/marquee'
 import { showSuccessToast } from '@/components/SuccessToast'
 import { Market } from '@/constants/MarketConfig'
 import { RewardType, useChestRewards } from '@/hooks/useChestRewards'
-import { getUserRewards, UserRewardsData } from '@/lib/endpoints'
+import { useZkImagine } from '@/hooks/useZkImagine'
+import {
+  getReferralCode,
+  getUserRewards,
+  UserRewardsData,
+} from '@/lib/endpoints'
 import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -41,11 +46,13 @@ export function Arrow({ className }: { className?: string }) {
 function PoolRewardCard({
   title,
   rewards,
+  rewardToken,
   claimableRewards,
   onClaim,
 }: {
   title: string
   rewards: string
+  rewardToken: string
   claimableRewards: bigint
   onClaim: () => void
 }) {
@@ -55,6 +62,7 @@ function PoolRewardCard({
         'group flex cursor-pointer flex-col justify-between rounded-2xl bg-[#CDF138] py-[21px] transition-colors hover:bg-black xl:w-[466px]',
         'h-[140px] md:h-[154px] lg:h-[166px] xl:h-[178px]',
         'px-[24px] md:px-[32px] lg:px-[40px] xl:px-[48px]',
+        'mt-[10px]',
       )}
     >
       <div
@@ -72,12 +80,14 @@ function PoolRewardCard({
           'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
         )}
       >
-        {rewards} ZK
+        {rewards} {rewardToken}
       </div>
       <div className="flex justify-between">
-        <div className="bg-white rounded-[2px] px-2 line-clamp-1">
+        <div className="line-clamp-1 rounded-[2px] bg-white px-2">
           Claimable:{' '}
-          <span className="font-bold">{formatEther(claimableRewards)} ZK</span>
+          <span className="font-bold">
+            {formatEther(claimableRewards)} {rewardToken}
+          </span>
         </div>
         <div
           className={`flex cursor-pointer items-center gap-2 transition-colors group-hover:text-[#CDF138] ${
@@ -95,6 +105,67 @@ function PoolRewardCard({
   )
 }
 
+function ReferralRewardCard({
+  title,
+  rewards,
+  rewardToken,
+  onClaim,
+  onCopy,
+}: {
+  title: string
+  rewards: string
+  rewardToken: string
+  onClaim: () => void
+  onCopy: () => void
+}) {
+  return (
+    <div
+      className={cn(
+        'group flex cursor-pointer flex-col justify-between rounded-2xl bg-[#CDF138] py-[21px] transition-colors hover:bg-black xl:w-[466px]',
+        'h-[140px] md:h-[154px] lg:h-[166px] xl:h-[178px]',
+        'px-[24px] md:px-[32px] lg:px-[40px] xl:px-[48px]',
+        'mt-[10px]',
+      )}
+    >
+      <div
+        className={cn(
+          'text-[#080808] transition-colors group-hover:text-[#CDF138]',
+          'text-[16px] leading-[1.3] md:text-[20px] lg:text-[24px] xl:text-[28px] 2xl:text-[32px]',
+          inter.className,
+        )}
+      >
+        {title}
+      </div>
+      <div
+        className={cn(
+          'font-SFMono font-bold text-[#1B1B1B] transition-colors group-hover:text-[#CDF138]',
+          'text-[24px] leading-[1.3] md:text-[30px] lg:text-[36px] xl:text-[42px] 2xl:text-[48px]',
+        )}
+      >
+        {rewards} {rewardToken}
+      </div>
+      <div className="flex justify-between">
+        <div
+          className={`flex cursor-pointer items-center gap-2 transition-colors group-hover:text-[#CDF138] ${
+            rewards === '0' ? 'pointer-events-none opacity-50' : ''
+          }`}
+          onClick={onClaim}
+        >
+          <div className="font-semibold underline">Claim</div>
+          <Arrow className="transition-transform group-hover:rotate-45" />
+        </div>
+        <div
+          className={`flex cursor-pointer items-center gap-2 transition-colors group-hover:text-[#CDF138]`}
+          onClick={onCopy}
+        >
+          <div className="font-semibold underline">Copy Referral Link</div>
+          <Arrow className="transition-transform group-hover:rotate-45" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function CampaignReward() {
   const { address } = useAccount()
   const { data: walletClient } = useWalletClient()
@@ -103,14 +174,21 @@ export function CampaignReward() {
   })
 
   const [userRewards, setUserRewards] = useState<UserRewardsData | null>(null)
+  const [referralFeesEarned, setReferralFeesEarned] = useState<
+    bigint | undefined
+  >(undefined)
+  const { getReferralFeesEarned, claimReferralFee } = useZkImagine()
   const { rewards, claimRewards } = useChestRewards(Market.zksync)
 
   useEffect(() => {
-    const fetchUserRewards = async () => {
+    const fetchChestAndReferralRewards = async () => {
       if (address) {
         try {
           const rewards = await getUserRewards(address)
           setUserRewards(rewards)
+
+          const referralFees = await getReferralFeesEarned(address)
+          setReferralFeesEarned(referralFees ?? BigInt(0))
         } catch (error) {
           console.error('Error fetching user rewards:', error)
         }
@@ -119,9 +197,10 @@ export function CampaignReward() {
       }
     }
 
-    fetchUserRewards()
-  }, [address])
+    fetchChestAndReferralRewards()
+  }, [address, getReferralFeesEarned])
 
+  //@dev claim rewards from chest contract
   const handleClaimRewards = async (poolType: RewardType) => {
     if (!publicClient) {
       toast.error('Error claiming rewards: Wallet not connected')
@@ -129,12 +208,12 @@ export function CampaignReward() {
     }
 
     try {
-      const tx = await claimRewards(poolType)
-      console.log('claim rewards tx', tx)
+      const txReceipt = await claimRewards(poolType)
+      console.log('claim rewards tx', txReceipt?.transactionHash)
       showSuccessToast(
         publicClient,
         'Rewards claimed successfully!',
-        tx?.transactionHash,
+        txReceipt?.transactionHash,
       )
     } catch (error) {
       console.error('Error claiming rewards:', error)
@@ -157,9 +236,59 @@ export function CampaignReward() {
     }
   }
 
+  //@dev claim referral fee from zkImagine contract
+  const handleClaimReferralFee = async () => {
+    if (!publicClient || !address) {
+      toast.error('Error claiming referral rewards: Wallet not connected')
+      return
+    }
+
+    try {
+      const txReceipt = await claimReferralFee()
+
+      console.log('claim referral rewards tx', txReceipt.transactionHash)
+
+      showSuccessToast(
+        publicClient,
+        'Referral rewards claimed successfully!',
+        txReceipt?.transactionHash,
+      )
+
+      // Refresh referral fees earned
+      const updatedReferralFees = await getReferralFeesEarned(address)
+      setReferralFeesEarned(updatedReferralFees ?? BigInt(0))
+    } catch (error) {
+      console.error('Error claiming referral rewards:', error)
+      toast.error('Error claiming referral rewards. Please try again.')
+    }
+  }
+
+  const handleCopyReferralLink = async () => {
+    if (!address) {
+      toast.error('Error copying referral link: Wallet not connected')
+      return
+    }
+
+    const referralCodeData = await getReferralCode(address)
+    console.log('referral code data', referralCodeData)
+
+    if (referralCodeData.referral_code) {
+      // Prod version:
+      const referralLink = `https://imagine.heurist.ai/campaign?ref=${referralCodeData.referral_code}`
+
+      const referralText = `Hey, I'm joining the Heurist Create to Earn campaign. Generate an image with Heurist AI and earn ZK & ETH rewards! Come and join me! ${referralLink}`
+      navigator.clipboard.writeText(referralText)
+      toast.success(
+        '🚀 Your Referral Code: ' +
+          referralCodeData.referral_code +
+          'The link has been copied to clipboard! Share it with your friends to earn more rewards!',
+      )
+    }
+  }
+
   return (
-    <div className="min-h-[1040px] relative">
-      <div className="bg-white flex flex-col pt-[76px] inset-0 gap-[55px] absolute overflow-y-hidden">
+    <div className="relative min-h-[1040px]">
+      <div className="absolute inset-0 flex flex-col gap-[55px] overflow-y-hidden bg-white pt-[76px]">
         <Marquee className="[--duration:32s] [--gap:100px]">
           <Image
             className="h-[129px] -translate-x-[250px]"
@@ -224,9 +353,18 @@ export function CampaignReward() {
             height={129}
           />
         </Marquee>
+        <Marquee className="[--duration:35s] [--gap:100px]">
+          <Image
+            className="h-[129px] -translate-x-[250px]"
+            src="/campaign/create-to-earn.png"
+            alt="reward"
+            width={1355}
+            height={129}
+          />
+        </Marquee>
       </div>
-      <div className="container flex flex-col py-[32px] z-10 gap-5 relative md:py-[100px] lg:py-[163px] xl:flex-row xl:py-[233px]">
-        <div className="flex flex-col gap-5 justify-between xl:gap-0">
+      <div className="container relative z-10 flex flex-col gap-5 py-[32px] md:py-[100px] lg:py-[163px] xl:flex-row xl:py-[233px]">
+        <div className="flex flex-col justify-between gap-5 xl:gap-0">
           <div
             className={cn(
               'group flex flex-col justify-between rounded-2xl bg-[#CDF138] py-[33px] transition-colors hover:bg-black xl:w-[466px]',
@@ -279,6 +417,7 @@ export function CampaignReward() {
             rewards={
               userRewards ? userRewards.pool1_rewards.toLocaleString() : '---'
             }
+            rewardToken="ZK"
             claimableRewards={rewards.silverRewards}
             onClaim={() => {
               if (rewards.silverRewards > BigInt(0)) {
@@ -292,11 +431,28 @@ export function CampaignReward() {
             rewards={
               userRewards ? userRewards.pool2_rewards.toLocaleString() : '---'
             }
+            rewardToken="ZK"
             claimableRewards={rewards.goldRewards}
             onClaim={() => {
               if (rewards.goldRewards > BigInt(0)) {
                 handleClaimRewards(RewardType.GOLD)
               }
+            }}
+          />
+
+          <ReferralRewardCard
+            title="My Referral Rewards"
+            rewards={
+              referralFeesEarned !== undefined
+                ? formatEther(referralFeesEarned)
+                : '---'
+            }
+            rewardToken="ETH"
+            onClaim={() => {
+              handleClaimReferralFee()
+            }}
+            onCopy={() => {
+              handleCopyReferralLink()
             }}
           />
         </div>
@@ -326,7 +482,7 @@ export function CampaignReward() {
             )}
           >
             <div className="flex flex-col gap-6 md:flex-row">
-              <div className="flex flex-col flex-1 gap-2 group/item">
+              <div className="group/item flex flex-1 flex-col gap-2">
                 <div
                   className={cn(
                     'transition-all group-hover/item:translate-x-1 group-hover/item:text-[#CDF138]',
@@ -335,15 +491,15 @@ export function CampaignReward() {
                 >
                   Step 1
                 </div>
-                <div className="font-semibold text-[16px] leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
+                <div className="text-[16px] font-semibold leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
                   Choose a Model
                 </div>
-                <div className="font-SFMono text-[14px] text-white/90 leading-[1.125] xl:text-[16px]">
+                <div className="font-SFMono text-[14px] leading-[1.125] text-white/90 xl:text-[16px]">
                   Some models are general-purpose and some models excel at
                   creating a specific visual style.
                 </div>
               </div>
-              <div className="flex flex-col flex-1 gap-2 group/item">
+              <div className="group/item flex flex-1 flex-col gap-2">
                 <div
                   className={cn(
                     'transition-all group-hover/item:translate-x-1 group-hover/item:text-[#CDF138]',
@@ -352,18 +508,18 @@ export function CampaignReward() {
                 >
                   Step 2
                 </div>
-                <div className="font-semibold text-[16px] leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
+                <div className="text-[16px] font-semibold leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
                   Write a Prompt
                 </div>
-                <div className="font-SFMono text-[14px] text-white/90 leading-[1.125] xl:text-[16px]">
+                <div className="font-SFMono text-[14px] leading-[1.125] text-white/90 xl:text-[16px]">
                   Describe the image using natural language to convey your
                   wishes. It's recommended to use keywords separated by commas.
                   Click on the preset images to get inspired.
                 </div>
               </div>
             </div>
-            <div className="flex flex-col mt-6 gap-6 md:flex-row lg:mt-10 xl:mt-0">
-              <div className="flex flex-col flex-1 gap-2 group/item">
+            <div className="mt-6 flex flex-col gap-6 md:flex-row lg:mt-10 xl:mt-0">
+              <div className="group/item flex flex-1 flex-col gap-2">
                 <div
                   className={cn(
                     'transition-all group-hover/item:translate-x-1 group-hover/item:text-[#CDF138]',
@@ -372,16 +528,16 @@ export function CampaignReward() {
                 >
                   Step 3
                 </div>
-                <div className="font-semibold text-[16px] leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
+                <div className="text-[16px] font-semibold leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
                   Generate and Mint
                 </div>
-                <div className="font-SFMono text-[14px] text-white/90 leading-[1.125] xl:text-[16px]">
+                <div className="font-SFMono text-[14px] leading-[1.125] text-white/90 xl:text-[16px]">
                   Mint fee is 0.0006 ETH on ZKsync Era. Partner NFT holders and
                   selected Heurist community members get one chance of free mint
                   per day. Gasless free mint is powered by Zyfi.
                 </div>
               </div>
-              <div className="flex flex-col flex-1 gap-2 group/item">
+              <div className="group/item flex flex-1 flex-col gap-2">
                 <div
                   className={cn(
                     'transition-all group-hover/item:translate-x-1 group-hover/item:text-[#CDF138]',
@@ -390,10 +546,10 @@ export function CampaignReward() {
                 >
                   Step 4
                 </div>
-                <div className="font-semibold text-[16px] leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
+                <div className="text-[16px] font-semibold leading-[1.2] md:text-[18px] lg:text-[21px] xl:text-[24px]">
                   Upload and Share
                 </div>
-                <div className="font-SFMono text-[14px] text-white/90 leading-[1.125] xl:text-[16px]">
+                <div className="font-SFMono text-[14px] leading-[1.125] text-white/90 xl:text-[16px]">
                   Upload the artwork to Gateway Network to prove your ownership,
                   and share on X (Twitter) to earn additional scores. Share your
                   creation in Heurist Discord to get more exposure.

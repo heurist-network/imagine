@@ -8,12 +8,14 @@ import { motion } from 'framer-motion'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Address, formatEther, Hash, isAddress } from 'viem'
+import { useSearchParams } from 'next/navigation'
+import { formatEther, getAddress, Hash, isAddress } from 'viem'
 import { zksync } from 'viem/chains'
 import { useAccount, useBalance, useClient, useSwitchChain } from 'wagmi'
 import { z } from 'zod'
 
 import { generateImage, issueToGateway } from '@/app/actions'
+import DiscloseImage from '@/components/magicui/disclose-image'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,12 +54,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
-import { useMintZkImagine } from '@/hooks/useMintZkImagine'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
+import { useZkImagine } from '@/hooks/useZkImagine'
 import {
-  API_NOTIFY_AFTER_MINT_ACTIONS,
-  API_NOTIFY_IMAGE_GEN,
+  getReferralAddress,
+  postImageGen,
   postNotifyAfterMintActions,
 } from '@/lib/endpoints'
 import { cn, extractImageId } from '@/lib/utils'
@@ -92,6 +94,7 @@ const inter = Inter({ subsets: ['latin'] })
  */
 
 export function FeatureModel({ lists }: { lists: any[] }) {
+  const searchParams = useSearchParams()
   const account = useAccount()
   const { switchChain } = useSwitchChain()
   const client = useClient()
@@ -110,7 +113,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     signatureFreeMint,
     partnerFreeMint,
     globalTimeThreshold,
-  } = useMintZkImagine()
+  } = useZkImagine()
   const {
     canSignatureFreeMint,
     isLoading: loadingSignatureFreeMint,
@@ -150,6 +153,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
   const [isMinted, setIsMinted] = useState(false)
   const [isUploaded, setIsUploaded] = useState(false)
   const [loadingMint, setLoadingMint] = useState(false)
+  const [referralCode, setReferralCode] = useState('')
 
   const balance =
     (useBalance({
@@ -281,6 +285,8 @@ export function FeatureModel({ lists }: { lists: any[] }) {
    * Uploads the generated image to the Gateway
    */
   const onUpload = async () => {
+    if (loadingUpload) return
+
     if (!isMinted)
       return toast.error('You need to mint NFT first to earn scores')
     if (!account.address) return openConnectModal?.()
@@ -358,7 +364,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
 
     try {
       // Signature Free Mint  - Partner Free Mint - Mint
-      let txHash: Hash
+      let txHash: Hash | undefined
       if (canSignatureFreeMint) {
         console.log('Calling Signature Free Mint function')
         txHash = await signatureFreeMint(info.model, extractedImageId)
@@ -383,8 +389,11 @@ export function FeatureModel({ lists }: { lists: any[] }) {
         )
       }
 
+      // @dev post image gen notification after mint
       await handleMintingProcess()
-      showSuccessToast('Mint successful! Score +1 ', txHash)
+      if (txHash) {
+        showSuccessToast('Mint successful! Score +1 ', txHash)
+      }
 
       setLoading(false)
       setReferralAddress('')
@@ -407,35 +416,19 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     const timeoutId = setTimeout(() => controller.abort(), 20000)
 
     try {
-      await postMintingData(controller.signal)
+      await postImageGen(
+        {
+          modelId: info.model,
+          imageId: info.id,
+          url: info.url,
+        },
+        controller.signal,
+      )
     } catch (error) {
       console.error('Error in minting process:', error)
     } finally {
       clearTimeout(timeoutId)
     }
-  }
-
-  /**
-   * Posts minting data to the API.
-   * @param txHash - The transaction hash
-   * @param signal - The AbortController signal
-   */
-  const postMintingData = async (signal: AbortSignal) => {
-    const response = await fetch(API_NOTIFY_IMAGE_GEN, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Origin: window.location.origin,
-      },
-      body: JSON.stringify({
-        imageId: info.id,
-        modelId: info.model,
-        url: info.url,
-      }),
-      signal,
-    }).catch(handleFetchError)
-
-    handleApiResponse(response)
   }
 
   /**
@@ -545,6 +538,17 @@ export function FeatureModel({ lists }: { lists: any[] }) {
   }, [referralAddress])
 
   useEffect(() => {
+    setReferralCode('')
+    setReferralAddress('')
+    const referralCode =
+      searchParams.get('ref') || searchParams.get('referral_code')
+    if (referralCode) {
+      setReferralCode(referralCode)
+      handleSubmitReferralCode(referralCode)
+    }
+  }, [])
+
+  useEffect(() => {
     if (models.length > 0) {
       const defaultModel = models[1]
       if (defaultModel && defaultModel.data) {
@@ -567,6 +571,76 @@ export function FeatureModel({ lists }: { lists: any[] }) {
       switchChain({ chainId: zksync.id })
     }
   }, [account, switchChain])
+
+  // // Validate referral code and set referral address if valid
+  // useEffect(() => {
+  //   const validateReferralCode = async () => {
+  //     if (!/^[0-9a-fA-F]{16}$/.test(referralCode)) {
+  //       toast.error('Invalid referral code, please try another one.')
+  //       setReferralAddress('')
+  //       return
+  //     }
+  //     try {
+  //       const data = await getReferralAddress(referralCode)
+  //       setReferralAddress(
+  //         isAddress(data.referral_address) ? data.referral_address : '',
+  //       )
+  //       toast.success(
+  //         '🎉 Congrats! You have successfully used the referral code to enjoy a discount mint!',
+  //       )
+  //       console.log('Referral code & address:', referralCode, data)
+  //     } catch (error) {
+  //       toast.error('Invalid referral code, please try another one.')
+  //       console.error('Error validating referral code:', error)
+  //       setReferralAddress('')
+  //     }
+  //   }
+  //   referralCode ? validateReferralCode() : setReferralAddress('')
+  // }, [referralCode])
+
+  const handleSubmitReferralCode = async (urlReferralCode?: string) => {
+    // urlReferralCode is the referral code from the URL, referralCode is the referral code from the state
+    const code = urlReferralCode || referralCode
+
+    console.log('handleSubmitReferralCode code:', code)
+
+    if (!/^[0-9a-fA-F]{16}$/.test(code)) {
+      setReferralAddress('')
+      toast.error('Invalid referral code, please try another one.')
+      return
+    }
+    try {
+      const data = await getReferralAddress(code)
+      setReferralAddress(
+        isAddress(data.referral_address) ? data.referral_address : '',
+      )
+
+      if (!account.address) {
+        setReferralCode(code)
+        toast.success(
+          '🎉 Congrats! You have successfully used the referral code to enjoy a discount mint! Please connect your wallet!',
+        )
+        return
+      } else if (
+        account &&
+        getAddress(account.address as string) ===
+          getAddress(data.referral_address)
+      ) {
+        toast.error('You cannot use your own referral code.')
+        setReferralCode('')
+        setReferralAddress('')
+        return
+      }
+
+      toast.success(
+        '🎉 Congrats! You have successfully used the referral code to enjoy a discount mint!',
+      )
+    } catch (error) {
+      toast.error('Invalid referral code, please try another one.')
+      console.error('Error validating referral code:', error)
+      setReferralAddress('')
+    }
+  }
 
   return (
     <div
@@ -657,7 +731,6 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => {
-                              // TODO: use the model prompt
                               form.setValue('prompt', item.data.prompt)
                               form.setValue(
                                 'neg_prompt',
@@ -981,7 +1054,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
           setOpen(isOpen)
         }}
       >
-        <DialogContent className="w-[804px]">
+        <DialogContent className="z-[200] max-h-[calc(100vh-150px)] w-[804px] overflow-y-auto">
           <DialogTitle className="hidden" />
           <DialogDescription className="hidden" />
           <div className="flex flex-col items-center gap-6 md:flex-row">
@@ -994,10 +1067,12 @@ export function FeatureModel({ lists }: { lists: any[] }) {
               )}
               {!!mintUrl && (
                 <div className="relative flex min-h-[300px] flex-1 md:h-[616px]">
-                  <Image
-                    className="absolute inset-0"
+                  <DiscloseImage
+                    doorClassName="bg-[#CDF138]"
+                    className="absolute inset-0 bg-[#CDF138]"
                     src={mintUrl}
                     alt="mint"
+                    imgClassName="inset-0 absolute"
                     objectFit="cover"
                     layout="fill"
                   />
@@ -1010,41 +1085,42 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                   'pointer-events-none opacity-50': loadingGenerate || !mintUrl,
                 })}
               >
-                <div className="flex flex-wrap gap-2">
-                  <Link href={mintUrl}>
-                    <Button className="rounded-full" variant="outline">
-                      Download
-                    </Button>
+                <div className="flex flex-col font-medium">
+                  <Link
+                    className="flex h-10 cursor-pointer items-center gap-2 px-3 text-sm transition-colors hover:bg-accent"
+                    href={mintUrl}
+                  >
+                    <span className="i-ri-download-2-line h-4 w-4" />
+                    <span>Download</span>
                   </Link>
-
-                  <Button
-                    className="gap-1.5 rounded-full"
-                    variant="outline"
+                  <Separator />
+                  <div
+                    className="flex h-10 cursor-pointer items-center gap-2 px-3 text-sm transition-colors hover:bg-accent"
                     onClick={onShareTwitter}
                   >
-                    <span>Share on</span>
                     <span className="i-ri-twitter-x-fill h-4 w-4" />
-                  </Button>
-
+                    <span>Share on X</span>
+                  </div>
                   {!isUploaded && (
-                    <Button
-                      className="gap-1.5 rounded-full"
-                      variant="outline"
-                      disabled={loadingUpload}
-                      onClick={onUpload}
-                    >
-                      {loadingUpload ? (
-                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Image
-                          src="/gateway.svg"
-                          alt="gateway"
-                          width={26}
-                          height={26}
-                        />
-                      )}
-                      Upload to Gateway
-                    </Button>
+                    <>
+                      <Separator />
+                      <div
+                        className="flex h-10 cursor-pointer items-center gap-2 px-3 text-sm transition-colors hover:bg-accent"
+                        onClick={onUpload}
+                      >
+                        {loadingUpload ? (
+                          <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Image
+                            src="/gateway.svg"
+                            alt="gateway"
+                            width={26}
+                            height={26}
+                          />
+                        )}
+                        Upload to Gateway
+                      </div>
+                    </>
                   )}
                 </div>
 
@@ -1070,34 +1146,55 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                     </Button>
                   </div>
                 )}
-                <Separator className="my-4" />
-                <Button
-                  className="w-full rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
-                  onClick={onMintToNFT}
-                  disabled={loadingMint}
-                >
-                  {(loadingMintNFT ||
-                    loadingPartnerFreeMint ||
-                    loadingSignatureFreeMint) && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  ✨ Mint zkImagine NFT{' '}
-                  {canSignatureFreeMint || availableNFT
-                    ? ' (Free & Zero Gas)'
-                    : ''}
-                </Button>
+                <Separator />
+                <div className="mt-6 flex flex-col space-y-2">
+                  <Label htmlFor="address">
+                    ✨ Mint zkImagine NFT{' '}
+                    {canSignatureFreeMint || availableNFT
+                      ? ' (Free)'
+                      : referralAddress
+                        ? `(${discountedFee ? formatEther(discountedFee.fee) : '-'} ETH)`
+                        : `(${mintFee ? formatEther(mintFee) : '-'} ETH)`}
+                  </Label>
+                  <Button
+                    className="w-full rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
+                    onClick={onMintToNFT}
+                    disabled={loadingMint}
+                  >
+                    {(loadingMintNFT ||
+                      loadingPartnerFreeMint ||
+                      loadingSignatureFreeMint) && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Mint
+                  </Button>
+                </div>
+
                 {!canSignatureFreeMint && !availableNFT && (
-                  <div className="mt-4 flex flex-col space-y-2">
-                    <Label htmlFor="address">Referral Address</Label>
-                    <Input
-                      id="address"
-                      placeholder="Referral Address"
-                      autoComplete="off"
-                      value={referralAddress}
-                      onChange={(e) =>
-                        setReferralAddress(e.target.value as Address)
-                      }
-                    />
+                  <div className="mt-6 flex flex-col space-y-2">
+                    <Label htmlFor="address">Referral Code</Label>
+                    <div className="flex space-x-2">
+                      <Input
+                        id="referral_code"
+                        placeholder="Referral Code"
+                        autoComplete="off"
+                        onChange={(e) =>
+                          setReferralCode(e.target.value as string)
+                        }
+                        value={referralCode}
+                        disabled={isAddress(referralAddress)}
+                      />
+                      <Button
+                        onClick={() => {
+                          console.log('Submitting referral code:', referralCode)
+                          handleSubmitReferralCode()
+                        }}
+                        className="bg-[#CDF138] text-black hover:bg-[#CDF138]/80"
+                        disabled={isAddress(referralAddress)}
+                      >
+                        Use
+                      </Button>
+                    </div>
                   </div>
                 )}
                 <Separator className="my-4" />

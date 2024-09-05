@@ -20,7 +20,7 @@ import { MarketConfig } from '@/constants/MarketConfig'
 
 import { useSignatureFreeMint } from './useSignatureFreeMint'
 
-export const useMintZkImagine = () => {
+export const useZkImagine = () => {
   const { address, chain } = useAccount()
   const { data: walletClient } = useWalletClient()
   const { switchChain } = useSwitchChain()
@@ -171,9 +171,15 @@ export const useMintZkImagine = () => {
         })
 
         const hash = await walletClient.writeContract(request)
-        await publicClient.waitForTransactionReceipt({ hash })
+        const receipt = await publicClient.waitForTransactionReceipt({ hash })
 
-        return hash
+        if (receipt.status !== 'success') {
+          throw new Error('Transaction failed')
+        }
+
+        return receipt.transactionHash
+      } catch (error) {
+        console.error('Error during mint:', error)
       } finally {
         setIsLoading(false)
       }
@@ -250,9 +256,15 @@ export const useMintZkImagine = () => {
           publicClient,
           txPayload,
         )
-        await publicClient.waitForTransactionReceipt({ hash })
+        const receipt = await publicClient.waitForTransactionReceipt({ hash })
 
-        return hash
+        if (receipt.status !== 'success') {
+          throw new Error('Transaction failed')
+        }
+
+        return receipt.transactionHash
+      } catch (error) {
+        console.error('Error during partner free mint:', error)
       } finally {
         setIsLoading(false)
       }
@@ -331,9 +343,15 @@ export const useMintZkImagine = () => {
           publicClient,
           txPayload,
         )
-        await publicClient.waitForTransactionReceipt({ hash })
+        const receipt = await publicClient.waitForTransactionReceipt({ hash })
 
-        return hash
+        if (receipt.status !== 'success') {
+          throw new Error('Transaction failed')
+        }
+
+        return receipt.transactionHash
+      } catch (error) {
+        console.error('Error during signature free mint:', error)
       } finally {
         setIsLoading(false)
         refreshSignatureData()
@@ -348,6 +366,51 @@ export const useMintZkImagine = () => {
       signatureData,
       getSponsoredPaymasterParams,
     ],
+  )
+
+  //@dev call to zkImagine contract to claim referral fee.
+  const claimReferralFee = useCallback(async () => {
+    if (!currentMarket || !walletClient || !publicClient || !address) {
+      throw new Error('Wallet not connected or unsupported chain')
+    }
+
+    setIsLoading(true)
+    try {
+      const { request } = await publicClient.simulateContract({
+        address: currentMarket.addresses.ZkImagine,
+        abi: ZkImagineABI,
+        functionName: 'claimReferralFee',
+        account: address,
+      })
+
+      const hash = await walletClient.writeContract(request)
+      const receipt = await publicClient.waitForTransactionReceipt({ hash })
+
+      return receipt
+    } finally {
+      setIsLoading(false)
+    }
+  }, [address, currentMarket, walletClient, publicClient])
+
+  //@dev call to zkImagine contract to get referral fees earned.
+  const getReferralFeesEarned = useCallback(
+    async (address: Address) => {
+      if (!publicClient || !currentMarket || !address) return BigInt(0)
+
+      try {
+        const feesEarned = await publicClient.readContract({
+          address: currentMarket.addresses.ZkImagine,
+          abi: ZkImagineABI,
+          functionName: 'referralFeesEarned',
+          args: [address],
+        })
+
+        return feesEarned as bigint
+      } catch (error) {
+        console.error('Error reading referral fees earned:', error)
+      }
+    },
+    [publicClient, currentMarket, address],
   )
 
   if (!chain || !address || !publicClient) {
@@ -377,6 +440,14 @@ export const useMintZkImagine = () => {
       },
       isLoading: false,
       canSignatureFreeMint: () => false,
+      globalTimeThreshold: null,
+      readGlobalTimeThreshold: async () => {
+        throw new Error('Public client not available')
+      },
+      claimReferralFee: async () => {
+        throw new Error('Wallet not connected or unsupported chain')
+      },
+      getReferralFeesEarned: async () => BigInt(0),
     }
   }
 
@@ -392,6 +463,8 @@ export const useMintZkImagine = () => {
     canSignatureFreeMint,
     globalTimeThreshold,
     readGlobalTimeThreshold,
+    claimReferralFee,
+    getReferralFeesEarned,
   }
 }
 
