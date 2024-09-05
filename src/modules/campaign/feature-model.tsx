@@ -9,7 +9,7 @@ import { Inter } from 'next/font/google'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { formatEther, Hash, isAddress } from 'viem'
+import { formatEther, getAddress, Hash, isAddress } from 'viem'
 import { zksync } from 'viem/chains'
 import { useAccount, useBalance, useClient, useSwitchChain } from 'wagmi'
 import { z } from 'zod'
@@ -391,7 +391,9 @@ export function FeatureModel({ lists }: { lists: any[] }) {
 
       // @dev post image gen notification after mint
       await handleMintingProcess()
-      showSuccessToast('Mint successful! Score +1 ', txHash)
+      if (txHash) {
+        showSuccessToast('Mint successful! Score +1 ', txHash)
+      }
 
       setLoading(false)
       setReferralAddress('')
@@ -536,9 +538,12 @@ export function FeatureModel({ lists }: { lists: any[] }) {
   }, [referralAddress])
 
   useEffect(() => {
+    setReferralCode('')
+    setReferralAddress('')
     const referralCode = searchParams.get('ref')
     if (referralCode) {
       setReferralCode(referralCode)
+      handleSubmitReferralCode(referralCode)
     }
   }, [])
 
@@ -566,26 +571,69 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     }
   }, [account, switchChain])
 
-  // Validate referral code and set referral address if valid
-  useEffect(() => {
-    const validateReferralCode = async () => {
-      if (!/^[0-9a-fA-F]{16}$/.test(referralCode)) {
+  // // Validate referral code and set referral address if valid
+  // useEffect(() => {
+  //   const validateReferralCode = async () => {
+  //     if (!/^[0-9a-fA-F]{16}$/.test(referralCode)) {
+  //       toast.error('Invalid referral code, please try another one.')
+  //       setReferralAddress('')
+  //       return
+  //     }
+  //     try {
+  //       const data = await getReferralAddress(referralCode)
+  //       setReferralAddress(
+  //         isAddress(data.referral_address) ? data.referral_address : '',
+  //       )
+  //       toast.success(
+  //         '🎉 Congrats! You have successfully used the referral code to enjoy a discount mint!',
+  //       )
+  //       console.log('Referral code & address:', referralCode, data)
+  //     } catch (error) {
+  //       toast.error('Invalid referral code, please try another one.')
+  //       console.error('Error validating referral code:', error)
+  //       setReferralAddress('')
+  //     }
+  //   }
+  //   referralCode ? validateReferralCode() : setReferralAddress('')
+  // }, [referralCode])
+
+  const handleSubmitReferralCode = async (urlReferralCode?: string) => {
+    // urlReferralCode is the referral code from the URL, referralCode is the referral code from the state
+    const code = urlReferralCode || referralCode
+
+    console.log('handleSubmitReferralCode code:', code)
+
+    if (!/^[0-9a-fA-F]{16}$/.test(code)) {
+      setReferralAddress('')
+      toast.error('Invalid referral code, please try another one.')
+      return
+    }
+    try {
+      const data = await getReferralAddress(code)
+      setReferralAddress(
+        isAddress(data.referral_address) ? data.referral_address : '',
+      )
+
+      if (
+        account &&
+        getAddress(account.address as string) ===
+          getAddress(data.referral_address)
+      ) {
+        toast.error('You cannot use your own referral code.')
+        setReferralCode('')
         setReferralAddress('')
         return
       }
-      try {
-        const data = await getReferralAddress(referralCode)
-        setReferralAddress(
-          isAddress(data.referral_address) ? data.referral_address : '',
-        )
-        console.log('Referral code & address:', referralCode, data)
-      } catch (error) {
-        console.error('Error validating referral code:', error)
-        setReferralAddress('')
-      }
+
+      toast.success(
+        '🎉 Congrats! You have successfully used the referral code to enjoy a discount mint!',
+      )
+    } catch (error) {
+      toast.error('Invalid referral code, please try another one.')
+      console.error('Error validating referral code:', error)
+      setReferralAddress('')
     }
-    referralCode ? validateReferralCode() : setReferralAddress('')
-  }, [referralCode])
+  }
 
   return (
     <div
@@ -1096,8 +1144,10 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                   <Label htmlFor="address">
                     ✨ Mint zkImagine NFT{' '}
                     {canSignatureFreeMint || availableNFT
-                      ? ' (Free & Zero Gas)'
-                      : ''}
+                      ? ' (Free)'
+                      : referralAddress
+                        ? `(${discountedFee ? formatEther(discountedFee.fee) : '-'} ETH)`
+                        : `(${mintFee ? formatEther(mintFee) : '-'} ETH)`}
                   </Label>
                   <Button
                     className="w-full rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
@@ -1116,15 +1166,28 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                 {!canSignatureFreeMint && !availableNFT && (
                   <div className="mt-6 flex flex-col space-y-2">
                     <Label htmlFor="address">Referral Code</Label>
-                    <Input
-                      id="referral_code"
-                      placeholder="Referral Code"
-                      autoComplete="off"
-                      value={referralCode}
-                      onChange={(e) =>
-                        setReferralCode(e.target.value as string)
-                      }
-                    />
+                    <div className="flex space-x-2">
+                      <Input
+                        id="referral_code"
+                        placeholder="Referral Code"
+                        autoComplete="off"
+                        onChange={(e) =>
+                          setReferralCode(e.target.value as string)
+                        }
+                        value={referralCode}
+                        disabled={isAddress(referralAddress)}
+                      />
+                      <Button
+                        onClick={() => {
+                          console.log('Submitting referral code:', referralCode)
+                          handleSubmitReferralCode()
+                        }}
+                        className="bg-[#CDF138] text-black hover:bg-[#CDF138]/80"
+                        disabled={isAddress(referralAddress)}
+                      >
+                        Use
+                      </Button>
+                    </div>
                   </div>
                 )}
                 <Separator className="my-4" />

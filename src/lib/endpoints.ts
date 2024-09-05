@@ -295,8 +295,6 @@ export const getReferralAddress = async (
 
     const data = await response.json()
 
-    console.log('Referral code , address:', referralCode, data)
-
     return data
   } catch (error) {
     console.error('Error fetching referral address:', error)
