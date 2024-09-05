@@ -540,7 +540,8 @@ export function FeatureModel({ lists }: { lists: any[] }) {
   useEffect(() => {
     setReferralCode('')
     setReferralAddress('')
-    const referralCode = searchParams.get('ref')
+    const referralCode =
+      searchParams.get('ref') || searchParams.get('referral_code')
     if (referralCode) {
       setReferralCode(referralCode)
       handleSubmitReferralCode(referralCode)

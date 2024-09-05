@@ -274,7 +274,7 @@ export function CampaignReward() {
 
     if (referralCodeData.referral_code) {
       // Prod version:
-      const referralLink = `https://imagine.heurist.ai/campaign?referral_code=${referralCodeData.referral_code}`
+      const referralLink = `https://imagine.heurist.ai/campaign?ref=${referralCodeData.referral_code}`
 
       const referralText = `Hey, I'm joining the Heurist Create to Earn campaign. Generate an image with Heurist AI and earn ZK & ETH rewards! Come and join me! ${referralLink}`
       navigator.clipboard.writeText(referralText)
