@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
-import { ContractFunctionExecutionError, formatEther } from 'viem'
+import { Address, ContractFunctionExecutionError, formatEther } from 'viem'
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
 import { MagicCard } from '@/components/magicui/magic-card'
@@ -173,7 +173,7 @@ export function CampaignReward() {
   const [referralFeesEarned, setReferralFeesEarned] = useState<
     bigint | undefined
   >(undefined)
-  const { getReferralFeesEarned } = useZkImagine()
+  const { getReferralFeesEarned, claimReferralFee } = useZkImagine()
   const { rewards, claimRewards } = useChestRewards(Market.zksync)
 
   useEffect(() => {
@@ -194,8 +194,9 @@ export function CampaignReward() {
     }
 
     fetchChestAndReferralRewards()
-  }, [address])
+  }, [address, getReferralFeesEarned])
 
+  //@dev claim rewards from chest contract
   const handleClaimRewards = async (poolType: RewardType) => {
     if (!publicClient) {
       toast.error('Error claiming rewards: Wallet not connected')
@@ -203,12 +204,12 @@ export function CampaignReward() {
     }
 
     try {
-      const tx = await claimRewards(poolType)
-      console.log('claim rewards tx', tx)
+      const txReceipt = await claimRewards(poolType)
+      console.log('claim rewards tx', txReceipt?.transactionHash)
       showSuccessToast(
         publicClient,
         'Rewards claimed successfully!',
-        tx?.transactionHash,
+        txReceipt?.transactionHash,
       )
     } catch (error) {
       console.error('Error claiming rewards:', error)
@@ -228,6 +229,33 @@ export function CampaignReward() {
         const updatedRewards = await getUserRewards(address)
         setUserRewards(updatedRewards)
       }
+    }
+  }
+
+  //@dev claim referral fee from zkImagine contract
+  const handleClaimReferralFee = async () => {
+    if (!publicClient || !address) {
+      toast.error('Error claiming referral rewards: Wallet not connected')
+      return
+    }
+
+    try {
+      const txReceipt = await claimReferralFee()
+
+      console.log('claim referral rewards tx', txReceipt.transactionHash)
+
+      showSuccessToast(
+        publicClient,
+        'Referral rewards claimed successfully!',
+        txReceipt?.transactionHash,
+      )
+
+      // Refresh referral fees earned
+      const updatedReferralFees = await getReferralFeesEarned(address)
+      setReferralFeesEarned(updatedReferralFees ?? BigInt(0))
+    } catch (error) {
+      console.error('Error claiming referral rewards:', error)
+      toast.error('Error claiming referral rewards. Please try again.')
     }
   }
 
@@ -394,7 +422,7 @@ export function CampaignReward() {
             }
             rewardToken="ETH"
             onClaim={() => {
-              console.log('claim referral rewards')
+              handleClaimReferralFee()
             }}
             onCopy={() => {
               console.log('copy referral link')

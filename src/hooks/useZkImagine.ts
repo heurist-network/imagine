@@ -384,9 +384,9 @@ export const useZkImagine = () => {
       })
 
       const hash = await walletClient.writeContract(request)
-      await publicClient.waitForTransactionReceipt({ hash })
+      const receipt = await publicClient.waitForTransactionReceipt({ hash })
 
-      return hash
+      return receipt
     } finally {
       setIsLoading(false)
     }
