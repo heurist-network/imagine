@@ -81,6 +81,7 @@ const config = {
       },
       transitionDuration: {
         image: '368ms',
+        mid: '3s',
       },
       keyframes: {
         'bounce-horizontal': {
