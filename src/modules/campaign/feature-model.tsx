@@ -55,7 +55,11 @@ import { Slider } from '@/components/ui/slider'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
 import { useZkImagine } from '@/hooks/useZkImagine'
-import { postImageGen, postNotifyAfterMintActions } from '@/lib/endpoints'
+import {
+  getReferralAddress,
+  postImageGen,
+  postNotifyAfterMintActions,
+} from '@/lib/endpoints'
 import { cn, extractImageId } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
@@ -146,6 +150,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
   const [isMinted, setIsMinted] = useState(false)
   const [isUploaded, setIsUploaded] = useState(false)
   const [loadingMint, setLoadingMint] = useState(false)
+  const [referralCode, setReferralCode] = useState('')
 
   const balance =
     (useBalance({
@@ -549,6 +554,27 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     }
   }, [account, switchChain])
 
+  // Validate referral code and set referral address if valid
+  useEffect(() => {
+    const validateReferralCode = async () => {
+      if (!/^[0-9a-fA-F]{16}$/.test(referralCode)) {
+        setReferralAddress('')
+        return
+      }
+      try {
+        const data = await getReferralAddress(referralCode)
+        setReferralAddress(
+          isAddress(data.referral_address) ? data.referral_address : '',
+        )
+        console.log('Referral code & address:', referralCode, data)
+      } catch (error) {
+        console.error('Error validating referral code:', error)
+        setReferralAddress('')
+      }
+    }
+    referralCode ? validateReferralCode() : setReferralAddress('')
+  }, [referralCode])
+
   return (
     <div
       className={cn(
@@ -638,7 +664,6 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => {
-                              // TODO: use the model prompt
                               form.setValue('prompt', item.data.prompt)
                               form.setValue(
                                 'neg_prompt',
@@ -1069,14 +1094,14 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                 </Button>
                 {!canSignatureFreeMint && !availableNFT && (
                   <div className="mt-4 flex flex-col space-y-2">
-                    <Label htmlFor="address">Referral Address</Label>
+                    <Label htmlFor="address">Referral Code</Label>
                     <Input
-                      id="address"
-                      placeholder="Referral Address"
+                      id="referral_code"
+                      placeholder="Referral Code"
                       autoComplete="off"
-                      value={referralAddress}
+                      value={referralCode}
                       onChange={(e) =>
-                        setReferralAddress(e.target.value as Address)
+                        setReferralCode(e.target.value as string)
                       }
                     />
                   </div>

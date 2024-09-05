@@ -46,6 +46,8 @@ export function MintToNFT({
     loading: loadingMintNFT,
   } = useMintToNFT()
 
+  // TODO: Replace referralAddress with referralCode.
+
   const {
     canSignatureFreeMint,
     isLoading: loadingSignatureFreeMint,

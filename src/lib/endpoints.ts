@@ -267,3 +267,49 @@ export const getReferralCode = async (
     }
   }
 }
+
+const API_REFERRAL_ADDRESS =
+  'https://mdce54a4gf.execute-api.us-east-1.amazonaws.com/prod/referral-address'
+
+/**
+ * Fetches the referral address for a given referral code.
+ * @param {string} referralCode - The referral code to look up.
+ * @returns {Promise<{ referral_address: string }>} A promise that resolves to an object containing the referral address.
+ * @throws {Error} If there's a network error, server error, or other issues during the request.
+ */
+export const getReferralAddress = async (
+  referralCode: string,
+): Promise<{ referral_address: string }> => {
+  if (!referralCode || typeof referralCode !== 'string') {
+    throw new Error('Invalid referral code provided')
+  }
+
+  try {
+    const response = await fetch(
+      `${API_REFERRAL_ADDRESS}?referral_code=${referralCode}`,
+    )
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    console.log('Referral code , address:', referralCode, data)
+
+    return data
+  } catch (error) {
+    console.error('Error fetching referral address:', error)
+    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      throw new Error(
+        'Network error: Unable to connect to the server. Please check your internet connection and try again.',
+      )
+    } else if (error instanceof Error) {
+      throw new Error(`Error fetching referral address: ${error.message}`)
+    } else {
+      throw new Error(
+        'An unexpected error occurred while fetching the referral address',
+      )
+    }
+  }
+}
