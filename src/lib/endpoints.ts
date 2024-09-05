@@ -213,3 +213,57 @@ export const getLeaderboard = async (
     }
   }
 }
+
+/**
+ * Fetches or creates a referral code for a given address.
+ * @param {string} address - The Ethereum address to get or create a referral code for.
+ * @returns {Promise<{ message: string, referral_code: string }>} A promise that resolves to an object containing a message and the referral code.
+ * @throws {Error} If the fetch request fails or returns a non-OK status.
+ */
+
+const API_REFERRAL_CODE =
+  'https://mdce54a4gf.execute-api.us-east-1.amazonaws.com/prod/referral-code'
+
+/**
+ * Fetches or creates a referral code for a given Ethereum address.
+ * @param {string} address - The Ethereum address to get or create a referral code for.
+ * @returns {Promise<{ message: string; referral_code: string }>} A promise that resolves to an object containing a message and the referral code.
+ * @throws {Error} If there's a network error, server error, or other issues during the request.
+ */
+export const getReferralCode = async (
+  address: string,
+): Promise<{ message: string; referral_code: string }> => {
+  if (!address || typeof address !== 'string') {
+    throw new Error('Invalid address provided')
+  }
+
+  try {
+    const response = await fetch(API_REFERRAL_CODE, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ referral_address: address }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Error fetching referral code:', error)
+    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      throw new Error(
+        'Network error: Unable to connect to the server. Please check your internet connection and try again.',
+      )
+    } else if (error instanceof Error) {
+      throw new Error(`Error fetching referral code: ${error.message}`)
+    } else {
+      throw new Error(
+        'An unexpected error occurred while fetching the referral code',
+      )
+    }
+  }
+}

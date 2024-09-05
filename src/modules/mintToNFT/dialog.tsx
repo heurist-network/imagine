@@ -18,7 +18,7 @@ import { Label } from '@/components/ui/label'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
 import { useZkImagine } from '@/hooks/useZkImagine'
-import { API_NOTIFY_IMAGE_GEN } from '@/lib/endpoints'
+import { API_NOTIFY_IMAGE_GEN, postImageGen } from '@/lib/endpoints'
 import { extractImageId } from '@/lib/utils'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
@@ -93,7 +93,7 @@ export function MintToNFT({
 
     try {
       const txHash = await signatureFreeMint(model, imageId)
-      await handleMintingProcess(txHash)
+      await handleMintingProcess()
       showSuccessToast('Mint zkImagine NFT successfully!', txHash)
 
       alreadyMinted.current = true
@@ -129,7 +129,7 @@ export function MintToNFT({
         availableNFT.address,
         BigInt(availableNFT.tokenId),
       )
-      await handleMintingProcess(txHash)
+      await handleMintingProcess()
       showSuccessToast('Mint zkImagine NFT successfully!', txHash)
 
       alreadyMinted.current = true
@@ -171,7 +171,7 @@ export function MintToNFT({
         model,
         extractedImageId,
       )
-      await handleMintingProcess(txHash)
+      await handleMintingProcess()
       showSuccessToast('Mint zkImagine NFT successfully!', txHash)
 
       alreadyMinted.current = true
@@ -187,12 +187,19 @@ export function MintToNFT({
    * Handles the common minting process after a transaction is initiated.
    * @param txHash - The transaction hash
    */
-  const handleMintingProcess = async (txHash: Hash) => {
+  const handleMintingProcess = async () => {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 20000)
 
     try {
-      await postMintingData(txHash, controller.signal)
+      await postImageGen(
+        {
+          modelId: model,
+          imageId: imageId,
+          url: url,
+        },
+        controller.signal,
+      )
     } catch (error) {
       console.error('Error in minting process:', error)
     } finally {

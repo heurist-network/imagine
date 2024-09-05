@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Address, formatEther, Hash, isAddress } from 'viem'
+import { Address, formatEther, Hash, isAddress, TransactionReceipt } from 'viem'
 import { zksync } from 'viem/chains'
 import { useAccount, useBalance, useClient, useSwitchChain } from 'wagmi'
 import { z } from 'zod'
@@ -354,7 +354,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
 
     try {
       // Signature Free Mint  - Partner Free Mint - Mint
-      let txHash: Hash
+      let txHash: Hash | undefined
       if (canSignatureFreeMint) {
         console.log('Calling Signature Free Mint function')
         txHash = await signatureFreeMint(info.model, extractedImageId)

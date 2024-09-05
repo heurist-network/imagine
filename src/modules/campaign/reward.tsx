@@ -13,7 +13,11 @@ import { showSuccessToast } from '@/components/SuccessToast'
 import { Market } from '@/constants/MarketConfig'
 import { RewardType, useChestRewards } from '@/hooks/useChestRewards'
 import { useZkImagine } from '@/hooks/useZkImagine'
-import { getUserRewards, UserRewardsData } from '@/lib/endpoints'
+import {
+  getReferralCode,
+  getUserRewards,
+  UserRewardsData,
+} from '@/lib/endpoints'
 import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -259,6 +263,27 @@ export function CampaignReward() {
     }
   }
 
+  const handleCopyReferralLink = async () => {
+    if (!address) {
+      toast.error('Error copying referral link: Wallet not connected')
+      return
+    }
+
+    const referralCodeData = await getReferralCode(address)
+    console.log('referral code data', referralCodeData)
+
+    if (referralCodeData.referral_code) {
+      // Prod version:
+      const referralLink = `https://imagine.heurist.ai/campaign?referral_code=${referralCodeData.referral_code}`
+
+      const referralText = `Hey, I'm joining the Heurist Create to Earn campaign. Generate an image with Heurist AI and earn ZK & ETH rewards! Come and join me! ${referralLink}`
+      navigator.clipboard.writeText(referralText)
+      toast.success(
+        '🚀 Referral link copied to clipboard! Share it with your friends to earn more rewards!',
+      )
+    }
+  }
+
   return (
     <div className="relative min-h-[1040px]">
       <div className="absolute inset-0 flex flex-col gap-[55px] overflow-y-hidden bg-white pt-[76px]">
@@ -425,7 +450,7 @@ export function CampaignReward() {
               handleClaimReferralFee()
             }}
             onCopy={() => {
-              console.log('copy referral link')
+              handleCopyReferralLink()
             }}
           />
         </div>
