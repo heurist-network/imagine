@@ -285,6 +285,8 @@ export function FeatureModel({ lists }: { lists: any[] }) {
    * Uploads the generated image to the Gateway
    */
   const onUpload = async () => {
+    if (loadingUpload) return
+
     if (!isMinted)
       return toast.error('You need to mint NFT first to earn scores')
     if (!account.address) return openConnectModal?.()
@@ -997,7 +999,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
           setOpen(isOpen)
         }}
       >
-        <DialogContent className="w-[804px]">
+        <DialogContent className="z-[200] max-h-[calc(100vh-150px)] w-[804px] overflow-y-auto">
           <DialogTitle className="hidden" />
           <DialogDescription className="hidden" />
           <div className="flex flex-col items-center gap-6 md:flex-row">
@@ -1028,41 +1030,42 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                   'pointer-events-none opacity-50': loadingGenerate || !mintUrl,
                 })}
               >
-                <div className="flex flex-wrap gap-2">
-                  <Link href={mintUrl}>
-                    <Button className="rounded-full" variant="outline">
-                      Download
-                    </Button>
+                <div className="flex flex-col font-medium">
+                  <Link
+                    className="flex h-10 cursor-pointer items-center gap-2 px-3 text-sm transition-colors hover:bg-accent"
+                    href={mintUrl}
+                  >
+                    <span className="i-ri-download-2-line h-4 w-4" />
+                    <span>Download</span>
                   </Link>
-
-                  <Button
-                    className="gap-1.5 rounded-full"
-                    variant="outline"
+                  <Separator />
+                  <div
+                    className="flex h-10 cursor-pointer items-center gap-2 px-3 text-sm transition-colors hover:bg-accent"
                     onClick={onShareTwitter}
                   >
-                    <span>Share on</span>
                     <span className="i-ri-twitter-x-fill h-4 w-4" />
-                  </Button>
-
+                    <span>Share on X</span>
+                  </div>
                   {!isUploaded && (
-                    <Button
-                      className="gap-1.5 rounded-full"
-                      variant="outline"
-                      disabled={loadingUpload}
-                      onClick={onUpload}
-                    >
-                      {loadingUpload ? (
-                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Image
-                          src="/gateway.svg"
-                          alt="gateway"
-                          width={26}
-                          height={26}
-                        />
-                      )}
-                      Upload to Gateway
-                    </Button>
+                    <>
+                      <Separator />
+                      <div
+                        className="flex h-10 cursor-pointer items-center gap-2 px-3 text-sm transition-colors hover:bg-accent"
+                        onClick={onUpload}
+                      >
+                        {loadingUpload ? (
+                          <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Image
+                            src="/gateway.svg"
+                            alt="gateway"
+                            width={26}
+                            height={26}
+                          />
+                        )}
+                        Upload to Gateway
+                      </div>
+                    </>
                   )}
                 </div>
 
@@ -1088,24 +1091,30 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                     </Button>
                   </div>
                 )}
-                <Separator className="my-4" />
-                <Button
-                  className="w-full rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
-                  onClick={onMintToNFT}
-                  disabled={loadingMint}
-                >
-                  {(loadingMintNFT ||
-                    loadingPartnerFreeMint ||
-                    loadingSignatureFreeMint) && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  ✨ Mint zkImagine NFT{' '}
-                  {canSignatureFreeMint || availableNFT
-                    ? ' (Free & Zero Gas)'
-                    : ''}
-                </Button>
+                <Separator />
+                <div className="mt-6 flex flex-col space-y-2">
+                  <Label htmlFor="address">
+                    ✨ Mint zkImagine NFT{' '}
+                    {canSignatureFreeMint || availableNFT
+                      ? ' (Free & Zero Gas)'
+                      : ''}
+                  </Label>
+                  <Button
+                    className="w-full rounded-full bg-[#CDF138] text-black hover:bg-[#CDF138]/90"
+                    onClick={onMintToNFT}
+                    disabled={loadingMint}
+                  >
+                    {(loadingMintNFT ||
+                      loadingPartnerFreeMint ||
+                      loadingSignatureFreeMint) && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Mint
+                  </Button>
+                </div>
+
                 {!canSignatureFreeMint && !availableNFT && (
-                  <div className="mt-4 flex flex-col space-y-2">
+                  <div className="mt-6 flex flex-col space-y-2">
                     <Label htmlFor="address">Referral Code</Label>
                     <Input
                       id="referral_code"
