@@ -279,7 +279,9 @@ export function CampaignReward() {
       const referralText = `Hey, I'm joining the Heurist Create to Earn campaign. Generate an image with Heurist AI and earn ZK & ETH rewards! Come and join me! ${referralLink}`
       navigator.clipboard.writeText(referralText)
       toast.success(
-        '🚀 Referral link copied to clipboard! Share it with your friends to earn more rewards!',
+        '🚀 Your Referral Code: ' +
+          referralCodeData.referral_code +
+          'The link has been copied to clipboard! Share it with your friends to earn more rewards!',
       )
     }
   }
