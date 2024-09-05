@@ -55,11 +55,7 @@ import { Slider } from '@/components/ui/slider'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
 import { useZkImagine } from '@/hooks/useZkImagine'
-import {
-  API_NOTIFY_AFTER_MINT_ACTIONS,
-  API_NOTIFY_IMAGE_GEN,
-  postNotifyAfterMintActions,
-} from '@/lib/endpoints'
+import { postImageGen, postNotifyAfterMintActions } from '@/lib/endpoints'
 import { cn, extractImageId } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
@@ -383,6 +379,7 @@ export function FeatureModel({ lists }: { lists: any[] }) {
         )
       }
 
+      // @dev post image gen notification after mint
       await handleMintingProcess()
       showSuccessToast('Mint successful! Score +1 ', txHash)
 
@@ -407,35 +404,19 @@ export function FeatureModel({ lists }: { lists: any[] }) {
     const timeoutId = setTimeout(() => controller.abort(), 20000)
 
     try {
-      await postMintingData(controller.signal)
+      await postImageGen(
+        {
+          modelId: info.model,
+          imageId: info.id,
+          url: info.url,
+        },
+        controller.signal,
+      )
     } catch (error) {
       console.error('Error in minting process:', error)
     } finally {
       clearTimeout(timeoutId)
     }
-  }
-
-  /**
-   * Posts minting data to the API.
-   * @param txHash - The transaction hash
-   * @param signal - The AbortController signal
-   */
-  const postMintingData = async (signal: AbortSignal) => {
-    const response = await fetch(API_NOTIFY_IMAGE_GEN, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Origin: window.location.origin,
-      },
-      body: JSON.stringify({
-        imageId: info.id,
-        modelId: info.model,
-        url: info.url,
-      }),
-      signal,
-    }).catch(handleFetchError)
-
-    handleApiResponse(response)
   }
 
   /**

@@ -3,6 +3,34 @@ import { getAddress } from 'viem'
 export const API_NOTIFY_IMAGE_GEN =
   'https://uoub6ss185.execute-api.us-east-1.amazonaws.com/prod/notify-image-gen'
 
+export const postImageGen = async (
+  data: {
+    imageId: string
+    modelId: string
+    url: string
+  },
+  signal: AbortSignal,
+) => {
+  try {
+    const response = await fetch(API_NOTIFY_IMAGE_GEN, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: window.location.origin,
+      },
+      body: JSON.stringify({
+        imageId: data.imageId,
+        modelId: data.modelId,
+        url: data.url,
+      }),
+      signal,
+    })
+    return response.json()
+  } catch (error) {
+    console.error('Error notifying image gen:', error)
+  }
+}
+
 /*
 Name: notify-after-mint-actions
 Method: POST
@@ -31,7 +59,7 @@ export const postNotifyAfterMintActions = async (data: {
     })
     return response.json()
   } catch (error) {
-    console.error('Error fetching user rewards:', error)
+    console.error('Error notifying after mint actions:', error)
   }
 }
 

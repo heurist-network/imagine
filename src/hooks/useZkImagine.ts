@@ -171,9 +171,13 @@ export const useZkImagine = () => {
         })
 
         const hash = await walletClient.writeContract(request)
-        await publicClient.waitForTransactionReceipt({ hash })
+        const receipt = await publicClient.waitForTransactionReceipt({ hash })
 
-        return hash
+        if (receipt.status !== 'success') {
+          throw new Error('Transaction failed')
+        }
+
+        return receipt.transactionHash
       } finally {
         setIsLoading(false)
       }
@@ -250,9 +254,13 @@ export const useZkImagine = () => {
           publicClient,
           txPayload,
         )
-        await publicClient.waitForTransactionReceipt({ hash })
+        const receipt = await publicClient.waitForTransactionReceipt({ hash })
 
-        return hash
+        if (receipt.status !== 'success') {
+          throw new Error('Transaction failed')
+        }
+
+        return receipt.transactionHash
       } finally {
         setIsLoading(false)
       }
@@ -331,9 +339,13 @@ export const useZkImagine = () => {
           publicClient,
           txPayload,
         )
-        await publicClient.waitForTransactionReceipt({ hash })
+        const receipt = await publicClient.waitForTransactionReceipt({ hash })
 
-        return hash
+        if (receipt.status !== 'success') {
+          throw new Error('Transaction failed')
+        }
+
+        return receipt.transactionHash
       } finally {
         setIsLoading(false)
         refreshSignatureData()
