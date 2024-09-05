@@ -178,6 +178,8 @@ export const useZkImagine = () => {
         }
 
         return receipt.transactionHash
+      } catch (error) {
+        console.error('Error during mint:', error)
       } finally {
         setIsLoading(false)
       }
@@ -261,6 +263,8 @@ export const useZkImagine = () => {
         }
 
         return receipt.transactionHash
+      } catch (error) {
+        console.error('Error during partner free mint:', error)
       } finally {
         setIsLoading(false)
       }
@@ -346,6 +350,8 @@ export const useZkImagine = () => {
         }
 
         return receipt.transactionHash
+      } catch (error) {
+        console.error('Error during signature free mint:', error)
       } finally {
         setIsLoading(false)
         refreshSignatureData()
