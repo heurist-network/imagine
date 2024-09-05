@@ -8,7 +8,8 @@ import { motion } from 'framer-motion'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Address, formatEther, Hash, isAddress, TransactionReceipt } from 'viem'
+import { useSearchParams } from 'next/navigation'
+import { formatEther, Hash, isAddress } from 'viem'
 import { zksync } from 'viem/chains'
 import { useAccount, useBalance, useClient, useSwitchChain } from 'wagmi'
 import { z } from 'zod'
@@ -92,6 +93,7 @@ const inter = Inter({ subsets: ['latin'] })
  */
 
 export function FeatureModel({ lists }: { lists: any[] }) {
+  const searchParams = useSearchParams()
   const account = useAccount()
   const { switchChain } = useSwitchChain()
   const client = useClient()
@@ -529,6 +531,13 @@ export function FeatureModel({ lists }: { lists: any[] }) {
       setIsValidReferral(false)
     }
   }, [referralAddress])
+
+  useEffect(() => {
+    const referralCode = searchParams.get('ref')
+    if (referralCode) {
+      setReferralCode(referralCode)
+    }
+  }, [])
 
   useEffect(() => {
     if (models.length > 0) {

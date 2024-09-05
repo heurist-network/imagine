@@ -3,7 +3,7 @@
 import { useLayoutEffect, useState } from 'react'
 import { motion, useMotionValueEvent, useScroll, Variants } from 'framer-motion'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useDebounceCallback } from 'usehooks-ts'
 
 import { Logo } from '@/components/Logo'
@@ -14,11 +14,19 @@ import { cn } from '@/lib/utils'
 
 export function Header() {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+
   const { scrollY } = useScroll()
   const [isScrollTop, setIsScrollTop] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [maxWidth, setMaxWidth] = useState<string | undefined>()
   const isHomePage = pathname === '/'
+
+  const referralCode = searchParams.get('ref')
+
+  const campaignLink = referralCode
+    ? `/campaign?ref=${referralCode}`
+    : '/campaign'
 
   // 定义滚动阈值
   const threshold = 28
@@ -66,7 +74,7 @@ export function Header() {
 
   return (
     <>
-      <header className="h-20 w-full transition-all z-50">
+      <header className="z-[100] h-20 w-full transition-all">
         <motion.div
           initial="stateA"
           animate={isScrollTop ? 'stateB' : 'stateA'}
@@ -97,8 +105,8 @@ export function Header() {
             <Logo />
           </Link>
           {pathname !== '/campaign' && (
-            <div className="flex-1 hidden justify-center lg:flex">
-              <Link href="/campaign">
+            <div className="hidden flex-1 justify-center lg:flex">
+              <Link href={campaignLink}>
                 <SwapText
                   initialText="Campaign"
                   finalText="Campaign"
@@ -112,7 +120,7 @@ export function Header() {
             </div>
           )}
 
-          <div className="w-[250px] hidden justify-end lg:flex">
+          <div className="hidden w-[250px] justify-end lg:flex">
             <ConnectButton />
           </div>
           <div className="block lg:hidden">
@@ -124,9 +132,9 @@ export function Header() {
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (
-                <span className="h-7 w-7 i-mingcute-close-line" />
+                <span className="i-mingcute-close-line h-7 w-7" />
               ) : (
-                <span className="h-7 w-7 i-mingcute-menu-line" />
+                <span className="i-mingcute-menu-line h-7 w-7" />
               )}
             </div>
           </div>
@@ -142,20 +150,20 @@ export function Header() {
       >
         <div className="flex h-20 items-center justify-end">
           <div
-            className="cursor-pointer flex h-10 text-black w-10 items-center justify-center"
+            className="flex h-10 w-10 cursor-pointer items-center justify-center text-black"
             onClick={() => setIsExpanded(false)}
           >
-            <span className="h-7 w-7 i-mingcute-close-line" />
+            <span className="i-mingcute-close-line h-7 w-7" />
           </div>
         </div>
         <Link
-          className="border-y flex border-y-[rgba(0,0,0,0.1)] h-12 gap-2 items-center"
-          href="/campaign"
+          className="flex h-12 items-center gap-2 border-y border-y-[rgba(0,0,0,0.1)]"
+          href={campaignLink}
           onClick={() => setIsExpanded(false)}
         >
           <span>Campaign</span>
           <div className="flex">
-            <AnimatedGradientText className="py-1 px-2 text-[10px] leading-[12px]">
+            <AnimatedGradientText className="px-2 py-1 text-[10px] leading-[12px]">
               <span
                 className={cn(
                   `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
