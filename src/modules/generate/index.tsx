@@ -217,7 +217,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
     if (!info) return
 
     try {
-      shareOnX(model, info.prompt)
+      shareOnX(info.id, info.prompt)
 
       toast.success('Share on Twitter successfully.')
       await postNotifyAfterMintActions({
