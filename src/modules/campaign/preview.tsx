@@ -311,7 +311,7 @@ export function CampaignPreview() {
             />
             <TextGenerateEffect
               words1ClassName="font-bold"
-              words1="Every zkImagine NFT is carrying rewards. Pool 1 is for everyone. Pool 2 is for top 20 participants."
+              words1="Every zkImagine NFT is carrying rewards. Pool 1 is for everyone. Pool 2 is for top 30 participants."
               words2="Your scores depend on your mint count and social activities. Rewards are claimable at the end of every sprint."
             />
           </div>
