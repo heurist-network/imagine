@@ -255,7 +255,7 @@ export function LeaderboardRow({
           'border-y-[3px] border-y-[#CDF138]': isUser,
         })}
       >
-        {item.mint_count}
+        {item.mint_count || 0}
       </div>
       <div
         className={cn('table-cell border-y bg-[#F8FAFD]/60 pl-4', {
@@ -273,7 +273,7 @@ export function LeaderboardRow({
           },
         )}
       >
-        {item.zk_cashback.toFixed(2)}
+        {item.zk_cashback?.toFixed(2) || '0.0'}
       </div>
     </div>
   )
