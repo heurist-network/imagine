@@ -42,7 +42,7 @@ Payload:
 }
 */
 export const API_NOTIFY_AFTER_MINT_ACTIONS =
-  'https://fkosy3nlq8.execute-api.us-east-1.amazonaws.com/prod/notify-after-mint-actions'
+  'https://github.com/heurist-network/zkimagine-backend/tree/main/c2e-api-action-handler'
 
 export const postNotifyAfterMintActions = async (data: {
   modelId: string
