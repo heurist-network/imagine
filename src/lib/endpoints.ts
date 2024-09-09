@@ -41,8 +41,9 @@ Payload:
   "actionType": "GATEWAY_UPLOAD" / "TWITTER_SHARE"
 }
 */
+// TODO: UPDATE TO USE API
 export const API_NOTIFY_AFTER_MINT_ACTIONS =
-  'https://fkosy3nlq8.execute-api.us-east-1.amazonaws.com/prod/notify-after-mint-actions'
+  'https://2xecufxgx1.execute-api.us-east-1.amazonaws.com/prod/record-user-action'
 
 export const postNotifyAfterMintActions = async (data: {
   modelId: string
