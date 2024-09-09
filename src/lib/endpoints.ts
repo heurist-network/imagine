@@ -41,8 +41,9 @@ Payload:
   "actionType": "GATEWAY_UPLOAD" / "TWITTER_SHARE"
 }
 */
+// TODO: UPDATE TO USE API
 export const API_NOTIFY_AFTER_MINT_ACTIONS =
-  'https://github.com/heurist-network/zkimagine-backend/tree/main/c2e-api-action-handler'
+  'https://2xecufxgx1.execute-api.us-east-1.amazonaws.com/dev/record-user-action'
 
 export const postNotifyAfterMintActions = async (data: {
   modelId: string
