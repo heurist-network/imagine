@@ -43,7 +43,7 @@ Payload:
 */
 // TODO: UPDATE TO USE API
 export const API_NOTIFY_AFTER_MINT_ACTIONS =
-  'https://2xecufxgx1.execute-api.us-east-1.amazonaws.com/dev/record-user-action'
+  'https://2xecufxgx1.execute-api.us-east-1.amazonaws.com/prod/record-user-action'
 
 export const postNotifyAfterMintActions = async (data: {
   modelId: string
