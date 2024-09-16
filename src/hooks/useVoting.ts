@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect } from 'react'
 import axios from 'axios'
 
@@ -18,10 +20,11 @@ export const useVoting = () => {
         BigInt(Math.floor(Math.random() * Number(totalSupply)) + 1),
       )
 
+      // Fetch the metadata for each random image
       const imagePromises = randomTokenIds.map(async (tokenId) => {
         const tokenURI = await fetchTokenURI(tokenId)
-        const response = await axios.get(tokenURI as string)
-        const metadata = response.data
+        const response = await fetch(tokenURI as string)
+        const metadata = await response.json()
 
         return {
           id: tokenId.toString(),

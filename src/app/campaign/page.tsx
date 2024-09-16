@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 
+import { VotingComponent } from '@/components/VotingComponent'
 import { FeatureModel } from '@/modules/campaign/feature-model'
 import { Leaderboard } from '@/modules/campaign/leaderboard'
 import { CampaignPreview } from '@/modules/campaign/preview'
@@ -66,6 +67,7 @@ export default async function NewCampaign() {
     <main className="flex-1">
       <CampaignPreview />
       <CampaignReward />
+      <VotingComponent />
       <Suspense>
         <FeatureModel lists={finalLists} />
       </Suspense>
