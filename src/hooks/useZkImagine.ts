@@ -413,6 +413,41 @@ export const useZkImagine = () => {
     [publicClient, currentMarket, address],
   )
 
+  const fetchTotalSupply = async () => {
+    if (!publicClient || !currentMarket) return
+
+    try {
+      const totalSupply = await publicClient.readContract({
+        address: currentMarket.addresses.ZkImagine,
+        abi: ZkImagineABI,
+        functionName: 'totalSupply',
+      })
+
+      return totalSupply as bigint
+    } catch (error) {
+      console.error('Error reading total supply:', error)
+      return BigInt(0)
+    }
+  }
+
+  const fetchTokenURI = async (tokenId: bigint) => {
+    if (!publicClient || !currentMarket) return
+
+    try {
+      const tokenURI = await publicClient.readContract({
+        address: currentMarket.addresses.ZkImagine,
+        abi: ZkImagineABI,
+        functionName: 'tokenURI',
+        args: [tokenId],
+      })
+
+      return tokenURI as string
+    } catch (error) {
+      console.error('Error reading token URI:', error)
+      return ''
+    }
+  }
+
   if (!chain || !address || !publicClient) {
     return {
       mint: async () => {
@@ -448,6 +483,8 @@ export const useZkImagine = () => {
         throw new Error('Wallet not connected or unsupported chain')
       },
       getReferralFeesEarned: async () => BigInt(0),
+      fetchTotalSupply: async () => BigInt(0),
+      fetchTokenURI: async () => '',
     }
   }
 
@@ -465,6 +502,8 @@ export const useZkImagine = () => {
     readGlobalTimeThreshold,
     claimReferralFee,
     getReferralFeesEarned,
+    fetchTotalSupply,
+    fetchTokenURI,
   }
 }
 
