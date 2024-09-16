@@ -226,6 +226,10 @@ export function FeatureModel({ lists }: { lists: any[] }) {
    */
   const onGenerate = async () => {
     try {
+      // Reset minted and uploaded states
+      setIsMinted(false)
+      setIsUploaded(false)
+
       setResult({ url: '', width: 0, height: 0 })
       setMintUrl('')
 
@@ -271,6 +275,8 @@ export function FeatureModel({ lists }: { lists: any[] }) {
       setOpen(false)
     } finally {
       setLoadingGenerate(false)
+      setLoadingUpload(false)
+      setIsUploaded(false)
       console.log(
         'Refreshed partner NFTs and signature data successfully. Result:',
         {
