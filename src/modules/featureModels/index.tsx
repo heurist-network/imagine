@@ -18,7 +18,8 @@ export async function FeatureModels() {
     (item) =>
       item.type === 'sd15' ||
       item.type === 'sdxl10' ||
-      item.type.includes('composite'),
+      item.type.includes('composite') ||
+      item.type.includes('flux'),
   )
 
   const getModelTag = (type: string): string => {
