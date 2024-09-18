@@ -19,7 +19,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 const title = 'Heurist Imagine'
 const description =
-  'Access Stable Diffusion models provided by a decentralized network of GPUs. Create and reproduce IP without limiation. Showcase your creativity and earn crypto.'
+  'Generate images with AI using a decentralized network of GPUs. Create and reproduce IP without limiation. Showcase your creativity and earn crypto.'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://imagine.heurist.ai'),
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
     url: 'https://imagine.heurist.ai',
     type: 'article',
     images: {
-      url: 'https://imagine.heurist.ai/BlazingDrive.jpg',
-      width: 512,
-      height: 768,
+      url: 'https://imagine.heurist.ai/CoverImage.jpg',
+      width: 1200,
+      height: 630,
       alt: 'Heurist Imagine',
     },
   },
@@ -45,9 +45,9 @@ export const metadata: Metadata = {
     title,
     description,
     images: {
-      url: 'https://imagine.heurist.ai/BlazingDrive.jpg',
-      width: 512,
-      height: 768,
+      url: 'https://imagine.heurist.ai/CoverImage.jpg',
+      width: 1200,
+      height: 630,
       alt: 'Heurist Imagine',
     },
   },
