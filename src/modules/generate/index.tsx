@@ -251,6 +251,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       setShowRecommend(true)
     } else {
       if (search) form.setValue('prompt', search)
+      setModelInfo(nowModel)
     }
 
     form.setValue('width', nowModel.defaults.width)
