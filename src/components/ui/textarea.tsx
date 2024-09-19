@@ -9,6 +9,10 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...props }, ref) => {
     const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
+    React.useEffect(() => {
+      onResize()
+    }, [props.value])
+
     const onResize = () => {
       if (!textareaRef.current) return
       textareaRef.current.style.height = 'auto'
@@ -27,7 +31,9 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           className,
         )}
         ref={textareaRef}
-        onInput={onResize}
+        onInput={() => {
+          onResize()
+        }}
         {...props}
       />
     )
