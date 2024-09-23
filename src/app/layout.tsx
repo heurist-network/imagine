@@ -114,10 +114,10 @@ export default function RootLayout({
         <Providers>
           <div className="bg-[#CDF138]">
             <div className="mx-auto flex h-10 max-w-5xl flex-nowrap items-center justify-center gap-0.5 truncate px-6 text-xs font-medium text-gray-950 md:max-w-[1440px] md:text-sm">
-              <span>🎉 Join ZK Fest: Create AI Art and Earn ZK Tokens.</span>
+              <span>🎉 Heurist x ZKsync Presents: Create AI Art and Earn ZK Tokens</span>
               <Link
                 className="underline"
-                href="https://heuristai.medium.com/heurist-x-zk-fest-presents-where-blockchain-meets-imagination-ed6d86248eb6"
+                href="https://docs.heurist.ai/ecosystem/create-to-earn"
                 target="_blank"
               >
                 Read more here
