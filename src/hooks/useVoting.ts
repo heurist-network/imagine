@@ -23,8 +23,13 @@ export const useVoting = () => {
       // Fetch the metadata for each random image
       const imagePromises = randomTokenIds.map(async (tokenId) => {
         const tokenURI = await fetchTokenURI(tokenId)
+        console.log(tokenURI)
+
         const response = await fetch(tokenURI as string)
+
         const metadata = await response.json()
+
+        console.log(metadata)
 
         return {
           id: tokenId.toString(),

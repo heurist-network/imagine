@@ -5,6 +5,7 @@ import { FeatureModel } from '@/modules/campaign/feature-model'
 import { Leaderboard } from '@/modules/campaign/leaderboard'
 import { CampaignPreview } from '@/modules/campaign/preview'
 import { CampaignReward } from '@/modules/campaign/reward'
+import { VotingModel } from '@/modules/campaign/voting-model'
 
 // Seeded random number generator
 function seededRandom(seed: number) {
@@ -70,6 +71,9 @@ export default async function NewCampaign() {
       <VotingComponent />
       <Suspense>
         <FeatureModel lists={finalLists} />
+      </Suspense>
+      <Suspense>
+        <VotingModel lists={finalLists} />
       </Suspense>
       <Leaderboard />
     </main>
