@@ -68,12 +68,11 @@ export default async function NewCampaign() {
     <main className="flex-1">
       <CampaignPreview />
       <CampaignReward />
-      <VotingComponent />
       <Suspense>
         <FeatureModel lists={finalLists} />
       </Suspense>
       <Suspense>
-        <VotingModel lists={finalLists} />
+        <VotingModel />
       </Suspense>
       <Leaderboard />
     </main>

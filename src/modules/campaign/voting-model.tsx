@@ -1,32 +1,15 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
-import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { formatEther, getAddress, Hash, isAddress } from 'viem'
-import { zksync } from 'viem/chains'
-import { useAccount, useBalance, useClient, useSwitchChain } from 'wagmi'
+import { Hash } from 'viem'
+import { useAccount, useClient, useSwitchChain } from 'wagmi'
 import { z } from 'zod'
 
-import { generateImage, issueToGateway } from '@/app/actions'
-import DiscloseImage from '@/components/magicui/disclose-image'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -36,34 +19,10 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
-import { Slider } from '@/components/ui/slider'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
 import { useZkImagine } from '@/hooks/useZkImagine'
-import {
-  getReferralAddress,
-  postImageGen,
-  postNotifyAfterMintActions,
-} from '@/lib/endpoints'
-import { cn, extractImageId } from '@/lib/utils'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { cn } from '@/lib/utils'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 
 import { useMintToNFT } from '../mintToNFT'
@@ -74,17 +33,6 @@ interface TabProps {
   setSelected: React.Dispatch<React.SetStateAction<string>>
 }
 
-const formSchema = z.object({
-  prompt: z.string().optional(),
-  neg_prompt: z.string().optional(),
-  num_iterations: z.number().min(1).max(50),
-  guidance_scale: z.number().min(1).max(12),
-  width: z.number().min(512).max(1024),
-  height: z.number().min(512).max(1024),
-  seed: z.string().optional(),
-  model: z.string().optional(),
-})
-
 const inter = Inter({ subsets: ['latin'] })
 
 /**
@@ -93,39 +41,7 @@ const inter = Inter({ subsets: ['latin'] })
  */
 
 export function VotingModel() {
-  const searchParams = useSearchParams()
-  const account = useAccount()
-  const { switchChain } = useSwitchChain()
   const client = useClient()
-  const { openConnectModal } = useConnectModal()
-  const {
-    setLoading,
-    referralAddress,
-    setReferralAddress,
-    loading: loadingMintNFT,
-  } = useMintToNFT()
-
-  const {
-    mint,
-    mintFee,
-    discountedFee,
-    signatureFreeMint,
-    partnerFreeMint,
-    globalTimeThreshold,
-  } = useZkImagine()
-  const {
-    canSignatureFreeMint,
-    isLoading: loadingSignatureFreeMint,
-    error: signatureFreeMintError,
-    refreshSignatureData,
-  } = useSignatureFreeMint()
-
-  const {
-    availableNFT,
-    isLoading: loadingPartnerFreeMint,
-    error: partnerFreeMintError,
-    refreshPartnerNFTs,
-  } = usePartnerFreeMint()
 
   /**
    * Shows a success toast with a transaction link.
@@ -151,23 +67,6 @@ export function VotingModel() {
         )}
       </div>,
     )
-  }
-
-  /**
-   * Handles errors that occur during minting
-   * @param {unknown} error - The error that occurred
-   */
-  const handleMintError = (error: unknown) => {
-    if (error instanceof Error) {
-      console.error('Failed to Mint zkImagine NFT:', error)
-      if (error.message.includes('User rejected the request.')) {
-        toast.error('User rejected transaction signature.')
-      } else {
-        toast.error(
-          `Failed to Mint zkImagine NFT: ${error.message}. Please try again later.`,
-        )
-      }
-    }
   }
 
   return (
@@ -204,68 +103,18 @@ export function VotingModel() {
         </div>
 
         {/* TODO: Display 3 images with voting buttons, reference the feature models for image style */}
-        <div className="flex flex-col items-center justify-center">
-          <div className="mt-10 flex flex-row items-center justify-center gap-20">
-            <div
-              className={cn(
-                'relative h-[480px] w-[320px] cursor-pointer overflow-hidden rounded-[8px] border-2 border-[#CDF138] bg-[#CDF138]',
-              )}
-            >
-              <Image
-                src="https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/BlazingDrive-2.jpg"
-                alt="Feature Model 1"
-                width={512}
-                height={768}
-              />
+        <VoteForYourFavoriteImage
+          images={[
+            'https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/BlazingDrive-2.jpg',
+            'https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/BlazingDrive-2.jpg',
+            'https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/BlazingDrive-2.jpg',
+          ]}
+        />
 
-              {/* Select the image button, button under the image */}
-              <div className="absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center">
-                <Button>Select</Button>
-              </div>
-            </div>
-
-            <div
-              className={cn(
-                'relative h-[480px] w-[320px] cursor-pointer overflow-hidden rounded-[8px] border-2 border-[#CDF138] bg-[#CDF138]',
-              )}
-            >
-              <Image
-                src="https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/BlazingDrive-2.jpg"
-                alt="Feature Model 1"
-                width={512}
-                height={768}
-              />
-
-              {/* Select the image button, button under the image */}
-              <div className="absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center">
-                <Button>Select</Button>
-              </div>
-            </div>
-
-            <div
-              className={cn(
-                'relative h-[480px] w-[320px] cursor-pointer overflow-hidden rounded-[8px] border-2 border-[#CDF138] bg-[#CDF138]',
-              )}
-            >
-              <Image
-                src="https://raw.githubusercontent.com/heurist-network/heurist-models/main/examples/BlazingDrive-2.jpg"
-                alt="Feature Model 1"
-                width={512}
-                height={768}
-              />
-
-              {/* Select the image button, button under the image */}
-              <div className="absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center">
-                <Button>Select</Button>
-              </div>
-            </div>
-          </div>
-
-          {/* TODO: Add a button to submit the vote */}
-          <div className="flex flex-row items-center justify-center gap-10">
-            <Button className="mt-10">Vote</Button>
-            <Button className="mt-10">Refresh</Button>
-          </div>
+        {/* TODO: Add a button to submit the vote */}
+        <div className="flex flex-row items-center justify-center gap-10">
+          <Button className="mt-10">Vote</Button>
+          <Button className="mt-10">Refresh</Button>
         </div>
       </div>
     </div>
@@ -378,3 +227,40 @@ const ModelCard: React.FC<ModelCardProps> = ({ item }) => (
     </CardContent>
   </Card>
 )
+interface VoteForYourFavoriteImageProps {
+  images: string[]
+}
+
+const VoteForYourFavoriteImage: React.FC<VoteForYourFavoriteImageProps> = ({
+  images,
+}) => {
+  const [selected, setSelected] = useState<number | null>(null)
+
+  return (
+    <div className="mt-10 grid grid-cols-3 gap-4">
+      {images.map((image, index) => (
+        <div
+          key={index}
+          className={`relative mx-4 cursor-pointer overflow-hidden rounded-lg ${
+            selected === index ? 'ring-2 ring-blue-500' : ''
+          }`}
+          onClick={() => setSelected(index)}
+        >
+          <Image
+            src={image}
+            alt={`Image ${index + 1}`}
+            width={300}
+            height={300}
+            objectFit="cover"
+            className="h-auto w-full"
+          />
+          {selected === index && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+              <span className="text-2xl font-bold text-white">Selected</span>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
