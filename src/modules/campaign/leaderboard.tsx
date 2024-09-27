@@ -110,7 +110,7 @@ export function Leaderboard() {
               <div className="min-w-[200px] pl-4 table-cell">Mint Count</div>
               <div className="min-w-[200px] pl-4 table-cell">Imagine Score</div>
               <div className="min-w-[200px] pl-4 table-cell">
-                ZK Token Rewords
+                ZK Token Rewards
               </div>
             </div>
             {/* User's rank (if available) */}

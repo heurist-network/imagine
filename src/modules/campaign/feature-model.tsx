@@ -54,6 +54,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
+import { Textarea } from '@/components/ui/textarea'
 import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
 import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
 import { useZkImagine } from '@/hooks/useZkImagine'
@@ -226,6 +227,10 @@ export function FeatureModel({ lists }: { lists: any[] }) {
    */
   const onGenerate = async () => {
     try {
+      // Reset minted and uploaded states
+      setIsMinted(false)
+      setIsUploaded(false)
+
       setResult({ url: '', width: 0, height: 0 })
       setMintUrl('')
 
@@ -271,6 +276,8 @@ export function FeatureModel({ lists }: { lists: any[] }) {
       setOpen(false)
     } finally {
       setLoadingGenerate(false)
+      setLoadingUpload(false)
+      setIsUploaded(false)
       console.log(
         'Refreshed partner NFTs and signature data successfully. Result:',
         {
@@ -797,10 +804,11 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                           Prompt
                         </FormLabel>
                         <FormControl>
-                          <Input
+                          <Textarea
                             className="'SF_Mono'] rounded-[6px] text-black"
                             placeholder="Prompt"
                             autoComplete="off"
+                            rows={3}
                             {...field}
                           />
                         </FormControl>
@@ -847,10 +855,11 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                           Prompt
                         </FormLabel>
                         <FormControl>
-                          <Input
+                          <Textarea
                             className="rounded-[6px] text-black"
                             placeholder="Prompt"
                             autoComplete="off"
+                            rows={3}
                             {...field}
                           />
                         </FormControl>
@@ -867,10 +876,11 @@ export function FeatureModel({ lists }: { lists: any[] }) {
                           Negative Prompt
                         </FormLabel>
                         <FormControl>
-                          <Input
+                          <Textarea
                             className="rounded-[6px] text-black"
                             placeholder="Negative Prompt"
                             autoComplete="off"
+                            rows={3}
                             {...field}
                           />
                         </FormControl>

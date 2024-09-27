@@ -21,7 +21,8 @@ export async function Hero() {
     (item) =>
       item.type === 'sd15' ||
       item.type === 'sdxl10' ||
-      item.type.includes('composite'),
+      item.type.includes('composite') ||
+      item.type.includes('flux'),
   )
 
   return (

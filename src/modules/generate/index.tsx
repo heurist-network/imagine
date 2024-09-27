@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
+import { Textarea } from '@/components/ui/textarea'
 import { postNotifyAfterMintActions } from '@/lib/endpoints'
 import { shareOnX } from '@/lib/share'
 import { cn, extractImageId } from '@/lib/utils'
@@ -251,6 +252,7 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
       setShowRecommend(true)
     } else {
       if (search) form.setValue('prompt', search)
+      setModelInfo(nowModel)
     }
 
     form.setValue('width', nowModel.defaults.width)
@@ -288,11 +290,11 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                 />
               </div>
             </AlertDialogTrigger>
-            <AlertDialogContent>
+            <AlertDialogContent className="z-[100]">
               <AlertDialogHeader>
                 <AlertDialogTitle>Prompt</AlertDialogTitle>
                 <AlertDialogDescription asChild>
-                  <div className="whitespace-pre-wrap text-left">
+                  <div className="max-h-[calc(100vh-20rem)] overflow-y-auto whitespace-pre-wrap text-left">
                     {JSON.stringify(item.data, null, 2)}
                   </div>
                 </AlertDialogDescription>
@@ -335,7 +337,12 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                 </FormLabel>
                 <FormControl>
                   <div>
-                    <Input placeholder="Prompt" autoComplete="off" {...field} />
+                    <Textarea
+                      placeholder="Prompt"
+                      autoComplete="off"
+                      rows={3}
+                      {...field}
+                    />
                     <div className="mt-2 text-right">
                       <a
                         href="https://ai-image-prompt-creator.vercel.app/"
@@ -371,9 +378,10 @@ export default function Generate({ model, models, isXl }: GenerateProps) {
                     </Tooltip>
                   </FormLabel>
                   <FormControl>
-                    <Input
+                    <Textarea
                       placeholder="Negative Prompt"
                       autoComplete="off"
+                      rows={3}
                       {...field}
                     />
                   </FormControl>

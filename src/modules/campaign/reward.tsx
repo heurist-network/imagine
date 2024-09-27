@@ -532,7 +532,7 @@ export function CampaignReward() {
                   Generate and Mint
                 </div>
                 <div className="font-SFMono text-[14px] leading-[1.125] text-white/90 xl:text-[16px]">
-                  Mint fee is 0.0006 ETH on ZKsync Era. Partner NFT holders and
+                  Mint fee is 0.001 ETH on ZKsync Era. Partner NFT holders and
                   selected Heurist community members get one chance of free mint
                   per day. Gasless free mint is powered by Zyfi.
                 </div>
