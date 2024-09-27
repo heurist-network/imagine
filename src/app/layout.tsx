@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast'
 import { Inter } from 'next/font/google'
 import localFont from 'next/font/local'
 import Link from 'next/link'
+import Script from 'next/script'
 import type { Metadata, Viewport } from 'next'
 
 import { env } from '@/env.mjs'
@@ -101,15 +102,29 @@ const SFMono = localFont({
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID
   return (
     <html lang="en" className={cn(inter.className, SFMono.variable)}>
-      {!!(env.UMAMI_URL && env.UMAMI_WEBSITE_ID) && (
-        <script
-          async
-          src={env.UMAMI_URL}
-          data-website-id={env.UMAMI_WEBSITE_ID}
+      <head>
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
         />
-      )}
+        <Script
+          id="gtag-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GA_TRACKING_ID}', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-screen">
         <Providers>
           <div className="bg-[#CDF138]">
