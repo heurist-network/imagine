@@ -5,10 +5,8 @@ import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
 import { Inter } from 'next/font/google'
 import Image from 'next/image'
-import { useSearchParams } from 'next/navigation'
 import { Hash } from 'viem'
-import { useAccount, useClient, useSwitchChain } from 'wagmi'
-import { z } from 'zod'
+import { useClient } from 'wagmi'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -19,13 +17,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
-import { usePartnerFreeMint } from '@/hooks/usePartnerFreeMint'
-import { useSignatureFreeMint } from '@/hooks/useSignatureFreeMint'
-import { useZkImagine } from '@/hooks/useZkImagine'
 import { cn } from '@/lib/utils'
-import { useConnectModal } from '@rainbow-me/rainbowkit'
-
-import { useMintToNFT } from '../mintToNFT'
 
 interface TabProps {
   text: string

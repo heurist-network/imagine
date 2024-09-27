@@ -1,6 +1,5 @@
 import { Suspense } from 'react'
 
-import { VotingComponent } from '@/components/VotingComponent'
 import { FeatureModel } from '@/modules/campaign/feature-model'
 import { Leaderboard } from '@/modules/campaign/leaderboard'
 import { CampaignPreview } from '@/modules/campaign/preview'
